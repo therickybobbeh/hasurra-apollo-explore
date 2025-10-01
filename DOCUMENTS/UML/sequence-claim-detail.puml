@@ -1,0 +1,76 @@
+@startuml Claim Detail and Add Note Sequence
+title ClaimSight - View Claim Detail & Add Note
+
+actor User
+participant "React\nClaimDetail" as React
+participant "Apollo\nClient" as Apollo
+participant "Hasura\nGraphQL" as Hasura
+participant "PostgreSQL\nRLS" as DB
+
+== Load Claim Detail ==
+
+User -> React: Navigate to /claims/:id
+activate React
+
+React -> Apollo: query GET_CLAIM(id)
+activate Apollo
+
+Apollo -> Hasura: POST /v1/graphql\n+ x-hasura-role header
+activate Hasura
+
+Hasura -> DB: SELECT claims WHERE id = :id\n+ RLS filters
+activate DB
+
+DB -> Hasura: claim data
+deactivate DB
+
+Hasura -> Apollo: { claim, member, provider, notes }
+deactivate Hasura
+
+Apollo -> Apollo: Cache result
+Apollo -> React: Query data
+deactivate Apollo
+
+React -> User: Render claim details & notes
+deactivate React
+
+== Add Note (with Optimistic Update) ==
+
+User -> React: Type note and click "Add Note"
+activate React
+
+React -> Apollo: mutation ADD_NOTE(memberId, body)\n+ optimisticResponse
+activate Apollo
+
+Apollo -> Apollo: Update cache optimistically
+Apollo -> React: Optimistic data
+React -> User: Show note immediately
+deactivate React
+
+Apollo -> Hasura: POST /v1/graphql\ninsert_notes_one
+activate Hasura
+
+Hasura -> DB: INSERT INTO notes\nWHERE member_id = x-hasura-user-id
+activate DB
+
+note right of DB
+  RLS policy checks:
+  member can only insert
+  notes for themselves
+end note
+
+DB -> Hasura: new note record
+deactivate DB
+
+Hasura -> Apollo: { insert_notes_one: note }
+deactivate Hasura
+
+Apollo -> Apollo: Replace optimistic data\nwith real data
+Apollo -> React: Confirmed data
+activate React
+
+React -> User: Note confirmed
+deactivate React
+deactivate Apollo
+
+@enduml

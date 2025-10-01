@@ -1,0 +1,63 @@
+table:
+  name: claims
+  schema: public
+object_relationships:
+  - name: member
+    using:
+      foreign_key_constraint_on: member_id
+  - name: provider
+    using:
+      foreign_key_constraint_on: provider_id
+select_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+  - role: member
+    permission:
+      columns:
+        - id
+        - member_id
+        - provider_id
+        - dos
+        - cpt
+        - charge_cents
+        - allowed_cents
+        - status
+        - denial_reason
+        - created_at
+        - updated_at
+      filter:
+        member_id:
+          _eq: X-Hasura-User-Id
+  - role: provider
+    permission:
+      columns:
+        - id
+        - member_id
+        - provider_id
+        - dos
+        - cpt
+        - charge_cents
+        - allowed_cents
+        - status
+        - denial_reason
+        - created_at
+        - updated_at
+      filter:
+        provider_id:
+          _eq: X-Hasura-Provider-Id
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: '*'
+update_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}

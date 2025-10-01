@@ -1,0 +1,42 @@
+{
+  "name": "claimsight",
+  "version": "1.0.0",
+  "description": "Cross-platform GraphQL learning application with Hasura, Apollo, and PromptQL",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node ./scripts/run-plat.js setup",
+    "seed": "node ./scripts/run-plat.js seed",
+    "hasura:apply": "node ./scripts/run-plat.js hasura",
+    "dev": "node ./scripts/run-plat.js dev",
+    "action:dev": "tsx watch hasura/actions/handlers/eligibility.mock.ts",
+    "client:dev": "cd app/client && npm run dev",
+    "subgraph:dev": "cd app/server && npm run dev",
+    "all:dev": "concurrently -n \"action,client,subgraph\" -c \"blue,green,yellow\" \"npm run action:dev\" \"npm run client:dev\" \"npm run subgraph:dev\""
+  },
+  "keywords": [
+    "graphql",
+    "hasura",
+    "apollo",
+    "promptql",
+    "healthcare",
+    "claims"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "concurrently": "^9.0.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

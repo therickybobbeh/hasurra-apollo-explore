@@ -1,0 +1,40 @@
+@startuml ClaimSight Component Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title ClaimSight - Component Diagram
+
+Container_Boundary(frontend, "Frontend Application") {
+    Component(react_app, "React SPA", "React + TypeScript", "User interface for claims management")
+    Component(apollo_client, "Apollo Client", "GraphQL Client", "Manages data fetching and caching")
+    Component(router, "React Router", "Routing", "Client-side navigation")
+}
+
+Container_Boundary(backend, "Backend Services") {
+    Component(hasura, "Hasura GraphQL Engine", "GraphQL Server", "Auto-generated GraphQL API with RLS")
+    Component(action_handler, "Action Handler", "Node.js/Express", "Custom business logic for eligibility checks")
+    Component(subgraph, "Federation Subgraph", "Apollo Server", "Provider ratings extension (optional)")
+}
+
+Container_Boundary(data, "Data Layer") {
+    ComponentDb(postgres, "PostgreSQL", "Relational Database", "Members, providers, claims, notes")
+}
+
+Rel(react_app, apollo_client, "Uses", "React Hooks")
+Rel(react_app, router, "Uses", "Routes")
+Rel(apollo_client, hasura, "Queries/Mutations/Subscriptions", "GraphQL/WebSocket")
+Rel(hasura, postgres, "Queries", "SQL")
+Rel(hasura, action_handler, "Calls", "HTTP/REST")
+Rel(action_handler, postgres, "Writes", "SQL")
+
+note right of hasura
+  Row-Level Security enforces
+  role-based access at DB level
+end note
+
+note right of apollo_client
+  Split link routes:
+  - Queries/Mutations → HTTP
+  - Subscriptions → WebSocket
+end note
+
+@enduml

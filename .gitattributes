@@ -1,0 +1,35 @@
+# Normalize line endings to LF on commit, allow local checkout as-is
+* text=auto eol=lf
+
+# Ensure shell scripts always have LF (even on Windows)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# PowerShell scripts can use CRLF on Windows
+*.ps1 text eol=crlf
+
+# Explicitly declare text files
+*.md text
+*.json text
+*.yml text
+*.yaml text
+*.sql text
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.css text
+*.html text
+*.graphql text
+*.puml text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

@@ -1,0 +1,7 @@
+version: 3
+endpoint: http://localhost:8080
+metadata_directory: metadata
+actions:
+  kind: synchronous
+  handler_webhook_baseurl: http://localhost:3001
+admin_secret: claimsight_admin_secret_change_me

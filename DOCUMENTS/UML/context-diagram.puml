@@ -1,0 +1,22 @@
+@startuml ClaimSight Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title ClaimSight - System Context Diagram
+
+Person(member, "Member/Patient", "Health plan member viewing claims and eligibility")
+Person(provider, "Healthcare Provider", "Doctor/hospital submitting and viewing claims")
+Person(admin, "Claims Administrator", "Manages all claims and member data")
+
+System(claimsight, "ClaimSight", "Healthcare claims management and eligibility verification system")
+
+System_Ext(postgres, "PostgreSQL Database", "Persistent data storage")
+System_Ext(eligibility_api, "Eligibility Verification API", "External payer eligibility service (mock)")
+
+Rel(member, claimsight, "Views claims, checks eligibility, adds notes", "HTTPS/GraphQL")
+Rel(provider, claimsight, "Views claims for patients", "HTTPS/GraphQL")
+Rel(admin, claimsight, "Manages all data", "HTTPS/GraphQL")
+
+Rel(claimsight, postgres, "Reads/writes data", "TCP/SQL")
+Rel(claimsight, eligibility_api, "Verifies member eligibility", "HTTPS/REST")
+
+@enduml

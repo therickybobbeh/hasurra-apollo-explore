@@ -1,0 +1,42 @@
+{
+  "ratings": {
+    "provider-1": {
+      "rating": 4.5,
+      "ratingCount": 127,
+      "reviews": [
+        {
+          "id": "r1",
+          "providerId": "provider-1",
+          "rating": 5,
+          "comment": "Excellent care, very thorough",
+          "date": "2024-01-15"
+        },
+        {
+          "id": "r2",
+          "providerId": "provider-1",
+          "rating": 4,
+          "comment": "Good doctor, long wait times",
+          "date": "2024-01-20"
+        }
+      ]
+    },
+    "provider-2": {
+      "rating": 4.8,
+      "ratingCount": 89,
+      "reviews": [
+        {
+          "id": "r3",
+          "providerId": "provider-2",
+          "rating": 5,
+          "comment": "Amazing specialist",
+          "date": "2024-02-01"
+        }
+      ]
+    },
+    "provider-3": {
+      "rating": 3.9,
+      "ratingCount": 45,
+      "reviews": []
+    }
+  }
+}

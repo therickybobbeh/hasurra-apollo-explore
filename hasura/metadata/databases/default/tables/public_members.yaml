@@ -1,0 +1,77 @@
+table:
+  name: members
+  schema: public
+array_relationships:
+  - name: claims
+    using:
+      foreign_key_constraint_on:
+        column: member_id
+        table:
+          name: claims
+          schema: public
+  - name: eligibility_checks
+    using:
+      foreign_key_constraint_on:
+        column: member_id
+        table:
+          name: eligibility_checks
+          schema: public
+  - name: notes
+    using:
+      foreign_key_constraint_on:
+        column: member_id
+        table:
+          name: notes
+          schema: public
+select_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+  - role: member
+    permission:
+      columns:
+        - id
+        - first_name
+        - last_name
+        - dob
+        - plan
+        - created_at
+        - updated_at
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+  - role: provider
+    permission:
+      columns:
+        - id
+        - first_name
+        - last_name
+        - dob
+        - plan
+      filter:
+        claims:
+          provider_id:
+            _eq: X-Hasura-Provider-Id
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: '*'
+update_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+  - role: member
+    permission:
+      columns:
+        - first_name
+        - last_name
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}

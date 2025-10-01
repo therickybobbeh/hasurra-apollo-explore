@@ -1,0 +1,47 @@
+@startuml ClaimSight Deployment Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+title ClaimSight - Deployment Diagram (No Docker)
+
+Deployment_Node(dev_machine, "Developer Machine", "Windows/macOS/Linux") {
+
+    Deployment_Node(browser, "Web Browser", "Chrome/Firefox/Edge") {
+        Container(spa, "React SPA", "JavaScript/TypeScript", "Port 5173 (Vite dev server)")
+    }
+
+    Deployment_Node(node_runtime, "Node.js 18+", "Runtime Environment") {
+        Container(action_server, "Action Handler", "Express", "Port 3001")
+        Container(subgraph_server, "Subgraph", "Apollo Server", "Port 3002")
+    }
+
+    Deployment_Node(hasura_binary, "Hasura CLI", "Standalone Binary") {
+        Container(hasura_console, "Hasura Console", "Web UI", "Port 8080/console")
+        Container(hasura_graphql, "GraphQL Engine", "API Server", "Port 8080/v1/graphql")
+    }
+
+    Deployment_Node(postgres_service, "PostgreSQL 15+", "Database Server") {
+        ContainerDb(database, "claimsight DB", "SQL Database", "Port 5432")
+    }
+}
+
+Rel(spa, hasura_graphql, "GraphQL Queries", "HTTP/WS")
+Rel(hasura_graphql, action_server, "Action Calls", "HTTP")
+Rel(hasura_graphql, database, "SQL Queries", "TCP")
+Rel(action_server, database, "Direct Writes", "TCP")
+
+note right of dev_machine
+  **Cross-Platform Setup:**
+  - No Docker required
+  - Native PostgreSQL install
+  - Hasura binary or Cloud
+  - All scripts work on Windows, macOS, Linux
+
+  **Ports:**
+  - 5173: Vite dev server
+  - 3001: Action handler
+  - 3002: Subgraph (optional)
+  - 8080: Hasura GraphQL
+  - 5432: PostgreSQL
+end note
+
+@enduml

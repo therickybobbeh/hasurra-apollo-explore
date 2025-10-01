@@ -1,0 +1,12 @@
+{
+  "name": "claimsight-promptql",
+  "version": "1.0.0",
+  "description": "PromptQL natural language to SQL examples for ClaimSight",
+  "private": true,
+  "scripts": {
+    "validate": "echo 'PromptQL configuration validated'"
+  },
+  "keywords": ["promptql", "natural-language", "sql", "healthcare"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,60 @@
+table:
+  name: providers
+  schema: public
+array_relationships:
+  - name: claims
+    using:
+      foreign_key_constraint_on:
+        column: provider_id
+        table:
+          name: claims
+          schema: public
+select_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+  - role: member
+    permission:
+      columns:
+        - id
+        - npi
+        - name
+        - specialty
+      filter:
+        claims:
+          member_id:
+            _eq: X-Hasura-User-Id
+  - role: provider
+    permission:
+      columns:
+        - id
+        - npi
+        - name
+        - specialty
+        - created_at
+        - updated_at
+      filter:
+        id:
+          _eq: X-Hasura-Provider-Id
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: '*'
+update_permissions:
+  - role: admin
+    permission:
+      columns: '*'
+      filter: {}
+  - role: provider
+    permission:
+      columns:
+        - name
+      filter:
+        id:
+          _eq: X-Hasura-Provider-Id
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}

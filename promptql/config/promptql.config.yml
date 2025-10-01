@@ -1,0 +1,157 @@
+# PromptQL Configuration
+# Natural language to SQL query engine configuration
+
+database:
+  type: postgresql
+  connection:
+    host: ${PGHOST}
+    port: ${PGPORT}
+    database: ${PGDATABASE}
+    user: ${PGUSER}
+    password: ${PGPASSWORD}
+
+# Alternative: Use GraphQL endpoint
+# graphql:
+#   endpoint: ${HASURA_GRAPHQL_ENDPOINT}/v1/graphql
+#   admin_secret: ${HASURA_GRAPHQL_ADMIN_SECRET}
+
+# Schema information for better query generation
+schema:
+  tables:
+    - name: members
+      description: Health plan members and patients
+      columns:
+        - name: id
+          type: uuid
+        - name: first_name
+          type: text
+        - name: last_name
+          type: text
+        - name: dob
+          type: date
+          description: Date of birth
+        - name: plan
+          type: text
+          description: "Insurance plan type: PPO, HMO, EPO, POS, HDHP"
+
+    - name: providers
+      description: Healthcare providers (doctors, hospitals, clinics)
+      columns:
+        - name: id
+          type: uuid
+        - name: npi
+          type: text
+          description: National Provider Identifier
+        - name: name
+          type: text
+        - name: specialty
+          type: text
+          description: Medical specialty
+
+    - name: claims
+      description: Medical claims for services rendered
+      columns:
+        - name: id
+          type: uuid
+        - name: member_id
+          type: uuid
+          foreign_key: members.id
+        - name: provider_id
+          type: uuid
+          foreign_key: providers.id
+        - name: dos
+          type: date
+          description: Date of service
+        - name: cpt
+          type: text
+          description: Current Procedural Terminology code
+        - name: charge_cents
+          type: integer
+          description: Amount charged in cents
+        - name: allowed_cents
+          type: integer
+          description: Amount allowed by insurance in cents
+        - name: status
+          type: text
+          description: "Claim status: PAID, DENIED, PENDING"
+        - name: denial_reason
+          type: text
+          description: Reason for claim denial
+
+    - name: notes
+      description: Case management notes for members
+      columns:
+        - name: id
+          type: uuid
+        - name: member_id
+          type: uuid
+          foreign_key: members.id
+        - name: created_at
+          type: timestamptz
+        - name: body
+          type: text
+          description: Note content
+      full_text_search:
+        - body
+
+    - name: eligibility_checks
+      description: Member eligibility verification results
+      columns:
+        - name: id
+          type: uuid
+        - name: member_id
+          type: uuid
+          foreign_key: members.id
+        - name: checked_at
+          type: timestamptz
+        - name: result
+          type: jsonb
+          description: Eligibility check result data
+
+# Common business terms mapping
+glossary:
+  - term: "PA"
+    expansion: "Prior Authorization"
+    related_columns:
+      - notes.body
+      - claims.denial_reason
+
+  - term: "step therapy"
+    description: "Insurance requirement to try lower-cost drugs before higher-cost alternatives"
+    related_columns:
+      - notes.body
+      - claims.denial_reason
+
+  - term: "allowed amount"
+    description: "Maximum amount insurance will pay for a service"
+    column: claims.allowed_cents
+
+  - term: "denial"
+    description: "Claim rejected by insurance"
+    filter:
+      table: claims
+      column: status
+      value: DENIED
+
+# Example prompts and patterns
+prompt_patterns:
+  - pattern: "top {n} denial reasons"
+    template: |
+      SELECT denial_reason, COUNT(*) as count
+      FROM claims
+      WHERE status = 'DENIED'
+      GROUP BY denial_reason
+      ORDER BY count DESC
+      LIMIT {n}
+
+  - pattern: "members with {condition}"
+    template: |
+      SELECT m.*
+      FROM members m
+      JOIN claims c ON c.member_id = m.id
+      WHERE {condition}
+
+output:
+  format: json
+  include_sql: true
+  pretty_print: true

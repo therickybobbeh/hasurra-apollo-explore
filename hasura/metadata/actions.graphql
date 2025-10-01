@@ -1,0 +1,14 @@
+type Mutation {
+  submitEligibilityCheck(
+    memberId: uuid!
+  ): eligibility_checks
+}
+
+type EligibilityResult {
+  eligible: Boolean!
+  plan_active: Boolean!
+  coverage_start: String!
+  coverage_end: String!
+  deductible_remaining: Int!
+  oop_max_remaining: Int!
+}
