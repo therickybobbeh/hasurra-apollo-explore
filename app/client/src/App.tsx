@@ -1,13 +1,13 @@
 import { ApolloProvider } from '@apollo/client';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { apolloClient, getCurrentRole } from './apollo/client';
+import { apolloClient } from './apollo/client';
+import { RoleProvider } from './context/RoleContext';
+import { RoleSwitcher } from './components/RoleSwitcher';
 import { ClaimsList } from './components/ClaimsList';
 import { ClaimDetail } from './components/ClaimDetail';
 import { EligibilityPanel } from './components/EligibilityPanel';
 
 function Layout({ children }: { children: React.ReactNode }) {
-  const role = getCurrentRole();
-
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow-sm">
@@ -25,9 +25,7 @@ function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </div>
             <div className="flex items-center">
-              <span className="text-sm text-gray-600">
-                Role: <span className="font-semibold">{role}</span>
-              </span>
+              <RoleSwitcher />
             </div>
           </div>
         </div>
@@ -42,17 +40,19 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <ApolloProvider client={apolloClient}>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<ClaimsList />} />
-            <Route path="/claims/:id" element={<ClaimDetail />} />
-            <Route path="/eligibility" element={<EligibilityPanel />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </ApolloProvider>
+    <RoleProvider>
+      <ApolloProvider client={apolloClient}>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<ClaimsList />} />
+              <Route path="/claims/:id" element={<ClaimDetail />} />
+              <Route path="/eligibility" element={<EligibilityPanel />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </ApolloProvider>
+    </RoleProvider>
   );
 }
 

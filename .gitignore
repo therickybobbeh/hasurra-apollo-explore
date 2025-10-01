@@ -66,5 +66,14 @@ hasura/config.yaml
 *.sqlite
 *.sqlite3
 
+# Docker volumes (keep containers stateless for lab reset)
+postgres-data/
+hasura-data/
+
+# Lab state - keep fresh for new learners
+# Users should be able to clone and start from scratch
+hasura/migrations/*/
+!hasura/migrations/.gitkeep
+
 # Misc
 .cache/

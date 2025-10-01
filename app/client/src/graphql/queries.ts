@@ -3,6 +3,7 @@ import {
   CLAIM_CORE_FRAGMENT,
   CLAIM_DETAIL_FRAGMENT,
   MEMBER_FRAGMENT,
+  PROVIDER_FRAGMENT,
   NOTE_FRAGMENT,
   ELIGIBILITY_CHECK_FRAGMENT
 } from './fragments';
@@ -42,12 +43,12 @@ export const GET_CLAIMS = gql`
 export const GET_CLAIM = gql`
   ${CLAIM_DETAIL_FRAGMENT}
   ${NOTE_FRAGMENT}
-  query GetClaim($id: uuid!) {
+  query GetClaim($id: uuid!, $memberId: uuid!) {
     claims_by_pk(id: $id) {
       ...ClaimDetailFields
     }
     notes(
-      where: { member_id: { _eq: $member_id } }
+      where: { member_id: { _eq: $memberId } }
       order_by: { created_at: desc }
       limit: 10
     ) {

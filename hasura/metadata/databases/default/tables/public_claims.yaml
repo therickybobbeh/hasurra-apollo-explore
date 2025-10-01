@@ -9,10 +9,6 @@ object_relationships:
     using:
       foreign_key_constraint_on: provider_id
 select_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
   - role: member
     permission:
       columns:
@@ -30,6 +26,7 @@ select_permissions:
       filter:
         member_id:
           _eq: X-Hasura-User-Id
+      allow_aggregations: true
   - role: provider
     permission:
       columns:
@@ -47,17 +44,7 @@ select_permissions:
       filter:
         provider_id:
           _eq: X-Hasura-Provider-Id
-insert_permissions:
-  - role: admin
-    permission:
-      check: {}
-      columns: '*'
-update_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
-delete_permissions:
-  - role: admin
-    permission:
-      filter: {}
+      allow_aggregations: true
+insert_permissions: []
+update_permissions: []
+delete_permissions: []

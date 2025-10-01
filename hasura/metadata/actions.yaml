@@ -2,31 +2,14 @@ actions:
   - name: submitEligibilityCheck
     definition:
       kind: synchronous
-      handler: '{{ACTION_HANDLER_URL}}/eligibility'
+      handler: http://host.docker.internal:3001/eligibility
       forward_client_headers: true
-      headers:
-        - name: x-hasura-action-secret
-          value_from_env: HASURA_ACTION_SECRET
     permissions:
-      - role: admin
       - role: member
     comment: Submits a member eligibility check to external verification service
 custom_types:
   enums: []
   input_objects: []
   objects:
-    - name: EligibilityResult
-      fields:
-        - name: eligible
-          type: Boolean!
-        - name: plan_active
-          type: Boolean!
-        - name: coverage_start
-          type: String!
-        - name: coverage_end
-          type: String!
-        - name: deductible_remaining
-          type: Int!
-        - name: oop_max_remaining
-          type: Int!
+    - name: EligibilityCheckOutput
   scalars: []

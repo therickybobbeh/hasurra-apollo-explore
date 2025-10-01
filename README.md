@@ -2,7 +2,7 @@
 
 **Cross-platform healthcare claims management system** built with GraphQL, Hasura, Apollo Client, and PromptQL.
 
-A comprehensive learning application that teaches modern GraphQL development **without Docker**, working identically on Windows, macOS, and Linux.
+A comprehensive learning application that teaches modern GraphQL development with **optional Docker** for PostgreSQL, working identically on Windows, macOS, and Linux.
 
 ## Features
 
@@ -15,6 +15,7 @@ A comprehensive learning application that teaches modern GraphQL development **w
 - ✅ **Apollo Federation** - Optional provider ratings subgraph
 - ✅ **PromptQL Examples** - Natural language to SQL query concepts
 - ✅ **Cross-Platform** - Native setup for Windows, macOS, Linux (no Docker)
+- ✅ **Learning Challenges** - 12+ hands-on exercises from beginner to expert
 
 ## Tech Stack
 
@@ -29,11 +30,13 @@ A comprehensive learning application that teaches modern GraphQL development **w
 
 ## Quick Start
 
+> **📘 Windows Users**: For a complete Docker-free setup using Hasura Cloud and native PostgreSQL, see the dedicated **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** with step-by-step instructions for PowerShell, PostgreSQL installation, and cloud deployment.
+
 ### Prerequisites
 
 **All Platforms:**
 - Node.js 18+ ([nodejs.org](https://nodejs.org/))
-- PostgreSQL 15+ ([postgresql.org](https://www.postgresql.org/download/))
+- PostgreSQL 15+ ([postgresql.org](https://www.postgresql.org/download/)) **OR** Docker for containerized PostgreSQL
 - Hasura CLI (installed via npm during setup)
 
 **Platform-Specific:**
@@ -106,10 +109,21 @@ PGPASSWORD=claimsight_dev
 PGDATABASE=claimsight
 ```
 
-**Step 2: Create Database**
+**Step 2: Start PostgreSQL**
 
+**Option A: Using Docker (Easiest)**
+```bash
+docker-compose up -d
+```
+
+This starts PostgreSQL 15 in a container with the database already created.
+
+**Option B: Local PostgreSQL**
 ```bash
 # Windows (if psql in PATH)
+createdb claimsight
+
+# macOS/Linux
 createdb claimsight
 
 # Or use pgAdmin, DBeaver, or another GUI tool
@@ -241,35 +255,36 @@ claimsight/
 
 ## Usage Examples
 
-### Testing Different Roles
+### Testing Different Roles with Role Switcher
 
-**Admin (Full Access):**
+The frontend includes a **role switcher dropdown** in the top-right corner that allows you to switch between different users/roles without restarting the app.
+
+**Pre-configured test users:**
+- 🟣 **Admin User** - Full access to all data
+- 🔵 **Member: Michael Lopez** - Only sees own claims (8 claims)
+- 🔵 **Member: Linda Davis** - Only sees own claims (6 claims)
+- 🟢 **Provider: Dr. Smith** - Only sees claims where they're the provider
+
+Click the dropdown, select a user, and the page will reload with new permissions applied.
+
+**Note:** Test users are hardcoded in `app/client/src/init.ts` and `app/client/src/context/RoleContext.tsx` as a fallback. The app first tries to load from `VITE_TEST_USERS` in `.env`, then falls back to hardcoded values.
+
+**To add custom test users**, either:
+1. Update `VITE_TEST_USERS` in `.env` (recommended for temporary changes)
+2. Update hardcoded users in `init.ts` and `RoleContext.tsx` (recommended for permanent changes)
+
 ```bash
-# In .env
-VITE_DEV_ROLE=admin
+# Get IDs from database
+docker exec claimsight-postgres psql -U claimsight -c \
+  "SELECT id, first_name, last_name FROM members WHERE id IN (
+    SELECT DISTINCT member_id FROM claims
+  ) LIMIT 5;"
+
+# Add to .env as JSON array
+VITE_TEST_USERS=[{"role":"member","label":"Member: Jane Doe","memberId":"uuid-here"}]
 ```
 
-**Member (Own Data Only):**
-```bash
-# Get a member ID from database
-psql -d claimsight -c "SELECT id, first_name, last_name FROM members LIMIT 1;"
-
-# In .env
-VITE_DEV_ROLE=member
-VITE_DEV_MEMBER_ID=<uuid-from-query>
-```
-
-**Provider (Patient Data Only):**
-```bash
-# Get a provider ID from database
-psql -d claimsight -c "SELECT id, name FROM providers LIMIT 1;"
-
-# In .env
-VITE_DEV_ROLE=provider
-VITE_DEV_PROVIDER_ID=<uuid-from-query>
-```
-
-Restart the frontend to apply changes.
+See [ROLE_SWITCHER.md](DOCUMENTS/ROLE_SWITCHER.md) for detailed documentation.
 
 ### GraphQL Examples
 
@@ -334,15 +349,43 @@ Follow the [LEARNING_CHECKLIST.md](DOCUMENTS/LEARNING_CHECKLIST.md) for a struct
 6. **Advanced Features** (45 min) - Fragments, federation, PromptQL
 7. **Customize & Extend** - Build your own features
 
+Then test your skills with [CHALLENGES.md](DOCUMENTS/CHALLENGES.md):
+- 🟢 **Beginner** (3 challenges) - GraphQL queries, mutations, relationships
+- 🟡 **Intermediate** (7 challenges) - RLS, custom actions, optimistic updates, note CRUD
+- 🔴 **Advanced** (3 challenges) - Federation, subscriptions, performance
+- 🟣 **Expert** (3 challenges) - Multi-tenant security, N+1 problem, full features
+
+**New!** Verify your solutions with automated tests:
+```bash
+npm run test:progress    # Check your progress
+npm run test:progress 1  # Test specific challenge
+```
+See [TESTING_GUIDE.md](DOCUMENTS/TESTING_GUIDE.md) for details.
+
 ## Documentation
 
 - 📘 **[Best Practices](DOCUMENTS/BEST_PRACTICES.md)** - Development guidelines
 - 🏗️ **[Architecture Overview](DOCUMENTS/ARCHITECTURE_OVERVIEW.md)** - System design and data flow
 - ✅ **[Learning Checklist](DOCUMENTS/LEARNING_CHECKLIST.md)** - Step-by-step tutorial
+- 🎯 **[Challenges](DOCUMENTS/CHALLENGES.md)** - 12+ hands-on exercises with automated tests
+- 🧪 **[Testing Guide](DOCUMENTS/TESTING_GUIDE.md)** - Automated challenge verification
+- 🔄 **[Role Switcher](DOCUMENTS/ROLE_SWITCHER.md)** - Test different permissions in real-time
+- 🪟 **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** - Docker-free setup with Hasura Cloud
 - 📋 **[UML Diagrams](DOCUMENTS/UML/)** - Visual architecture
 - 📝 **[ADRs](DOCUMENTS/ADRs/)** - Architecture decision records
 
 ## Troubleshooting
+
+<details>
+<summary><strong>Windows: Want to Avoid Docker?</strong></summary>
+
+See the comprehensive **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** for:
+- Native PostgreSQL installation
+- Hasura Cloud free tier setup
+- Action handler deployment options (ngrok, Railway, Render)
+- PowerShell-specific instructions
+- Cloud database alternatives (Neon, Supabase)
+</details>
 
 <details>
 <summary><strong>Windows: PowerShell Execution Policy Error</strong></summary>
@@ -398,6 +441,28 @@ SUBGRAPH_PORT=3002
 4. Test query in Hasura Console first
 </details>
 
+<details>
+<summary><strong>Action Handler Connection Refused (Eligibility Check Fails)</strong></summary>
+
+If eligibility checks fail with "connection refused" errors, this is likely a Docker networking issue:
+
+**Problem**: Hasura running in Docker can't reach `localhost:3001` on the host machine.
+
+**Solution**: Update action handler URL to use `host.docker.internal`:
+
+```bash
+# In hasura/metadata/actions.yaml
+handler: http://host.docker.internal:3001/eligibility
+```
+
+Then reapply metadata:
+```bash
+npm run hasura:apply
+```
+
+**Why**: Docker containers have their own network namespace. `localhost` inside a container refers to the container itself, not the host machine. Use `host.docker.internal` (Docker Desktop) or `172.17.0.1` (Linux) to reach the host.
+</details>
+
 ## Scripts Reference
 
 | Command | Description |
@@ -409,6 +474,16 @@ SUBGRAPH_PORT=3002
 | `npm run client:dev` | Start frontend only |
 | `npm run action:dev` | Start action handler only |
 | `npm run subgraph:dev` | Start subgraph only |
+
+## Docker Commands
+
+| Command | Description |
+|---------|-------------|
+| `docker-compose up -d` | Start PostgreSQL in background |
+| `docker-compose down` | Stop PostgreSQL |
+| `docker-compose logs -f postgres` | View PostgreSQL logs |
+| `docker-compose ps` | Check container status |
+| `docker exec -it claimsight-postgres psql -U claimsight` | Connect to PostgreSQL |
 
 ## Contributing
 
@@ -432,11 +507,32 @@ Built with:
 - [PostgreSQL](https://www.postgresql.org/) - Database
 - [Vite](https://vitejs.dev/) - Build Tool
 
+## Resetting the Lab
+
+To restore the project to a clean state for new learners:
+
+```bash
+# Stop all services
+docker-compose down -v
+
+# Remove generated files (migrations are gitignored)
+rm -rf hasura/migrations/default/*
+
+# Start fresh
+docker-compose up -d
+npm run seed
+npm run hasura:apply
+npm run dev
+```
+
+The `.gitignore` is configured to keep the repository in a fresh state - migrations and Docker volumes are not committed.
+
 ## Support
 
 - 📖 **Docs:** [DOCUMENTS/](DOCUMENTS/)
 - 💬 **Issues:** Create a GitHub issue
 - 🎓 **Learning:** [LEARNING_CHECKLIST.md](DOCUMENTS/LEARNING_CHECKLIST.md)
+- 🎯 **Challenges:** [CHALLENGES.md](DOCUMENTS/CHALLENGES.md)
 
 ---
 

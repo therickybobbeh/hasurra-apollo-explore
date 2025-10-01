@@ -2,15 +2,20 @@ import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CLAIM, GET_NOTES } from '../graphql/queries';
 import { ADD_NOTE } from '../graphql/mutations';
+import { useRole } from '../context/RoleContext';
 import { formatCurrency, formatDate, formatDateTime, getStatusBadgeClass } from '../utils/format';
 import { useState } from 'react';
 
 export function ClaimDetail() {
   const { id } = useParams<{ id: string }>();
+  const { currentUser } = useRole();
   const [noteBody, setNoteBody] = useState('');
 
   const { loading, error, data } = useQuery(GET_CLAIM, {
-    variables: { id, member_id: '' }, // member_id will be set by context
+    variables: {
+      id,
+      memberId: currentUser.memberId || currentUser.providerId || '00000000-0000-0000-0000-000000000000'
+    },
     skip: !id
   });
 

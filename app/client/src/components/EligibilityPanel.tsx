@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ELIGIBILITY_CHECKS } from '../graphql/queries';
 import { SUBMIT_ELIGIBILITY_CHECK } from '../graphql/mutations';
-import { getCurrentUserId } from '../apollo/client';
+import { useRole } from '../context/RoleContext';
 import { formatDateTime } from '../utils/format';
 
 export function EligibilityPanel() {
-  const memberId = getCurrentUserId();
+  const { currentUser } = useRole();
+  const memberId = currentUser.memberId;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data, loading, refetch } = useQuery(GET_ELIGIBILITY_CHECKS, {
@@ -39,7 +40,11 @@ export function EligibilityPanel() {
   if (!memberId) {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
-        <p className="text-gray-600">Member ID not configured. Set VITE_DEV_MEMBER_ID in .env</p>
+        <p className="text-gray-600">
+          {currentUser.role === 'member'
+            ? 'Member ID not configured. Switch to a member user with the role switcher.'
+            : 'This feature is only available for member users. Switch to a member role using the dropdown.'}
+        </p>
       </div>
     );
   }

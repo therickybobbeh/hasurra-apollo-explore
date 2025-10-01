@@ -1,6 +1,27 @@
 -- ClaimSight Row-Level Security (RLS)
 -- Hasura will use these policies with role-based headers
 
+-- Create Hasura roles if they don't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'hasura_admin') THEN
+    CREATE ROLE hasura_admin;
+  END IF;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'hasura_member') THEN
+    CREATE ROLE hasura_member;
+  END IF;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'hasura_provider') THEN
+    CREATE ROLE hasura_provider;
+  END IF;
+END
+$$;
+
+-- Grant necessary permissions to roles
+GRANT USAGE ON SCHEMA public TO hasura_admin, hasura_member, hasura_provider;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO hasura_admin;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO hasura_member, hasura_provider;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO hasura_admin, hasura_member, hasura_provider;
+
 -- Enable RLS on all tables
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE providers ENABLE ROW LEVEL SECURITY;

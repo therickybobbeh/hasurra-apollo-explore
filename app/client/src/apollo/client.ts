@@ -3,6 +3,9 @@
  * Sets up HTTP and WebSocket links for queries/mutations and subscriptions
  */
 
+// IMPORTANT: Import init first to ensure localStorage is set before we create the client
+import '../init';
+
 import { ApolloClient, InMemoryCache, HttpLink, split, from } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
@@ -13,10 +16,29 @@ import { createClient } from 'graphql-ws';
 const HTTP_URL = import.meta.env.VITE_GRAPHQL_HTTP_URL || 'http://localhost:8080/v1/graphql';
 const WS_URL = import.meta.env.VITE_GRAPHQL_WS_URL || 'ws://localhost:8080/v1/graphql';
 
-// Development role headers (for testing without auth)
-const DEV_ROLE = import.meta.env.VITE_DEV_ROLE || 'admin';
-const DEV_MEMBER_ID = import.meta.env.VITE_DEV_MEMBER_ID;
-const DEV_PROVIDER_ID = import.meta.env.VITE_DEV_PROVIDER_ID;
+// Helper to get current user from localStorage
+const getCurrentUser = () => {
+  try {
+    const stored = localStorage.getItem('claimsight_current_user');
+    console.log('[getCurrentUser] Raw localStorage value:', stored);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      console.log('[getCurrentUser] Parsed user:', parsed);
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Failed to parse current user:', error);
+  }
+
+  // Fallback to env vars
+  const fallback = {
+    role: import.meta.env.VITE_DEV_ROLE || 'admin',
+    memberId: import.meta.env.VITE_DEV_MEMBER_ID,
+    providerId: import.meta.env.VITE_DEV_PROVIDER_ID
+  };
+  console.log('[getCurrentUser] Using fallback:', fallback);
+  return fallback;
+};
 
 // HTTP link for queries and mutations
 const httpLink = new HttpLink({
@@ -25,24 +47,27 @@ const httpLink = new HttpLink({
 
 // Auth link to inject headers
 const authLink = setContext((_, { headers }) => {
-  // In production, you would get these from your auth system
+  const user = getCurrentUser();
   const authHeaders: Record<string, string> = {
-    'x-hasura-role': DEV_ROLE
+    'x-hasura-role': user.role,
+    // IMPORTANT: In dev mode, always send admin secret to allow role switching
+    // In production, use JWT authentication instead
+    'x-hasura-admin-secret': import.meta.env.VITE_HASURA_ADMIN_SECRET || 'claimsight_admin_secret_change_me'
   };
 
   // Add user ID if member role
-  if (DEV_ROLE === 'member' && DEV_MEMBER_ID) {
-    authHeaders['x-hasura-user-id'] = DEV_MEMBER_ID;
+  if (user.role === 'member' && user.memberId) {
+    authHeaders['x-hasura-user-id'] = user.memberId;
   }
 
   // Add provider ID if provider role
-  if (DEV_ROLE === 'provider' && DEV_PROVIDER_ID) {
-    authHeaders['x-hasura-provider-id'] = DEV_PROVIDER_ID;
+  if (user.role === 'provider' && user.providerId) {
+    authHeaders['x-hasura-provider-id'] = user.providerId;
   }
 
-  // Admin secret for development (in production, use JWT tokens)
-  if (DEV_ROLE === 'admin') {
-    authHeaders['x-hasura-admin-secret'] = import.meta.env.VITE_HASURA_ADMIN_SECRET || 'claimsight_admin_secret_change_me';
+  // Debug logging
+  if (import.meta.env.DEV) {
+    console.log('[Apollo Client] Auth headers:', authHeaders);
   }
 
   return {
@@ -58,22 +83,21 @@ const wsLink = new GraphQLWsLink(
   createClient({
     url: WS_URL,
     connectionParams: () => {
+      const user = getCurrentUser();
       const params: Record<string, string> = {
         headers: {
-          'x-hasura-role': DEV_ROLE
+          'x-hasura-role': user.role,
+          // Always send admin secret in dev mode
+          'x-hasura-admin-secret': import.meta.env.VITE_HASURA_ADMIN_SECRET || 'claimsight_admin_secret_change_me'
         }
       };
 
-      if (DEV_ROLE === 'member' && DEV_MEMBER_ID) {
-        params.headers['x-hasura-user-id'] = DEV_MEMBER_ID;
+      if (user.role === 'member' && user.memberId) {
+        params.headers['x-hasura-user-id'] = user.memberId;
       }
 
-      if (DEV_ROLE === 'provider' && DEV_PROVIDER_ID) {
-        params.headers['x-hasura-provider-id'] = DEV_PROVIDER_ID;
-      }
-
-      if (DEV_ROLE === 'admin') {
-        params.headers['x-hasura-admin-secret'] = import.meta.env.VITE_HASURA_ADMIN_SECRET || 'claimsight_admin_secret_change_me';
+      if (user.role === 'provider' && user.providerId) {
+        params.headers['x-hasura-provider-id'] = user.providerId;
       }
 
       return params;
@@ -146,7 +170,7 @@ export const apolloClient = new ApolloClient({
   connectToDevTools: import.meta.env.DEV
 });
 
-// Export helper function to get current role
-export const getCurrentRole = () => DEV_ROLE;
-export const getCurrentUserId = () => DEV_MEMBER_ID;
-export const getCurrentProviderId = () => DEV_PROVIDER_ID;
+// Export helper functions to get current user info
+export const getCurrentRole = () => getCurrentUser().role;
+export const getCurrentUserId = () => getCurrentUser().memberId;
+export const getCurrentProviderId = () => getCurrentUser().providerId;

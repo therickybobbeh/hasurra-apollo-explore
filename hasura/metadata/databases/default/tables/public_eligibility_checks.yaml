@@ -6,10 +6,6 @@ object_relationships:
     using:
       foreign_key_constraint_on: member_id
 select_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
   - role: member
     permission:
       columns:
@@ -21,17 +17,3 @@ select_permissions:
       filter:
         member_id:
           _eq: X-Hasura-User-Id
-insert_permissions:
-  - role: admin
-    permission:
-      check: {}
-      columns: '*'
-update_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
-delete_permissions:
-  - role: admin
-    permission:
-      filter: {}

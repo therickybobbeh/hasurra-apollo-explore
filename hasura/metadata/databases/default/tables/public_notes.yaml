@@ -5,11 +5,16 @@ object_relationships:
   - name: member
     using:
       foreign_key_constraint_on: member_id
-select_permissions:
-  - role: admin
+insert_permissions:
+  - role: member
     permission:
-      columns: '*'
-      filter: {}
+      check:
+        member_id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - member_id
+        - body
+select_permissions:
   - role: member
     permission:
       columns:
@@ -20,24 +25,7 @@ select_permissions:
       filter:
         member_id:
           _eq: X-Hasura-User-Id
-insert_permissions:
-  - role: admin
-    permission:
-      check: {}
-      columns: '*'
-  - role: member
-    permission:
-      check:
-        member_id:
-          _eq: X-Hasura-User-Id
-      columns:
-        - member_id
-        - body
 update_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
   - role: member
     permission:
       columns:
@@ -45,10 +33,8 @@ update_permissions:
       filter:
         member_id:
           _eq: X-Hasura-User-Id
+      check: null
 delete_permissions:
-  - role: admin
-    permission:
-      filter: {}
   - role: member
     permission:
       filter:

@@ -14,8 +14,10 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Load environment variables
-export $(grep -v '^#' .env | xargs)
+# Load environment variables (skip VITE_TEST_USERS which has special chars)
+set -a
+source <(grep -v '^#' .env | grep -v '^VITE_TEST_USERS')
+set +a
 
 # Check Hasura CLI
 if ! command -v hasura &> /dev/null; then

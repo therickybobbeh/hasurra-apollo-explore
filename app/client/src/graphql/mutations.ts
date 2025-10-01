@@ -32,10 +32,13 @@ export const DELETE_NOTE = gql`
 
 // Submit eligibility check (custom action)
 export const SUBMIT_ELIGIBILITY_CHECK = gql`
-  ${ELIGIBILITY_CHECK_FRAGMENT}
   mutation SubmitEligibilityCheck($memberId: uuid!) {
     submitEligibilityCheck(memberId: $memberId) {
-      ...EligibilityCheckFields
+      id
+      member_id
+      checked_at
+      result
+      created_at
     }
   }
 `;

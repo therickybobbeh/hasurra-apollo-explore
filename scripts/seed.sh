@@ -14,9 +14,11 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Load environment variables
+# Load environment variables (skip VITE_TEST_USERS which has special chars)
 echo "Loading environment variables..."
-export $(grep -v '^#' .env | xargs)
+set -a
+source <(grep -v '^#' .env | grep -v '^VITE_TEST_USERS')
+set +a
 
 # Run the Node.js seeder
 echo "Running database seeder..."

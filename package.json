@@ -12,7 +12,10 @@
     "action:dev": "tsx watch hasura/actions/handlers/eligibility.mock.ts",
     "client:dev": "cd app/client && npm run dev",
     "subgraph:dev": "cd app/server && npm run dev",
-    "all:dev": "concurrently -n \"action,client,subgraph\" -c \"blue,green,yellow\" \"npm run action:dev\" \"npm run client:dev\" \"npm run subgraph:dev\""
+    "all:dev": "concurrently -n \"action,client,subgraph\" -c \"blue,green,yellow\" \"npm run action:dev\" \"npm run client:dev\" \"npm run subgraph:dev\"",
+    "test:challenges": "vitest run --config tests/vitest.config.ts",
+    "test:challenge": "vitest run --config tests/vitest.config.ts --grep",
+    "test:progress": "tsx tests/runner.ts"
   },
   "keywords": [
     "graphql",
@@ -25,14 +28,18 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@apollo/client": "^3.8.0",
     "@types/node": "^20.11.0",
     "concurrently": "^9.0.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.0",
+    "graphql": "^16.8.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
   },
   "dependencies": {
+    "cross-fetch": "^4.0.0",
     "pg": "^8.11.3"
   },
   "engines": {

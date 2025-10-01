@@ -10,10 +10,6 @@ array_relationships:
           name: claims
           schema: public
 select_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
   - role: member
     permission:
       columns:
@@ -37,16 +33,7 @@ select_permissions:
       filter:
         id:
           _eq: X-Hasura-Provider-Id
-insert_permissions:
-  - role: admin
-    permission:
-      check: {}
-      columns: '*'
 update_permissions:
-  - role: admin
-    permission:
-      columns: '*'
-      filter: {}
   - role: provider
     permission:
       columns:
@@ -54,7 +41,4 @@ update_permissions:
       filter:
         id:
           _eq: X-Hasura-Provider-Id
-delete_permissions:
-  - role: admin
-    permission:
-      filter: {}
+      check: null

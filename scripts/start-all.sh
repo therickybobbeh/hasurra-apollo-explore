@@ -14,8 +14,11 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Load environment variables
-export $(grep -v '^#' .env | xargs)
+# Load environment variables (but skip complex VITE_TEST_USERS which is only needed by Vite)
+# Vite will load .env automatically, we only need the non-Vite vars for bash
+set -a
+source <(grep -v '^#' .env | grep -v '^VITE_TEST_USERS')
+set +a
 
 echo "Starting all services..."
 echo "- Action handler (port 3001)"
