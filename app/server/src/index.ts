@@ -1,6 +1,7 @@
 /**
- * Apollo Federation Subgraph - Provider Ratings
- * Extends the Provider type with rating information
+ * Apollo GraphQL Subgraph - Provider Ratings
+ * Standalone service with provider ratings data
+ * Demonstrates Apollo Federation concepts
  */
 
 import { ApolloServer } from '@apollo/server';
@@ -24,13 +25,18 @@ const ratingsData = JSON.parse(
   readFileSync(join(__dirname, 'ratings.json'), 'utf-8')
 );
 
-// GraphQL schema with federation directives
+// GraphQL schema - Provider Service with Ratings
+// Demonstrates Apollo Federation by defining base Provider type with @key
+// This can be extended by other subgraphs
 const typeDefs = gql`
   extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external"])
+    @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key"])
 
   type Provider @key(fields: "id") {
-    id: ID! @external
+    id: ID!
+    name: String!
+    specialty: String!
+    npi: String!
     rating: Float
     ratingCount: Int
     reviews: [Review!]!
@@ -38,37 +44,77 @@ const typeDefs = gql`
 
   type Review {
     id: ID!
-    providerId: ID!
     rating: Int!
     comment: String
     date: String!
   }
 
   type Query {
-    _empty: String
+    provider(id: ID!): Provider
+    providers: [Provider!]!
   }
 `;
 
+// Mock provider data (in real app, this would come from Hasura or a database)
+const providers = [
+  {
+    id: '734f62da-879d-45bb-b07b-8163182ef917',
+    name: 'Dr. Sarah Smith',
+    specialty: 'Cardiology',
+    npi: '1234567890'
+  },
+  {
+    id: 'provider-2',
+    name: 'Dr. John Doe',
+    specialty: 'Pediatrics',
+    npi: '0987654321'
+  }
+];
+
 // Resolvers
 const resolvers = {
+  Query: {
+    provider(_: any, { id }: { id: string }) {
+      const provider = providers.find(p => p.id === id);
+      if (!provider) return null;
+
+      const ratingInfo = ratingsData.ratings[id];
+      return {
+        ...provider,
+        rating: ratingInfo?.rating || null,
+        ratingCount: ratingInfo?.ratingCount || 0,
+        reviews: ratingInfo?.reviews || []
+      };
+    },
+    providers() {
+      return providers.map(provider => {
+        const ratingInfo = ratingsData.ratings[provider.id];
+        return {
+          ...provider,
+          rating: ratingInfo?.rating || null,
+          ratingCount: ratingInfo?.ratingCount || 0,
+          reviews: ratingInfo?.reviews || []
+        };
+      });
+    }
+  },
   Provider: {
     __resolveReference(reference: { id: string }) {
-      const rating = ratingsData.ratings[reference.id];
-      return rating ? { id: reference.id, ...rating } : null;
-    },
-    rating(parent: any) {
-      return parent.rating || null;
-    },
-    ratingCount(parent: any) {
-      return parent.ratingCount || 0;
-    },
-    reviews(parent: any) {
-      return parent.reviews || [];
+      const provider = providers.find(p => p.id === reference.id);
+      if (!provider) return null;
+
+      const ratingInfo = ratingsData.ratings[reference.id];
+      return {
+        ...provider,
+        rating: ratingInfo?.rating || null,
+        ratingCount: ratingInfo?.ratingCount || 0,
+        reviews: ratingInfo?.reviews || []
+      };
     }
   }
 };
 
-// Build subgraph schema
+// Build federation-compatible subgraph schema
 const schema = buildSubgraphSchema([{ typeDefs, resolvers }]);
 
 // Create Apollo Server

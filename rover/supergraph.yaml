@@ -1,0 +1,22 @@
+# Apollo Federation Supergraph Configuration
+# Used with Rover CLI for production-ready supergraph composition
+#
+# Usage: rover supergraph compose --config rover/supergraph.yaml
+
+federation_version: =2.6.0
+
+subgraphs:
+  # Hasura GraphQL Engine
+  hasura:
+    routing_url: http://localhost:8080/v1/graphql
+    schema:
+      subgraph_url: http://localhost:8080/v1/graphql
+      # Hasura requires admin secret for introspection
+      introspection_headers:
+        x-hasura-admin-secret: ${HASURA_GRAPHQL_ADMIN_SECRET}
+
+  # Provider Ratings Subgraph
+  ratings:
+    routing_url: http://localhost:3002/graphql
+    schema:
+      subgraph_url: http://localhost:3002/graphql

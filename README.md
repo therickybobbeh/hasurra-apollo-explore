@@ -12,7 +12,7 @@ A comprehensive learning application that teaches modern GraphQL development wit
 - ✅ **Custom Actions** - Eligibility verification via REST API integration
 - ✅ **Apollo Client** - HTTP + WebSocket links, optimistic updates, normalized cache
 - ✅ **React + TypeScript** - Modern frontend with TailwindCSS
-- ✅ **Apollo Federation** - Optional provider ratings subgraph
+- ✅ **Apollo Federation** - Gateway + subgraph with ratings, visualize in Apollo Studio
 - ✅ **PromptQL Examples** - Natural language to SQL query concepts
 - ✅ **Cross-Platform** - Native setup for Windows, macOS, Linux (no Docker)
 - ✅ **Learning Challenges** - 12+ hands-on exercises from beginner to expert
@@ -158,14 +158,57 @@ Configures Hasura with metadata, relationships, and permissions.
 
 **Step 6: Start All Services**
 
+**Two Development Modes:**
+
+<details open>
+<summary><strong>Option A: Federated Mode (Recommended for Full Features)</strong></summary>
+
+```bash
+npm run federated:dev
+```
+
+Starts **all services** including Apollo Federation:
+- **Action Handler** (port 3001) - Eligibility check API
+- **Ratings Subgraph** (port 3002) - Provider ratings API
+- **Apollo Gateway** (port 4000) - **Federation endpoint** ⭐
+- **Client App** (port 5173) - React frontend (connects to gateway)
+
+**Features:**
+- ✅ Full Apollo Federation capabilities
+- ✅ Provider ratings and reviews (federated data)
+- ✅ Gateway combines Hasura + ratings subgraph
+- ✅ Demonstrates entity resolution across services
+
+**When to use:** Learning federation, building with multiple data sources, or exploring the ratings feature.
+
+</details>
+
+<details>
+<summary><strong>Option B: Direct Mode (Simpler, Faster Startup)</strong></summary>
+
 ```bash
 npm run dev
 ```
 
-Starts:
+Starts **core services only**:
 - **Action Handler** (port 3001) - Eligibility check API
-- **Client App** (port 5173) - React frontend
-- **Subgraph** (port 3002) - Provider ratings (optional)
+- **Client App** (port 5173) - React frontend (connects directly to Hasura)
+
+**Features:**
+- ✅ Simpler setup
+- ✅ Faster startup time
+- ✅ All core functionality (claims, notes, eligibility)
+- ❌ No provider ratings (requires federation)
+
+**When to use:** Learning GraphQL basics, focusing on Hasura, or skipping federation for now.
+
+</details>
+
+> **💡 Tip:** The default `.env` points to the gateway (port 4000). To use direct mode, update `.env`:
+> ```bash
+> VITE_GRAPHQL_HTTP_URL=http://localhost:8080/v1/graphql
+> VITE_GRAPHQL_WS_URL=ws://localhost:8080/v1/graphql
+> ```
 
 **Step 7: Start Hasura**
 
@@ -204,13 +247,16 @@ chmod +x hasura
 
 ### Access Points
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend** | http://localhost:5173 | React app |
-| **Hasura Console** | http://localhost:8080/console | GraphQL API explorer |
-| **Hasura GraphQL** | http://localhost:8080/v1/graphql | GraphQL endpoint |
-| **Action Handler** | http://localhost:3001 | Eligibility API |
-| **Subgraph** | http://localhost:3002/graphql | Ratings API |
+| Service | URL | Description | Mode |
+|---------|-----|-------------|------|
+| **Frontend** | http://localhost:5173 | React app | Both |
+| **Apollo Gateway** | http://localhost:4000/graphql | **Federated GraphQL endpoint** ⭐ | Federated |
+| **Hasura Console** | http://localhost:8080/console | GraphQL API explorer | Both |
+| **Hasura GraphQL** | http://localhost:8080/v1/graphql | Direct GraphQL endpoint | Both |
+| **Action Handler** | http://localhost:3001 | Eligibility API | Both |
+| **Ratings Subgraph** | http://localhost:3002/graphql | Provider ratings API | Federated |
+
+**Note:** In federated mode, the client connects to the gateway (4000) which combines Hasura + ratings. In direct mode, the client connects to Hasura (8080) directly.
 
 ## Project Structure
 
@@ -362,6 +408,50 @@ npm run test:progress 1  # Test specific challenge
 ```
 See [TESTING_GUIDE.md](DOCUMENTS/TESTING_GUIDE.md) for details.
 
+## Apollo Federation (Optional)
+
+ClaimSight demonstrates **Apollo Federation** by extending the `Provider` type with ratings from a separate subgraph.
+
+### Quick Start
+
+```bash
+# Start all services including federation gateway
+npm run federated:dev
+```
+
+This starts:
+- Hasura (port 8080) - Main GraphQL API
+- Ratings subgraph (port 3002) - Provider ratings
+- Federation gateway (port 4000) - **Unified endpoint** ⭐
+- React client (port 5173)
+
+### Query Federated Data
+
+```graphql
+query ProviderWithRatings {
+  providers {
+    name
+    specialty    # From Hasura
+    rating       # From subgraph!
+    reviews {    # From subgraph!
+      comment
+    }
+  }
+}
+```
+
+### Visualize in Apollo Studio
+
+Sign up for free at [studio.apollographql.com](https://studio.apollographql.com/) to:
+- 📊 Visualize your federated graph
+- 🔍 Explore schema with interactive query builder
+- 📈 Monitor query performance
+- ✅ Validate schema changes
+
+**See [FEDERATION_GUIDE.md](DOCUMENTS/FEDERATION_GUIDE.md) for complete documentation.**
+
+---
+
 ## Documentation
 
 - 📘 **[Best Practices](DOCUMENTS/BEST_PRACTICES.md)** - Development guidelines
@@ -371,6 +461,7 @@ See [TESTING_GUIDE.md](DOCUMENTS/TESTING_GUIDE.md) for details.
 - 🧪 **[Testing Guide](DOCUMENTS/TESTING_GUIDE.md)** - Automated challenge verification
 - 🔄 **[Role Switcher](DOCUMENTS/ROLE_SWITCHER.md)** - Test different permissions in real-time
 - 🪟 **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** - Docker-free setup with Hasura Cloud
+- 🌐 **[Federation Guide](DOCUMENTS/FEDERATION_GUIDE.md)** - Apollo Federation setup and visualization
 - 📋 **[UML Diagrams](DOCUMENTS/UML/)** - Visual architecture
 - 📝 **[ADRs](DOCUMENTS/ADRs/)** - Architecture decision records
 

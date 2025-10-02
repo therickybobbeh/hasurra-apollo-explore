@@ -6,6 +6,60 @@ ClaimSight is a cross-platform healthcare claims management system built with Gr
 
 ### High-Level Architecture
 
+**Federated Architecture (Default):**
+
+```
+┌────────────────────────────────────────────────────────┐
+│                  Browser (Port 5173)                    │
+│              React SPA + Apollo Client                  │
+└──────────────────────┬─────────────────────────────────┘
+                       │ GraphQL/WebSocket
+                       ▼
+┌────────────────────────────────────────────────────────┐
+│         Apollo Federation Gateway (Port 4000)           │
+│              IntrospectAndCompose                       │
+│         (Combines multiple GraphQL services)            │
+└──────────┬─────────────────────────────┬───────────────┘
+           │                             │
+           │                             │
+    ┌──────▼──────────┐          ┌──────▼──────────┐
+    │ Hasura Subgraph │          │ Ratings Subgraph│
+    │   (Port 8080)   │          │   (Port 3002)   │
+    │                 │          │                 │
+    │ • Members       │          │ • Provider      │
+    │ • Claims        │          │   ratings       │
+    │ • Providers     │◄─────────┤ • Reviews       │
+    │ • Notes         │ Entity   │                 │
+    │ • Eligibility   │Resolution│                 │
+    └────────┬────────┘          └─────────────────┘
+             │                            │
+             │ SQL + RLS                  │ In-Memory
+             ▼                            │ Data
+    ┌──────────────────┐                  │
+    │   PostgreSQL     │◄─────────────────┘
+    │    Database      │  (Resolves provider entities)
+    └──────────────────┘
+             ▲
+             │
+    ┌────────┴────────┐
+    │ Action Handler  │
+    │  (Port 3001)    │
+    │                 │
+    │ • Eligibility   │
+    │   checks        │
+    └─────────────────┘
+```
+
+**Key Concepts:**
+- **Apollo Gateway** acts as single entry point combining multiple GraphQL services
+- **Entity Resolution**: Gateway fetches provider IDs from Hasura, then enriches with ratings from subgraph
+- **Type Extension**: Provider type defined in Hasura, extended with `rating` and `reviews` in ratings subgraph
+- **Development Mode**: Uses IntrospectAndCompose for automatic schema discovery and composition
+
+**Direct Hasura Architecture (Alternative):**
+
+For simpler development without federation, configure client to bypass gateway:
+
 ```
 ┌─────────────┐
 │   Browser   │
@@ -24,6 +78,8 @@ ClaimSight is a cross-platform healthcare claims management system built with Gr
 │    Database      │
 └──────────────────┘
 ```
+
+To switch: Set `VITE_GRAPHQL_HTTP_URL=http://localhost:8080/v1/graphql` in `.env`
 
 ## Layers
 
@@ -79,13 +135,93 @@ ClaimSight is a cross-platform healthcare claims management system built with Gr
 - Validates member eligibility
 - Stores result in database
 
-#### Apollo Subgraph (Optional)
-**Purpose:** Extend GraphQL schema via federation
+#### Apollo Federation Gateway
+**Purpose:** Combine multiple GraphQL services into unified supergraph
 
-**Example:** Provider Ratings
-- Adds `rating` field to Provider type
-- Demonstrates federated architecture
-- Independent deployment
+**Technology:**
+- Apollo Gateway with IntrospectAndCompose
+- Apollo Federation v2 spec
+- Automatic schema discovery
+
+**Responsibilities:**
+- Query planning across subgraphs
+- Entity resolution and type merging
+- Schema composition
+- Request routing
+
+**Key Features:**
+- **IntrospectAndCompose**: Auto-discovers subgraph schemas (easy for development)
+- **Entity References**: Links types across services using `@key` directive
+- **Type Extension**: Subgraphs can add fields to types defined elsewhere
+- **Query Planning**: Efficiently fetches data from multiple sources
+
+**Example Query Flow:**
+```graphql
+query {
+  providers(limit: 1) {
+    id           # From Hasura
+    name         # From Hasura
+    rating       # From ratings subgraph!
+    reviews {    # From ratings subgraph!
+      comment
+    }
+  }
+}
+```
+
+**Execution:**
+1. Gateway receives query
+2. Fetches `id` and `name` from Hasura subgraph
+3. Passes `id` to ratings subgraph via entity reference
+4. Ratings subgraph's `__resolveReference` resolves the Provider entity
+5. Gateway merges results into single response
+
+#### Apollo Subgraphs
+
+**Hasura Subgraph (Port 8080):**
+- Core domain data (members, claims, providers, notes)
+- PostgreSQL backing with RLS
+- Auto-generated CRUD operations
+- Real-time subscriptions
+
+**Ratings Subgraph (Port 3002):**
+- Extends Provider type with ratings data
+- In-memory data source (ratings.json)
+- Demonstrates federation capabilities
+- Independent deployment and scaling
+
+**Subgraph Schema Example:**
+```graphql
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.0",
+        import: ["@key", "@external"])
+
+type Provider @key(fields: "id") {
+  id: ID! @external           # References Hasura's Provider.id
+  rating: Float               # New field added by this subgraph
+  ratingCount: Int            # New field
+  reviews: [Review!]!         # New relationship
+}
+
+type Review {
+  id: ID!
+  rating: Int!
+  comment: String!
+  date: String!
+}
+```
+
+**Entity Resolution:**
+```typescript
+const resolvers = {
+  Provider: {
+    __resolveReference(reference: { id: string }) {
+      // Lookup rating data for this provider ID
+      return ratingsData[reference.id];
+    }
+  }
+};
+```
 
 ### 4. Data Layer (PostgreSQL)
 
@@ -149,6 +285,36 @@ Component mounts
   → Apollo Client receives event
   → Component re-renders with new data
 ```
+
+### Federated Query Flow
+
+**Example: Query Provider with Ratings**
+
+```
+User requests provider with rating
+  → React Component
+  → Apollo Client
+  → GraphQL Query sent to Gateway (port 4000)
+  → Gateway analyzes query and creates execution plan
+
+  → Gateway queries Hasura subgraph (port 8080)
+    → Fetches: { id, name, specialty, npi }
+    → Returns provider data with ID
+
+  → Gateway calls ratings subgraph (port 3002)
+    → Passes provider ID as entity reference
+    → __resolveReference({ id }) looks up ratings
+    → Returns: { rating, ratingCount, reviews }
+
+  → Gateway merges responses
+    → Combines Hasura fields + ratings fields
+    → Returns unified Provider object
+
+  → Apollo Client (cache update)
+  → React Component (re-render with complete data)
+```
+
+**Key Insight:** The Provider type is split across two services but appears as one unified type to the client!
 
 ## Security Architecture
 
@@ -294,13 +460,28 @@ RLS ensures users can only access their own data, even if Hasura permissions are
 
 ### Development
 
+**Federated Mode (Full Features):**
 ```
 Single machine:
 - PostgreSQL (port 5432)
 - Hasura (port 8080)
 - Action Handler (port 3001)
-- Subgraph (port 3002)
+- Ratings Subgraph (port 3002)
+- Apollo Gateway (port 4000)    ← Client connects here
 - Vite dev server (port 5173)
+
+Start with: npm run federated:dev
+```
+
+**Direct Mode (Simpler):**
+```
+Single machine:
+- PostgreSQL (port 5432)
+- Hasura (port 8080)            ← Client connects here
+- Action Handler (port 3001)
+- Vite dev server (port 5173)
+
+Start with: npm run dev
 ```
 
 ### Production

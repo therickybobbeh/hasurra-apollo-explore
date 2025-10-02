@@ -6,6 +6,7 @@ import { RoleSwitcher } from './components/RoleSwitcher';
 import { ClaimsList } from './components/ClaimsList';
 import { ClaimDetail } from './components/ClaimDetail';
 import { EligibilityPanel } from './components/EligibilityPanel';
+import { ProviderRatings } from './components/ProviderRatings';
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,9 @@ function Layout({ children }: { children: React.ReactNode }) {
               </Link>
               <Link to="/eligibility" className="flex items-center text-gray-700 hover:text-gray-900">
                 Eligibility
+              </Link>
+              <Link to="/ratings" className="flex items-center text-gray-700 hover:text-gray-900">
+                <span className="mr-1">⭐</span> Ratings
               </Link>
             </div>
             <div className="flex items-center">
@@ -48,6 +52,7 @@ function App() {
               <Route path="/" element={<ClaimsList />} />
               <Route path="/claims/:id" element={<ClaimDetail />} />
               <Route path="/eligibility" element={<EligibilityPanel />} />
+              <Route path="/ratings" element={<ProviderRatings />} />
             </Routes>
           </Layout>
         </BrowserRouter>

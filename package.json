@@ -12,6 +12,8 @@
     "action:dev": "tsx watch hasura/actions/handlers/eligibility.mock.ts",
     "client:dev": "cd app/client && npm run dev",
     "subgraph:dev": "cd app/server && npm run dev",
+    "gateway:dev": "cd app/gateway && npm run dev",
+    "federated:dev": "concurrently -n \"action,subgraph,gateway,client\" -c \"blue,yellow,magenta,green\" \"npm run action:dev\" \"npm run subgraph:dev\" \"npm run gateway:dev\" \"npm run client:dev\"",
     "all:dev": "concurrently -n \"action,client,subgraph\" -c \"blue,green,yellow\" \"npm run action:dev\" \"npm run client:dev\" \"npm run subgraph:dev\"",
     "test:challenges": "vitest run --config tests/vitest.config.ts",
     "test:challenge": "vitest run --config tests/vitest.config.ts --grep",

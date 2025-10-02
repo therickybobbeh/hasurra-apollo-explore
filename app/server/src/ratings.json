@@ -1,42 +1,31 @@
 {
   "ratings": {
-    "provider-1": {
-      "rating": 4.5,
-      "ratingCount": 127,
+    "734f62da-879d-45bb-b07b-8163182ef917": {
+      "rating": 4.7,
+      "ratingCount": 124,
       "reviews": [
         {
           "id": "r1",
-          "providerId": "provider-1",
+          "providerId": "734f62da-879d-45bb-b07b-8163182ef917",
           "rating": 5,
-          "comment": "Excellent care, very thorough",
+          "comment": "Dr. Smith is fantastic! Very thorough and caring.",
           "date": "2024-01-15"
         },
         {
           "id": "r2",
-          "providerId": "provider-1",
+          "providerId": "734f62da-879d-45bb-b07b-8163182ef917",
           "rating": 4,
-          "comment": "Good doctor, long wait times",
-          "date": "2024-01-20"
-        }
-      ]
-    },
-    "provider-2": {
-      "rating": 4.8,
-      "ratingCount": 89,
-      "reviews": [
+          "comment": "Great doctor, though wait times can be long.",
+          "date": "2024-01-10"
+        },
         {
           "id": "r3",
-          "providerId": "provider-2",
+          "providerId": "734f62da-879d-45bb-b07b-8163182ef917",
           "rating": 5,
-          "comment": "Amazing specialist",
-          "date": "2024-02-01"
+          "comment": "Highly recommend! Explains everything clearly.",
+          "date": "2024-01-05"
         }
       ]
-    },
-    "provider-3": {
-      "rating": 3.9,
-      "ratingCount": 45,
-      "reviews": []
     }
   }
 }
