@@ -8,7 +8,7 @@
 
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import { ApolloGateway, IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
 import express from 'express';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -64,19 +64,42 @@ async function waitForHasura() {
 
 // Start server
 async function startServer() {
-  // Create gateway with federated subgraphs
-  // Note: Hasura v2/v3 can't have its types extended by Apollo subgraphs,
-  // so we use a standalone providers subgraph for federation demo
-  // Hasura is still available at port 8080 for members/claims/eligibility
+  // Wait for Hasura to be ready first
+  await waitForHasura();
+
+  // Create gateway with Hasura + Providers subgraph
+  // Note: Hasura types can't be EXTENDED by Apollo subgraphs,
+  // but Hasura CAN be included in the gateway as a subgraph!
+  // This gives you one endpoint for all queries.
   const gateway = new ApolloGateway({
     supergraphSdl: new IntrospectAndCompose({
       subgraphs: [
+        {
+          name: 'hasura',
+          url: `${HASURA_URL}/v1/graphql`,
+        },
         {
           name: 'providers',
           url: SUBGRAPH_URL,
         },
       ],
+      introspectionHeaders: {
+        'x-hasura-admin-secret': HASURA_SECRET,
+      },
     }),
+    // Custom data source to pass headers to Hasura during query execution
+    buildService({ name, url }) {
+      return new RemoteGraphQLDataSource({
+        url,
+        willSendRequest({ request, context }: any) {
+          // Pass admin secret to Hasura for all queries
+          if (name === 'hasura') {
+            request.http.headers.set('x-hasura-admin-secret', HASURA_SECRET);
+            request.http.headers.set('x-hasura-role', context.headers?.['x-hasura-role'] || 'admin');
+          }
+        },
+      });
+    },
     // Enable debug logging in development
     debug: true,
   });
@@ -133,11 +156,11 @@ async function startServer() {
     console.log('\n🚀 Apollo Federation Gateway ready!');
     console.log(`   GraphQL endpoint: http://localhost:${GATEWAY_PORT}/graphql`);
     console.log(`   Health check: http://localhost:${GATEWAY_PORT}/health`);
-    console.log('\n   Federated subgraphs:');
-    console.log(`   - Providers: ${SUBGRAPH_URL} (Provider type with ratings)`);
-    console.log('\n   📊 Hasura (non-federated):');
-    console.log(`   - Direct access: ${HASURA_URL}/v1/graphql (members, claims, eligibility)`);
-    console.log('\n   🎯 Demonstrates Apollo Federation + Hasura working together!');
+    console.log('\n   📊 Unified subgraphs:');
+    console.log(`   - Hasura: ${HASURA_URL}/v1/graphql (members, claims, eligibility, notes)`);
+    console.log(`   - Providers: ${SUBGRAPH_URL} (providers with ratings - uses @key)`);
+    console.log('\n   🎯 Query everything from ONE endpoint (port 4000)!');
+    console.log('   💡 Note: Hasura types cannot be extended by Apollo (v2/v3 limitation)');
     console.log('');
   });
 }

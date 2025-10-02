@@ -8,7 +8,7 @@ Complete guide to understanding and using Apollo Federation in ClaimSight. Learn
 
 **Apollo Federation** allows you to split a GraphQL type across multiple services and combine them through a gateway using entity resolution.
 
-### In ClaimSight (TRUE Federation):
+### In ClaimSight (Federation + Hasura):
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -16,29 +16,32 @@ Complete guide to understanding and using Apollo Federation in ClaimSight. Learn
 │         - IntrospectAndCompose                      │
 │         - Entity Resolution                         │
 │         - Query Planning                            │
+│         - ONE unified endpoint for everything       │
 └──────────────┬─────────────────────┬────────────────┘
                │                     │
-       ┌───────▼────────┐   ┌───────▼────────┐
-       │  Hasura (8080) │   │ Ratings (3002) │
-       │                │   │                │
-       │ Provider (BASE)│   │ Provider (EXT) │
-       │ • id           │   │ • @key(id)     │
-       │ • name         │   │ • rating       │
-       │ • specialty    │   │ • reviews      │
-       │ • npi          │   │                │
-       │                │   │                │
-       │ + Members      │   └────────────────┘
-       │ + Claims       │
-       │ + Notes        │
-       └────────────────┘
+       ┌───────▼────────┐   ┌───────▼────────────┐
+       │  Hasura (8080) │   │ Providers (3002)   │
+       │                │   │                    │
+       │ • Members      │   │ Provider (@key id) │
+       │ • Claims       │   │ • id               │
+       │ • Eligibility  │   │ • name             │
+       │ • Notes        │   │ • specialty        │
+       │ • provider_    │   │ • npi              │
+       │   records*     │   │ • rating           │
+       │                │   │ • reviews          │
+       └────────────────┘   └────────────────────┘
 ```
 
-**Key Concept**: The `Provider` type is **split across services**:
-- Hasura defines the base type (database fields)
-- Ratings subgraph extends it with `@key(fields: "id")` (computed fields)
-- Gateway performs entity resolution to merge them into one unified type!
+**Key Concepts**:
+- **Providers subgraph** defines `Provider` type with `@key(fields: "id")` - TRUE federation!
+- **Hasura** provides database operations (members, claims, eligibility, provider_records)
+- **Gateway** combines both into one unified endpoint
+- **provider_records*** was renamed to avoid conflict (see limitation below)
 
-**Requirement:** Hasura v2.10.0+ with `HASURA_GRAPHQL_ENABLE_APOLLO_FEDERATION=true`
+**⚠️ Important Limitation**: Hasura v2/v3 types **cannot be extended** by Apollo subgraphs. This is why we:
+1. Renamed Hasura's `providers` → `provider_records`
+2. Created a standalone federated `Provider` type in a custom subgraph
+3. This demonstrates a real-world migration pattern!
 
 ---
 
@@ -543,6 +546,59 @@ npm run subgraph:dev
 - Don't use federation if a single service would suffice
 - Don't skip schema validation
 - Don't force federation on services that don't support it (like Hasura)
+
+---
+
+## Hasura + Apollo Federation: Understanding the Limitation
+
+### The Challenge
+
+**Hasura v2/v3 cannot have its types extended by Apollo subgraphs.** This is a fundamental limitation.
+
+### What This Means
+
+❌ **Cannot do**: Extend Hasura's `providers` type with Apollo subgraph fields
+✅ **Can do**: Include Hasura as a subgraph alongside federated Apollo services
+✅ **Can do**: Query both from one unified gateway endpoint
+
+### The Solution (Migration Pattern)
+
+This project demonstrates a real-world migration approach:
+
+1. **Rename conflicting tables**: `providers` → `provider_records` in Hasura
+2. **Create federated type**: New `Provider` type in custom Apollo subgraph with `@key`
+3. **Unified gateway**: Combines both Hasura and federated subgraphs
+4. **One endpoint**: Everything queryable from port 4000
+
+### Query Example
+
+```graphql
+query UnifiedQuery {
+  # From Hasura subgraph
+  members(limit: 5) {
+    id
+    first_name
+    last_name
+  }
+
+  claims(limit: 10) {
+    id
+    status
+  }
+
+  # From Providers subgraph (federated)
+  providers {
+    id
+    name
+    rating
+    reviews {
+      comment
+    }
+  }
+}
+```
+
+**Result**: Learn both Hasura's database power AND Apollo Federation patterns!
 
 ---
 

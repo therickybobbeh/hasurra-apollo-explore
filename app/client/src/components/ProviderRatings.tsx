@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 
 const GET_PROVIDERS_WITH_RATINGS = gql`
   query GetProvidersWithRatings {
-    providers(limit: 20) {
+    providers {
       id
       name
       specialty
@@ -67,10 +67,14 @@ export function ProviderRatings() {
           <div>
             <p className="font-semibold text-blue-900">TRUE Federation Demo</p>
             <p className="text-sm text-blue-700 mt-1">
-              The <code className="bg-blue-100 px-1">Provider</code> type is <strong>split across services</strong>:
-              base fields (name, specialty, NPI) come from <strong>Hasura</strong>, while
-              extension fields (rating, reviews) come from the <strong>ratings subgraph</strong>.
-              The Apollo Gateway performs <strong>entity resolution</strong> to combine them into one unified response!
+              The <code className="bg-blue-100 px-1">Provider</code> type uses Apollo Federation with <code className="bg-blue-100 px-1">@key(fields: "id")</code>.
+              This federated type includes base provider info (name, specialty, NPI) plus ratings & reviews.
+              Query from <strong>one endpoint</strong> (gateway:4000) to access both Hasura data (members, claims, eligibility)
+              and federated Provider data!
+            </p>
+            <p className="text-xs text-blue-600 mt-2">
+              <strong>Note:</strong> Hasura's <code className="bg-blue-100 px-1">provider_records</code> table was renamed to avoid conflicts.
+              This demonstrates a real migration pattern when introducing Apollo Federation.
             </p>
           </div>
         </div>
@@ -131,25 +135,25 @@ export function ProviderRatings() {
       </div>
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-8">
-        <h3 className="font-semibold text-gray-900 mb-2">🔍 How This Works (Entity Resolution)</h3>
+        <h3 className="font-semibold text-gray-900 mb-2">🔍 How This Works (Apollo Federation)</h3>
         <div className="text-sm text-gray-700 space-y-2">
           <p>
-            <strong>1. Hasura Subgraph (Port 8080):</strong> Defines base Provider type (id, name, specialty, NPI)
+            <strong>1. Providers Subgraph (Port 3002):</strong> Defines Provider type with <code className="bg-gray-100 px-1">@key(fields: "id")</code>
           </p>
           <p>
-            <strong>2. Ratings Subgraph (Port 3002):</strong> Extends Provider with @key(fields: "id") to add rating & reviews
+            <strong>2. Hasura (Port 8080):</strong> Provides members, claims, eligibility_checks, provider_records (database operations)
           </p>
           <p>
-            <strong>3. Apollo Gateway (Port 4000):</strong> Combines both via entity resolution
+            <strong>3. Apollo Gateway (Port 4000):</strong> Federates providers subgraph, exposes unified endpoint
           </p>
           <p className="pt-2 border-t">
-            <span className="text-purple-600 font-semibold">Entity Resolution Flow:</span><br />
-            Gateway queries Hasura for providers → Gets provider IDs → Calls ratings subgraph's
-            <code className="bg-gray-100 px-1">__resolveReference</code> for each ID → Merges results →
-            Returns unified Provider with both base fields and extensions!
+            <span className="text-purple-600 font-semibold">Key Concept:</span><br />
+            Provider type uses <code className="bg-gray-100 px-1">@key</code> directive to enable federation. The gateway can resolve
+            Provider entities by ID using <code className="bg-gray-100 px-1">__resolveReference</code>. Other subgraphs could extend this type!
           </p>
           <p className="text-xs text-gray-600 mt-2 pt-2 border-t">
-            <strong>Requirement:</strong> Hasura v2.10.0+ with HASURA_GRAPHQL_ENABLE_APOLLO_FEDERATION=true
+            <strong>Limitation:</strong> Hasura v2/v3 types cannot be extended by Apollo subgraphs. That's why provider_records was renamed -
+            demonstrating a real-world migration pattern.
           </p>
         </div>
       </div>

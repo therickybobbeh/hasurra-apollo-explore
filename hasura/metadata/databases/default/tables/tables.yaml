@@ -2,4 +2,4 @@
 - "!include public_eligibility_checks.yaml"
 - "!include public_members.yaml"
 - "!include public_notes.yaml"
-- "!include public_providers.yaml"
+- "!include public_provider_records.yaml"
