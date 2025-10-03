@@ -12,7 +12,7 @@ A comprehensive learning application that teaches modern GraphQL development wit
 - ✅ **Custom Actions** - Eligibility verification via REST API integration
 - ✅ **Apollo Client** - HTTP + WebSocket links, optimistic updates, normalized cache
 - ✅ **React + TypeScript** - Modern frontend with TailwindCSS
-- ✅ **Apollo Federation** - Gateway + subgraph with ratings, visualize in Apollo Studio
+- ✅ **Apollo Federation** - TRUE federation with `@key` directive, demonstrates Hasura limitation workaround
 - ✅ **PromptQL Examples** - Natural language to SQL query concepts
 - ✅ **Cross-Platform** - Native setup for Windows, macOS, Linux (no Docker)
 - ✅ **Learning Challenges** - 12+ hands-on exercises from beginner to expert

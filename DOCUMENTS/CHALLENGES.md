@@ -42,19 +42,19 @@ See **[TESTING_GUIDE.md](TESTING_GUIDE.md)** for complete testing documentation.
 **Tasks**:
 1. Open Hasura Console at `http://localhost:8080/console`
 2. Navigate to the "API" tab (GraphiQL)
-3. Write a query to fetch all claims with their provider information
+3. Write a query to fetch all claims with their provider_record information
 4. Use the "Explorer" panel to build queries visually
 5. Add filters to show only denied claims (`status: "denied"`)
 6. Limit results to 10 and add pagination with offset
 
 **Success Criteria**:
-- Query returns claims with nested provider data
+- Query returns claims with nested provider_record data
 - Filters work correctly
 - You understand GraphQL query structure
 
 **Hints**:
 - Use the `claims` table as your starting point
-- Provider data comes from the `provider` relationship
+- Provider data comes from the `provider_record` relationship
 - Filter syntax: `where: { status: { _eq: "denied" } }`
 
 <details>
@@ -73,7 +73,7 @@ query GetDeniedClaims {
     dos
     charge_cents
     denial_reason
-    provider {
+    provider_record {
       name
       specialty
       npi
@@ -96,7 +96,7 @@ query GetDeniedClaims {
    - Which tables have array relationships? (one-to-many)
 3. Write a query that fetches a member with:
    - All their claims
-   - Each claim's provider details
+   - Each claim's provider_record details
    - Aggregate count of total claims
 
 **Success Criteria**:
@@ -125,7 +125,7 @@ query GetMemberWithClaims($memberId: uuid!) {
       cpt
       charge_cents
       status
-      provider {
+      provider_record {
         name
         specialty
       }
@@ -682,26 +682,55 @@ UI:
 
 ### Challenge 7: Apollo Federation with Provider Ratings
 
-**Goal**: Extend the schema using Apollo Federation.
+**Goal**: Understand TRUE Apollo Federation and its limitations with Hasura.
+
+**Important Context**:
+⚠️ **Hasura v2/v3 Limitation**: Hasura types **cannot be extended** by Apollo subgraphs. This is why we:
+1. Renamed Hasura's `providers` table → `provider_records`
+2. Created a standalone federated `Provider` type with `@key(fields: "id")`
+3. Set up a gateway to combine both Hasura and the federated subgraph
+
+This demonstrates a **real-world migration pattern** when introducing federation to an existing system!
 
 **Tasks**:
-1. Examine the subgraph in `app/server/src/index.ts`
-2. Add a new field to the subgraph: `recentReviews: [Review!]!`
-3. Create sample review data in `app/server/src/ratings.json`
-4. Query the federated schema from the client
-5. Understand how `@key` and `@extends` work
+1. Examine the federated `Provider` type in `app/server/src/index.ts`
+2. Review the gateway configuration in `app/gateway/src/index.ts`
+3. Start the federated system: `npm run federated:dev`
+4. Query the unified endpoint at http://localhost:4000/graphql
+5. Compare `provider_records` (Hasura) vs `providers` (federated)
 
 **Success Criteria**:
-- Subgraph extends the `providers` type
-- You can query both Hasura and subgraph fields in one query
-- Federation resolves references correctly
+- Understand why `provider_records` was renamed
+- Can query both Hasura data AND federated Provider type from one endpoint
+- Understand `@key` directive and `__resolveReference` pattern
+- Can explain the Hasura/Apollo limitation
+
+**Example Query**:
+```graphql
+query UnifiedQuery {
+  # From Hasura
+  members(limit: 2) {
+    first_name
+  }
+
+  # From federated subgraph
+  providers {
+    name
+    rating
+    reviews {
+      comment
+    }
+  }
+}
+```
 
 **Hints**:
-- The subgraph uses `@apollo/subgraph` package
-- Reference resolvers use the `__resolveReference` function
-- You need to combine Hasura + subgraph endpoints in Apollo Client
+- The gateway at port 4000 combines both subgraphs
+- `@key(fields: "id")` marks Provider as a federated entity
+- `__resolveReference` enables entity resolution
+- See FEDERATION_GUIDE.md for complete explanation
 
-**Bonus**: Set up Apollo Gateway to stitch both graphs together.
+**Bonus**: Add another custom subgraph that extends the Provider type!
 
 ---
 
@@ -739,7 +768,7 @@ subscription NewClaims($memberId: uuid!) {
     cpt
     dos
     status
-    provider {
+    provider_record {
       name
     }
   }
@@ -893,6 +922,104 @@ query SlowQuery {
 - Start with the database schema
 - Use existing code as templates
 - Test each layer before moving to the next
+
+---
+
+---
+
+### Challenge 13: Cloud Deployment (Windows)
+
+**Difficulty**: 🔥🔥🔥🔥 Expert
+**Estimated Time**: 4-6 hours
+**Prerequisites**: Complete Challenges 1-7
+
+**Objective**: Deploy the entire ClaimSight stack to cloud services using free tiers. Perfect for Windows users exploring cloud-native GraphQL architectures.
+
+**Reference Guide**: `DOCUMENTS/CLOUD_DEPLOYMENT.md`
+
+**Tasks**:
+
+1. **Database Setup** (`CLOUD_DEPLOYMENT.md` → Step 1):
+   - Create Neon PostgreSQL account (free tier)
+   - Get connection string
+   - Apply migrations using Hasura CLI from Windows
+
+2. **Hasura Cloud** (`CLOUD_DEPLOYMENT.md` → Step 2):
+   - Create Hasura Cloud project
+   - Connect to Neon database
+   - Apply metadata from `hasura/metadata/`
+   - Enable Apollo Federation (`HASURA_GRAPHQL_ENABLE_APOLLO_FEDERATION=true`)
+   - Configure admin secret and CORS
+
+3. **Deploy Action Handler** (`CLOUD_DEPLOYMENT.md` → Step 3):
+   - Deploy `hasura/actions/handlers/` to Render
+   - Configure environment variables
+   - Update Hasura actions to point to deployed handler
+   - **Reference**: `hasura/metadata/actions.yaml`
+
+4. **Deploy Providers Subgraph** (`CLOUD_DEPLOYMENT.md` → Step 4):
+   - Deploy `app/server/` to Render
+   - Test federation schema with `{ _service { sdl } }`
+   - **Reference**: `app/server/src/index.ts` (Provider type with `@key`)
+
+5. **Deploy Federation Gateway** (`CLOUD_DEPLOYMENT.md` → Step 5):
+   - Deploy `app/gateway/` to Render
+   - Configure subgraph URLs
+   - Test federation query combining Hasura + Providers
+   - **Reference**: `app/gateway/src/index.ts` (IntrospectAndCompose)
+
+6. **Deploy React Frontend** (`CLOUD_DEPLOYMENT.md` → Step 6):
+   - Update `app/client/.env.production` to point to gateway
+   - Deploy to Vercel
+   - Update Hasura CORS for Vercel domain
+   - **Reference**: `app/client/src/apollo/client.ts`
+
+7. **Apollo Studio (Optional)** (`CLOUD_DEPLOYMENT.md` → Step 7):
+   - Create Apollo Studio account
+   - Publish subgraph schemas using Rover CLI
+   - View federated schema in Studio
+   - Explore schema analytics
+
+8. **End-to-End Testing**:
+   - Run health checks on all services
+   - Test provider ratings query (federation)
+   - Test eligibility check (action)
+   - Test member claims query (Hasura)
+
+**Success Criteria**:
+- All services deployed and accessible via HTTPS
+- Frontend loads from Vercel domain
+- Federation query works from gateway (combining Hasura + Providers subgraph)
+- Eligibility check action executes successfully
+- Zero monthly cost (using only free tiers)
+
+**Key Files to Reference**:
+- `DOCUMENTS/CLOUD_DEPLOYMENT.md` - Complete step-by-step guide
+- `.env.example` - Environment variable template
+- `app/client/src/apollo/client.ts` - Apollo Client config (update endpoints)
+- `app/gateway/src/index.ts` - Gateway subgraph configuration
+- `hasura/config.yaml` - Hasura CLI endpoint
+- `hasura/metadata/actions.yaml` - Action handler URLs
+
+**Learning Outcomes**:
+- Deploy PostgreSQL to cloud (Neon)
+- Configure Hasura Cloud with migrations and metadata
+- Deploy Node.js services to Render/Railway
+- Deploy React app to Vercel
+- Manage environment variables across services
+- Understand free tier limitations and optimization
+- Apollo Studio schema registry
+- Windows-specific tooling (npm global packages, PowerShell)
+
+**Troubleshooting**:
+See `CLOUD_DEPLOYMENT.md` → "Troubleshooting (Windows-Specific)" for:
+- npm permission errors
+- hasura CLI PATH issues
+- Git authentication
+- CORS configuration
+- Free tier service sleep/wake behavior
+
+**Architecture Diagram**: See `CLOUD_DEPLOYMENT.md` for complete cloud architecture diagram.
 
 ---
 
