@@ -67,48 +67,45 @@ hasura version
 
 ---
 
-## 🚀 Step 2: Create Project with GraphQL Endpoint
+## 🚀 Step 2: Create Project and Initialize Database
 
-### 2.1 Select Project Type
+### 2.1 Create Hasura Project
 
-1. After logging in, you'll see project creation options
-2. **Click** "Work with GraphQL endpoint" (this creates a new Hasura project)
+1. After logging in, **click** "Work with GraphQL endpoint" (this creates a new Hasura project)
+2. Wait ~30 seconds for project provisioning
 
-### 2.2 Choose Database Provider
+### 2.2 Initialize Neon PostgreSQL Database
 
-Hasura will prompt you to select a database:
-
-1. **Select** "Neon" (marked as **FREE** ⭐)
+1. In the Hasura Console, you'll be prompted to connect a database
+2. **Select** "Neon" (marked as **FREE** ⭐)
    - Neon provides serverless PostgreSQL
    - Includes 0.5 GB storage on free tier
    - Auto-scaling, branching support
    - Perfect for development and learning
 
-2. **Other options** (skip these for free tier):
-   - Bring your own database
-   - Other cloud providers
+3. Follow the prompts to:
+   - Create a new Neon database (or connect existing)
+   - Name your database (e.g., `hasura-postgres`)
+   - Select region closest to your users
+   - Click "Connect Database"
 
-### 2.3 Configure Neon Database
+4. Wait ~30-60 seconds for database initialization
 
-1. **Database name**: `hasura-postgres` (or your preferred name)
-2. **Region**: Choose closest to your users:
-   - `US East (N. Virginia)` - for USA
-   - `EU West (Frankfurt)` - for Europe
-   - `Asia Pacific (Singapore)` - for Asia
-3. **Click** "Connect Database" or "Create Project"
+### 2.3 Verify Database Connection
 
-Wait ~30-60 seconds for provisioning.
+1. In Hasura Console, go to **"Data"** tab (database icon in left sidebar)
+2. You should see your database connected (usually named **"default"**)
+3. ✅ Database is ready!
 
 ### 2.4 Note Your Project Details
 
-Once created, you'll see the Hasura Console. Note these important details:
+**⚠️ Save these important details:**
 
 - **GraphQL Endpoint:** `https://your-project-name.hasura.app/v1/graphql`
-- **Admin Secret:** Automatically generated (click "Show" to reveal)
+- **Admin Secret:** Find in Project Settings → Env Vars (click "Show" to reveal)
 - **Project ID:** In the URL `cloud.hasura.io/project/{PROJECT_ID}`
-- **Database URL:** Available in Data tab
 
-**⚠️ Save your admin secret immediately!** Store in password manager or `.env` file:
+Store in `.env.cloud` file:
 
 ```bash
 # .env.cloud
@@ -116,125 +113,191 @@ HASURA_GRAPHQL_ENDPOINT=https://your-project-name.hasura.app/v1/graphql
 HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret-here
 ```
 
----
+### 2.5 Get Database Connection String (Optional)
 
-## 🗄️ Step 3: Get Database Connection Details
+If you need direct database access for debugging:
 
-Your Neon PostgreSQL database is already connected to Hasura!
-
-### 3.1 Find Database URL
-
-1. In Hasura Console, click **"Data"** tab (database icon in left sidebar)
-2. You'll see database already connected as **"default"**
-3. Click the database name → **"Edit"** or **"Connection Settings"**
-4. Copy **Database URL**: `postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb`
-
-### 3.2 Store Database URL Locally
+1. In **Data** tab, click your database name
+2. Click **"Connection Settings"** or **"Edit"**
+3. Copy **Database URL**: `postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb`
 
 ```bash
-# .env.cloud
+# Add to .env.cloud
 DATABASE_URL=postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
 ```
 
-**Note:** Neon requires SSL, so `?sslmode=require` is already included.
+---
+
+## 🚀 Step 3: Set Up Database Schema
+
+Now we'll create the database schema in your Neon database. **We'll use Hasura's Console** (point-and-click) rather than CLI migrations to avoid conflicts with your local development setup.
+
+### What We're Setting Up
+
+- **Database Schema** = Tables, indexes, constraints (members, claims, providers, notes, etc.)
+- **Row-Level Security (RLS)** = Database-level permissions
+- **Hasura Metadata** = GraphQL configuration (relationships, permissions, actions)
+
+### 3.1 Create Database Schema via Hasura Console
+
+Hasura's strength: Give it a database with tables, and it auto-generates GraphQL! 🚀
+
+#### Option A: SQL Tab in Hasura Console (Recommended - No CLI Needed)
+
+1. **Open Hasura Console**
+   - Go to https://cloud.hasura.io/
+   - Click on your project
+   - Click **"Launch Console"**
+
+2. **Navigate to SQL Tab**
+   - In left sidebar, click **"Data"** (database icon)
+   - Click **"SQL"** tab at top
+
+3. **Run Schema SQL**
+   - Open `db/schema.sql` from your project in a text editor
+   - Copy the entire contents
+   - Paste into the SQL editor in Hasura Console
+   - Click **"Run!"** button
+   - ✅ You should see "Success!" - this created all your tables
+
+4. **Run Indexes SQL**
+   - Open `db/indexes.sql` from your project
+   - Copy and paste into SQL editor
+   - Click **"Run!"**
+   - ✅ Creates performance indexes
+
+5. **Run RLS Policies SQL**
+   - Open `db/rls.sql` from your project
+   - Copy and paste into SQL editor
+   - Click **"Run!"**
+   - ✅ Enables Row-Level Security policies
+
+**Expected Result:** You should see tables created successfully with no errors.
+
+#### Option B: Direct Database Connection (Advanced - psql)
+
+If you're comfortable with command-line database tools:
+
+```bash
+# Get your Neon database URL from Hasura Console (Step 2.5)
+# Format: postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb
+
+# Set as environment variable
+export DATABASE_URL="postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+# Navigate to project root
+cd /Users/bobbycole/github/medica/poc-has-apal
+
+# Run SQL files in order
+psql $DATABASE_URL -f db/schema.sql
+psql $DATABASE_URL -f db/indexes.sql
+psql $DATABASE_URL -f db/rls.sql
+```
 
 ---
 
-## 🚀 Step 4: Apply Migrations and Metadata
+### 3.2 Track Tables in Hasura (Auto-Generate GraphQL) ✨
 
-Now push your local database schema to Hasura Cloud's Neon database.
+This is where Hasura's magic happens! It will auto-discover your database tables and generate GraphQL.
 
-### 4.1 Initialize Hasura Project (if not already done)
+1. **In Hasura Console → Data tab**
+2. You'll see **"Untracked tables or views"** section with a list of tables:
+   - `members`
+   - `providers`
+   - `provider_records`
+   - `claims`
+   - `notes`
+   - `eligibility_checks`
 
-```bash
-# In your project root
-cd /path/to/poc-has-apal
+3. **Click "Track All"** button (or track each table individually)
 
-# Initialize Hasura configuration
-npx hasura-cli init hasura --endpoint https://your-project-name.hasura.app
-```
+4. **✅ Done!** Hasura has now auto-generated:
+   - GraphQL queries for each table
+   - Mutations (insert, update, delete)
+   - Subscriptions (real-time updates)
 
-This creates `hasura/` directory with:
-- `migrations/` - Database schema changes
-- `metadata/` - Hasura configuration (permissions, relationships, actions)
-- `seeds/` - Sample data
+---
 
-### 4.2 Configure Hasura CLI
+### 3.3 Import Hasura Metadata (Relationships, Permissions, Actions)
 
-Edit `hasura/config.yaml`:
+Now import the Hasura configuration (relationships, permissions, actions) using the CLI **without modifying your local config**.
 
-```yaml
-version: 3
-endpoint: https://your-project-name.hasura.app
-admin_secret: your-admin-secret-here
-metadata_directory: metadata
-migrations_directory: migrations
-seeds_directory: seeds
-```
+#### Why Use CLI Here?
 
-**Or use environment variables:**
+The metadata includes complex configurations (permissions, relationships, actions) that are easier to import from existing files than recreate manually.
+
+#### Import Metadata with CLI Flags
 
 ```bash
-export HASURA_GRAPHQL_ENDPOINT=https://your-project-name.hasura.app
-export HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret
+# Navigate to project root
+cd /Users/bobbycole/github/medica/poc-has-apal
+
+# Import metadata using command-line flags (doesn't touch config.yaml)
+npx hasura-cli metadata apply \
+  --endpoint https://your-project-name.hasura.app \
+  --admin-secret your-admin-secret-from-step-2.4
 ```
 
-### 4.3 Apply Migrations
-
-Create database tables and RLS policies in your Neon database:
-
-```bash
-# Navigate to hasura directory
-cd hasura
-
-# Apply all migrations
-npx hasura-cli migrate apply --database-name default
-
-# Verify
-npx hasura-cli migrate status --database-name default
-```
+**What this does:**
+- Reads configuration from `hasura/metadata/`
+- Sets up table relationships (member → claims, claim → notes, etc.)
+- Configures permissions (admin, member, provider roles)
+- Registers Hasura Actions (checkEligibility)
+- Leaves `hasura/config.yaml` alone (still points to localhost for local labs)
 
 **Expected output:**
 ```
-INFO migrations applied
-VERSION        NAME                           SOURCE STATUS  DATABASE STATUS
-1234567890123  init                          Present Present
-1234567890124  create_members_table          Present Present
-1234567890125  create_claims_table           Present Present
-1234567890126  create_rls_policies           Present Present
+INFO metadata applied
 ```
 
-### 4.4 Apply Metadata
-
-Configure Hasura (relationships, permissions, actions):
-
+**Verify metadata:**
 ```bash
-# Apply metadata
-npx hasura-cli metadata apply
-
-# Verify
-npx hasura-cli metadata diff
+npx hasura-cli metadata diff \
+  --endpoint https://your-project-name.hasura.app \
+  --admin-secret your-admin-secret
 ```
 
-**Expected output:** `✔ Metadata is consistent`
-
-### 4.5 Apply Seeds (Optional)
-
-Load sample data for testing:
-
-```bash
-# Apply seed data
-npx hasura-cli seed apply --database-name default
-
-# Or apply specific seed file
-npx hasura-cli seed apply --database-name default --file seeds/default/members.sql
-```
+**Expected:** No differences or `✔ Metadata is consistent`
 
 ---
 
-## ✅ Step 5: Verify Deployment
+### 3.4 Load Sample Data (Optional)
 
-### 5.1 Open Hasura Console
+Load sample members, claims, and providers for testing:
+
+1. **Open `db/seeds.sql`** (if it exists) in text editor
+2. **In Hasura Console → Data → SQL tab**
+3. **Paste and run** the seed SQL
+
+**Or use the data entry in the Console:**
+- Go to Data → members → Insert Row
+- Add sample members manually
+
+---
+
+### 3.5 Troubleshooting
+
+**Error: "relation 'members' already exists"**
+- Tables already created! Skip to step 3.2 (Track Tables)
+
+**Error: "permission denied for schema public"**
+- Check that you're using the correct database URL with proper credentials
+- Ensure SSL mode: `?sslmode=require` is in the connection string
+
+**Error: "failed to connect to hasura server"**
+- Verify your endpoint URL (should start with `https://`)
+- Check admin secret is correct
+- Make sure you're connected to the internet
+
+**Metadata apply fails with "action handler not found"**
+- This is OK - the action handler isn't deployed yet
+- We'll configure it in Step 6
+
+---
+
+## ✅ Step 4: Verify Deployment
+
+### 4.1 Open Hasura Console
 
 Visit your Hasura Cloud project and click **"Launch Console"** or go directly to:
 ```
@@ -301,9 +364,9 @@ mutation CheckEligibility {
 
 ---
 
-## 🔐 Step 6: Configure Security
+## 🔐 Step 5: Configure Security
 
-### 6.1 Rotate Admin Secret (Recommended)
+### 5.1 Rotate Admin Secret (Recommended)
 
 Don't use the default admin secret in production:
 
@@ -313,7 +376,7 @@ Don't use the default admin secret in production:
 4. Click **"Edit"** → Generate new secret
 5. Update local `.env.cloud` file with new secret
 
-### 6.2 Configure JWT Authentication
+### 5.2 Configure JWT Authentication
 
 For production, replace admin secret with JWT:
 
@@ -339,7 +402,7 @@ For production, replace admin secret with JWT:
 
 See [Challenge 15: JWT Authentication](../../DOCUMENTS/CHALLENGES.md#task-21-jwt-authentication-setup) for complete setup.
 
-### 6.3 Set Query Limits
+### 5.3 Set Query Limits
 
 Protect against query depth attacks:
 
@@ -353,7 +416,7 @@ Protect against query depth attacks:
 | `HASURA_GRAPHQL_ENABLE_CONSOLE` | `true` | Enable console (disable in prod) |
 | `HASURA_GRAPHQL_DEV_MODE` | `false` | Production mode |
 
-### 6.4 Configure Allowed Origins (CORS)
+### 5.4 Configure Allowed Origins (CORS)
 
 Restrict which domains can query your API:
 
@@ -365,11 +428,11 @@ Restrict which domains can query your API:
 
 ---
 
-## 🔗 Step 7: Configure Hasura Actions Handler
+## 🔗 Step 6: Configure Hasura Actions Handler
 
 Hasura Actions require an external webhook. You have two options:
 
-### Option A: Deploy to Render.com (Recommended)
+### 6.1 Deploy to Render.com (Recommended)
 
 See [../render/actions-handler-guide.md](../render/actions-handler-guide.md) for deploying the action handler.
 
@@ -389,11 +452,11 @@ git push
 # 6. Port: 3001
 ```
 
-### Option B: Use Hasura Cloud Functions (Enterprise)
+### 6.2 Use Hasura Cloud Functions (Enterprise)
 
 Available on Hasura Cloud Enterprise plan only.
 
-### 6.1 Update Action Handler URL
+### 6.3 Update Action Handler URL
 
 1. In Hasura Console → **Actions** tab
 2. Click **"checkEligibility"** action
@@ -403,7 +466,7 @@ Available on Hasura Cloud Enterprise plan only.
    ```
 4. Click **"Save"**
 
-### 6.2 Test Action Again
+### 6.4 Test Action Again
 
 ```graphql
 mutation TestAction {
@@ -427,11 +490,11 @@ mutation TestAction {
 
 ---
 
-## 📊 Step 8: Enable Monitoring
+## 📊 Step 7: Enable Monitoring
 
 Hasura Cloud includes built-in monitoring.
 
-### 8.1 View Metrics
+### 7.1 View Metrics
 
 1. In Hasura Cloud Console → **Monitoring** tab
 2. View:
@@ -440,7 +503,7 @@ Hasura Cloud includes built-in monitoring.
    - **Latency:** P50, P95, P99 response times
    - **Active Subscriptions:** WebSocket connections
 
-### 8.2 Set Up Alerts (Pro Plan)
+### 7.2 Set Up Alerts (Pro Plan)
 
 Available on Pro plan and above:
 
@@ -451,7 +514,7 @@ Available on Pro plan and above:
    - Notification: Email or Slack
    - Cooldown: 5 minutes
 
-### 8.3 View Query Analytics (Pro Plan)
+### 7.3 View Query Analytics (Pro Plan)
 
 1. Go to **Monitoring** → **Operations**
 2. See:
@@ -461,11 +524,11 @@ Available on Pro plan and above:
 
 ---
 
-## 🔄 Step 9: Set Up Continuous Deployment
+## 🔄 Step 8: Set Up Continuous Deployment
 
 Automate migrations and metadata updates using GitHub Actions.
 
-### 9.1 Create GitHub Action Workflow
+### 8.1 Create GitHub Action Workflow
 
 Create `.github/workflows/hasura-deploy.yml`:
 
