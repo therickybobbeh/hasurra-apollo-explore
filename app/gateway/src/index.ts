@@ -26,6 +26,13 @@ const HASURA_SECRET = process.env.HASURA_GRAPHQL_ADMIN_SECRET || '';
 const SUBGRAPH_URL = process.env.SUBGRAPH_URL || 'http://localhost:3002/graphql';
 const GATEWAY_PORT = process.env.GATEWAY_PORT || 4000;
 
+// Debug logging
+console.log('🔧 Gateway Configuration:');
+console.log(`   HASURA_URL: ${HASURA_URL}`);
+console.log(`   HASURA_SECRET: ${HASURA_SECRET ? '***' + HASURA_SECRET.slice(-4) : 'NOT SET'}`);
+console.log(`   SUBGRAPH_URL: ${SUBGRAPH_URL}`);
+console.log(`   GATEWAY_PORT: ${GATEWAY_PORT}\n`);
+
 const app = express();
 
 // Wait for Hasura to be ready with federation enabled
@@ -45,12 +52,18 @@ async function waitForHasura() {
       });
 
       const data = await response.json();
+
+      // Debug: Show what we got back
+      if (i === 0) {
+        console.log('🔍 Hasura response:', JSON.stringify(data).substring(0, 200) + '...');
+      }
+
       if (data.data?._service?.sdl) {
         console.log('✓ Hasura is ready with Apollo Federation enabled');
         return true;
       }
     } catch (error) {
-      // Ignore errors and retry
+      console.log(`❌ Error on attempt ${i + 1}:`, error instanceof Error ? error.message : error);
     }
 
     if (i < maxRetries - 1) {

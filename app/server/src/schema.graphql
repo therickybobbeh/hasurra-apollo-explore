@@ -1,13 +1,15 @@
 # Apollo Federation Subgraph Schema
-# Extends Provider type with rating information
+# Extends provider_records type (from Hasura) with rating information
 
 extend schema
   @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external"])
 
-type Provider @key(fields: "id") {
-  id: ID! @external
+scalar uuid
+
+type provider_records @key(fields: "id") {
+  id: uuid! @external
   rating: Float
-  ratingCount: Int
+  reviewCount: Int
   reviews: [Review!]!
 }
 

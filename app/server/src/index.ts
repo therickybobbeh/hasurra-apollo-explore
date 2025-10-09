@@ -26,32 +26,30 @@ const ratingsData = JSON.parse(
 );
 
 // GraphQL schema - Provider Service with Ratings
-// Demonstrates Apollo Federation by defining base Provider type with @key
-// This can be extended by other subgraphs
+// Demonstrates Apollo Federation by extending provider_records type from Hasura
 const typeDefs = gql`
   extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key"])
+    @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external"])
 
-  type Provider @key(fields: "id") {
-    id: ID!
-    name: String!
-    specialty: String!
-    npi: String!
+  scalar uuid
+
+  type provider_records @key(fields: "id") {
+    id: uuid! @external
     rating: Float
-    ratingCount: Int
+    reviewCount: Int
     reviews: [Review!]!
   }
 
   type Review {
     id: ID!
+    providerId: ID!
     rating: Int!
     comment: String
     date: String!
   }
 
   type Query {
-    provider(id: ID!): Provider
-    providers: [Provider!]!
+    _empty: String
   }
 `;
 
@@ -82,7 +80,7 @@ const resolvers = {
       return {
         ...provider,
         rating: ratingInfo?.rating || null,
-        ratingCount: ratingInfo?.ratingCount || 0,
+        reviewCount: ratingInfo?.ratingCount || 0,
         reviews: ratingInfo?.reviews || []
       };
     },
@@ -92,13 +90,13 @@ const resolvers = {
         return {
           ...provider,
           rating: ratingInfo?.rating || null,
-          ratingCount: ratingInfo?.ratingCount || 0,
+          reviewCount: ratingInfo?.ratingCount || 0,
           reviews: ratingInfo?.reviews || []
         };
       });
     }
   },
-  Provider: {
+  provider_records: {
     __resolveReference(reference: { id: string }) {
       const provider = providers.find(p => p.id === reference.id);
       if (!provider) return null;
@@ -107,7 +105,7 @@ const resolvers = {
       return {
         ...provider,
         rating: ratingInfo?.rating || null,
-        ratingCount: ratingInfo?.ratingCount || 0,
+        reviewCount: ratingInfo?.ratingCount || 0,
         reviews: ratingInfo?.reviews || []
       };
     }

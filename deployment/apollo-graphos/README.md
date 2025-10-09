@@ -418,24 +418,44 @@ npm run server
 # Health check
 curl http://localhost:3002/health
 
+# Expected: {"status":"ok","service":"provider-ratings-subgraph"}
+
 # GraphQL query (check if schema is valid)
-curl -X POST http://localhost:3002/ \
+curl -X POST http://localhost:3002/graphql \
   -H "Content-Type: application/json" \
   -d '{"query":"{ _service { sdl } }"}'
+
+# Should return the federation schema SDL
 ```
 
-### 5.4 Add Sample Ratings Data
+### 5.4 Test Sample Ratings Data
 
 The subgraph starts with some seed data. Let's verify it:
 
 ```bash
-# Query available ratings
-curl -X POST http://localhost:3002/ \
+# Query providers with ratings
+curl -X POST http://localhost:3002/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query":"{ allRatings { providerId rating reviewCount } }"}'
+  -d '{"query":"{ providers { id name rating ratingCount } }"}'
 ```
 
-**Note:** The Providers subgraph doesn't resolve full provider data alone - it only adds ratings. Apollo Gateway will combine it with Hasura's provider data!
+**Expected response:**
+```json
+{
+  "data": {
+    "providers": [
+      {
+        "id": "734f62da-879d-45bb-b07b-8163182ef917",
+        "name": "Dr. Sarah Smith",
+        "rating": 4.8,
+        "ratingCount": 24
+      }
+    ]
+  }
+}
+```
+
+**Note:** This subgraph has its own mock provider data for standalone testing. When federated, Apollo Gateway will use Hasura's provider data and add ratings from this subgraph!
 
 ---
 
@@ -459,19 +479,70 @@ npm run federated:dev
 
 **Hasura runs separately** in Hasura Cloud (from Phase 1).
 
-### 6.2 Configure Gateway for Your Hasura Endpoint
+### 6.2 Enable Federation in Hasura Cloud
 
-Update `app/gateway/.env`:
+Before the gateway can connect, you need to enable Apollo Federation in your Hasura Cloud instance:
+
+1. Go to https://cloud.hasura.io/
+2. Open your project from Phase 1
+3. Click **"Env vars"** in the left sidebar
+4. Click **"New Env Var"**
+5. Add:
+   - **Key:** `HASURA_GRAPHQL_ENABLE_APOLLO_FEDERATION`
+   - **Value:** `true`
+6. Click **"Add"**
+
+**Hasura will restart automatically** (takes ~10-15 seconds).
+
+**Why needed?** This tells Hasura to expose the `_service { sdl }` query that Apollo Gateway uses for federation.
+
+### 6.3 Configure Gateway for Your Hasura Endpoint
+
+The gateway loads environment variables from the **project root `.env`** file. Update it to use Hasura Cloud:
 
 ```bash
-# app/gateway/.env
-HASURA_ENDPOINT=https://your-project.hasura.app/v1/graphql
-HASURA_ADMIN_SECRET=your-admin-secret-from-phase-1
-PROVIDERS_SUBGRAPH_URL=http://localhost:3002
-PORT=4000
+# Edit .env in project root
+# Comment out local Hasura, add Cloud settings:
+
+# Local Hasura (commented out when using Hasura Cloud)
+# HASURA_GRAPHQL_ENDPOINT=http://localhost:8080
+# HASURA_GRAPHQL_ADMIN_SECRET=claimsight_admin_secret_change_me
+
+# Hasura Cloud (Phase 2 - Federation)
+# NOTE: Base URL only - gateway code adds /v1/graphql
+HASURA_GRAPHQL_ENDPOINT=https://your-project.hasura.app
+HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret-from-phase-1
 ```
 
-### 6.3 Test Federated Query
+**Important:**
+- Use **base URL only** (without `/v1/graphql`) - the gateway code adds it
+- The gateway reads from project root `.env`, not `app/gateway/.env`
+- To switch back to local Hasura later, uncomment the local settings
+
+**Note:** The `.env` file is gitignored - your secrets are safe!
+
+### 6.4 Test Federated Query
+
+Now start the federated stack:
+
+```bash
+# From project root
+npm run federated:dev
+```
+
+**Expected output:**
+```
+✓ Eligibility action handler running on port 3001
+✓ Provider ratings subgraph running on port 3002
+✓ Hasura is ready with Apollo Federation enabled
+🚀 Apollo Federation Gateway ready!
+   GraphQL endpoint: http://localhost:4000/graphql
+```
+
+**If you see "Hasura did not become ready in time":**
+- Check that you added the `HASURA_GRAPHQL_ENABLE_APOLLO_FEDERATION=true` env var
+- Wait for Hasura Cloud to finish restarting
+- Check your `app/gateway/.env` has the correct HASURA_ENDPOINT
 
 Open http://localhost:4000/graphql in your browser (Apollo Explorer).
 
@@ -497,7 +568,7 @@ query FederatedProviders {
 
 This is **entity resolution** - the core of Apollo Federation!
 
-### 6.4 Checkpoint ✅
+### 6.5 Checkpoint ✅
 
 Before continuing, verify:
 - [ ] Providers subgraph running on port 3002
