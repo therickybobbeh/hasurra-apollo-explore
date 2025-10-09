@@ -1,0 +1,36 @@
+# Member-Claims Relationship - DDN Metadata
+
+kind: Relationship
+version: v1
+definition:
+  name: claims
+  source: Members
+  target:
+    model:
+      name: Claims
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: id
+      target:
+        modelField:
+          - fieldName: member_id
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: member
+  source: Claims
+  target:
+    model:
+      name: Members
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: member_id
+      target:
+        modelField:
+          - fieldName: id

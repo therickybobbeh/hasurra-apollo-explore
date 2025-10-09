@@ -1,0 +1,38 @@
+# Hasura DDN Subgraph Configuration
+# This file defines the ClaimSight DDN subgraph
+
+kind: Subgraph
+version: v1
+
+definition:
+  name: claimsight
+  generator:
+    rootPath: .
+
+  # Include all metadata files
+  includePaths:
+    - metadata/**/*.hml
+    - connector/**/*.yaml
+
+  # Environment configuration
+  envFile: .env
+
+  # Apollo Federation support
+  apolloFederation:
+    enabled: true
+    version: v2
+
+  # GraphQL configuration
+  graphql:
+    # Global settings
+    query:
+      rootOperationTypeName: Query
+      depth: 5
+    mutation:
+      rootOperationTypeName: Mutation
+    subscription:
+      rootOperationTypeName: Subscription
+
+    # Naming conventions
+    naming:
+      style: hasura-default

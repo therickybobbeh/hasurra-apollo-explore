@@ -1,0 +1,36 @@
+# PostgreSQL Connector Configuration for Hasura DDN
+# This connector replaces the direct database connection from Hasura v2
+
+kind: Connector
+version: v1
+definition:
+  name: postgres
+  type: postgres
+
+  # Connection configuration
+  connection:
+    uri:
+      valueFromEnv: POSTGRESQL_CONNECTION_STRING
+    poolSettings:
+      maxConnections: 50
+      idleTimeout: 30
+
+  # Schema introspection
+  introspection:
+    excludedSchemas:
+      - information_schema
+      - pg_catalog
+    includedSchemas:
+      - public
+
+  # Capabilities
+  capabilities:
+    queries: true
+    mutations: true
+    subscriptions: true
+    relationships: true
+
+  # Performance settings
+  settings:
+    queryTimeout: 30000
+    mutationTimeout: 60000

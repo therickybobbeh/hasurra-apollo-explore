@@ -28,6 +28,23 @@ A comprehensive learning application that teaches modern GraphQL development wit
 | Business Logic | Node.js/Express (Actions & Subgraph) |
 | NL Queries | PromptQL concepts |
 
+---
+
+## 🎓 Learning Labs
+
+**New to GraphQL?** Follow our progressive learning labs:
+
+| Lab | Topic | Time | Difficulty |
+|-----|-------|------|------------|
+| **[Phase 1](labs/phase-1-hasura-cloud/README.md)** | Hasura Cloud + PostgreSQL | 30 min | 🟢 Beginner |
+| **[Phase 2](labs/phase-2-apollo-federation/README.md)** | Apollo GraphOS Federation | 45 min | 🟡 Intermediate |
+| **[Phase 3](labs/phase-3-hasura-ddn/README.md)** | Hasura DDN Migration | 2-3 hrs | 🔴 Advanced |
+| **[Phase 4](labs/phase-4-promptql/README.md)** | PromptQL + AI Integration | 1-2 hrs | 🔴 Advanced |
+
+👉 **Start here:** [Labs Overview](labs/README.md)
+
+---
+
 ## Quick Start
 
 > **📘 Windows Users**: For a complete Docker-free setup using Hasura Cloud and native PostgreSQL, see the dedicated **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** with step-by-step instructions for PowerShell, PostgreSQL installation, and cloud deployment.

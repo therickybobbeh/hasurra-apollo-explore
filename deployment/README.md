@@ -2,7 +2,11 @@
 
 Complete guide to deploying ClaimSight to production using managed cloud services.
 
-> **💻 Looking for local development?** See the [local-lab](./local-lab/) subdirectory for Docker and native PostgreSQL setup. This guide focuses exclusively on **cloud deployment**.
+> **🎓 New to GraphQL?** Start with the [Learning Labs](../labs/) for step-by-step tutorials on Hasura Cloud, Apollo Federation, DDN, and PromptQL.
+
+> **💻 Looking for local development?** See the [local-lab](./local-lab/) subdirectory for Docker and native PostgreSQL setup.
+
+This guide focuses exclusively on **production deployment options**.
 
 ---
 
@@ -85,7 +89,7 @@ All services below are **100% free** with these limitations:
 
 ### Step 1: Deploy Hasura to Hasura Cloud
 
-See detailed guide: **[hasura-cloud/README.md](./hasura-cloud/README.md)**
+See detailed guide: **[Phase 1: Hasura Cloud](../labs/phase-1-hasura-cloud/README.md)**
 
 Quick version:
 1. Visit https://cloud.hasura.io/
@@ -169,7 +173,7 @@ VITE_HASURA_ADMIN_SECRET=your-admin-secret
 ### Deployment Steps
 
 #### 1. Deploy Hasura to Hasura Cloud
-See **[hasura-cloud/README.md](./hasura-cloud/README.md)** for detailed steps.
+See **[Phase 1: Hasura Cloud](../labs/phase-1-hasura-cloud/README.md)** for detailed steps.
 
 #### 2. Deploy Providers Subgraph to Render.com
 See **[render/providers-subgraph-guide.md](./render/providers-subgraph-guide.md)** for detailed steps.
@@ -200,7 +204,7 @@ PROVIDERS_SUBGRAPH_URL=https://your-subgraph.onrender.com
 ```
 
 #### 4. Publish Schemas to Apollo GraphOS
-See **[apollo-graphos/README.md](./apollo-graphos/README.md)** for detailed steps.
+See **[Phase 2: Apollo Federation](../labs/phase-2-apollo-federation/README.md)** for detailed steps.
 
 ```bash
 # Install Rover CLI locally
@@ -250,7 +254,7 @@ VITE_GRAPHQL_ENDPOINT=https://your-gateway.onrender.com/graphql
 See detailed guide: **[render/README.md](./render/README.md)**
 
 **Blueprint Deployment** (simplified):
-1. Deploy Hasura to Hasura Cloud ([guide](./hasura-cloud/README.md))
+1. Deploy Hasura to Hasura Cloud ([guide](../labs/phase-1-hasura-cloud/README.md))
 2. Click "New Blueprint Instance" on Render.com
 3. Connect GitHub repo
 4. Review resources:
@@ -374,7 +378,7 @@ Follow these phases in order to build understanding progressively:
 - GraphQL queries, mutations, and subscriptions
 - Row-level security and permissions
 
-**Deployment Guide:** [Hasura Cloud Setup](./hasura-cloud/README.md)
+**Deployment Guide:** [Phase 1: Hasura Cloud](../labs/phase-1-hasura-cloud/README.md)
 
 **Testing Your Work:**
 ```graphql
@@ -411,7 +415,7 @@ query GetMembers {
 - Entity resolution across subgraphs
 - Supergraph composition
 
-**Deployment Guide:** [Apollo GraphOS Federation](./apollo-graphos/README.md)
+**Deployment Guide:** [Phase 2: Apollo Federation](../labs/phase-2-apollo-federation/README.md)
 
 **Before Starting:** Complete Phase 1 (you need working Hasura Cloud)
 
@@ -562,9 +566,13 @@ Use this checklist when deploying to any environment:
 
 ## 📚 Resources
 
-### Cloud Deployment Guides (This Directory)
-- [Hasura Cloud Deployment](./hasura-cloud/README.md)
-- [Apollo GraphOS Setup](./apollo-graphos/README.md)
+### Learning Labs
+- [Phase 1: Hasura Cloud](../labs/phase-1-hasura-cloud/README.md) - Deploy database + GraphQL
+- [Phase 2: Apollo Federation](../labs/phase-2-apollo-federation/README.md) - Add federation
+- [Phase 3: Hasura DDN](../labs/phase-3-hasura-ddn/README.md) - Migrate to DDN v3
+- [Phase 4: PromptQL + AI](../labs/phase-4-promptql/README.md) - AI-powered queries
+
+### Production Deployment Guides
 - [Vercel Deployment](./vercel/README.md)
 - [Render.com Deployment](./render/README.md)
 - [Azure Enterprise Deployment](./azure/README.md)

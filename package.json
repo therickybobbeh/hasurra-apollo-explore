@@ -15,6 +15,8 @@
     "gateway:dev": "cd app/gateway && npm run dev",
     "federated:dev": "npx concurrently -n \"action,subgraph,gateway,client\" -c \"blue,yellow,magenta,green\" \"npm run action:dev\" \"npm run subgraph:dev\" \"npm run gateway:dev\" \"npm run client:dev\"",
     "all:dev": "npx concurrently -n \"action,client,subgraph\" -c \"blue,green,yellow\" \"npm run action:dev\" \"npm run client:dev\" \"npm run subgraph:dev\"",
+    "promptql:dev": "cd app/promptql && npm run dev",
+    "ddn:migrate": "tsx scripts/migrate-to-ddn.ts",
     "docs:generate": "magidoc generate",
     "docs:preview": "magidoc preview",
     "docs:serve": "http-server docs -p 8081 -o",
