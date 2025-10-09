@@ -6,9 +6,9 @@ CREATE INDEX idx_members_dob ON members(dob);
 CREATE INDEX idx_members_plan ON members(plan);
 CREATE INDEX idx_members_last_name ON members(last_name);
 
--- Providers indexes
-CREATE INDEX idx_providers_npi ON providers(npi);
-CREATE INDEX idx_providers_specialty ON providers(specialty);
+-- Provider Records indexes
+CREATE INDEX idx_provider_records_npi ON provider_records(npi);
+CREATE INDEX idx_provider_records_specialty ON provider_records(specialty);
 
 -- Claims indexes (most frequently queried table)
 CREATE INDEX idx_claims_member_id ON claims(member_id);

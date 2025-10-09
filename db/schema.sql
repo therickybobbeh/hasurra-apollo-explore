@@ -15,8 +15,8 @@ CREATE TABLE members (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Providers table
-CREATE TABLE providers (
+-- Provider Records table
+CREATE TABLE provider_records (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   npi TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE providers (
 CREATE TABLE claims (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   member_id UUID NOT NULL REFERENCES members(id) ON DELETE CASCADE,
-  provider_id UUID NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  provider_id UUID NOT NULL REFERENCES provider_records(id) ON DELETE CASCADE,
   dos DATE NOT NULL,
   cpt TEXT NOT NULL,
   charge_cents INTEGER NOT NULL CHECK (charge_cents >= 0),
@@ -75,8 +75,8 @@ CREATE TRIGGER update_members_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_providers_updated_at
-  BEFORE UPDATE ON providers
+CREATE TRIGGER update_provider_records_updated_at
+  BEFORE UPDATE ON provider_records
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
@@ -87,7 +87,7 @@ CREATE TRIGGER update_claims_updated_at
 
 -- Comments for documentation
 COMMENT ON TABLE members IS 'Health plan members/patients';
-COMMENT ON TABLE providers IS 'Healthcare providers (doctors, hospitals, etc.)';
+COMMENT ON TABLE provider_records IS 'Healthcare providers (doctors, hospitals, etc.)';
 COMMENT ON TABLE claims IS 'Medical claims submitted for services';
 COMMENT ON TABLE eligibility_checks IS 'Member eligibility verification results';
 COMMENT ON TABLE notes IS 'Case management notes for members';

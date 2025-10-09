@@ -1,33 +1,97 @@
-# Apollo GraphOS Deployment Guide
+# Apollo GraphOS Federation Guide - Phase 2
 
-Set up Apollo GraphOS for schema registry, managed federation, and observability.
+**Welcome to GraphQL Federation!** 🎉
+
+In [Phase 1](../hasura-cloud/README.md), you built a single GraphQL API with Hasura Cloud. Now you'll learn how to **combine multiple GraphQL services** into one unified API using Apollo Federation.
 
 ---
 
-## 📋 Overview
+## 📋 What You'll Build
 
-**Apollo GraphOS** (formerly Apollo Studio) is a cloud platform for managing federated GraphQL APIs with schema registry, monitoring, and analytics.
+By the end of this guide, you'll have:
 
-**What it provides:**
-- ✅ **Schema Registry** - Version control for GraphQL schemas
-- ✅ **Managed Federation** - Automatic gateway configuration
-- ✅ **Schema Checks** - Validate breaking changes before deploy
-- ✅ **Query Analytics** - Operation performance and usage tracking
-- ✅ **Distributed Tracing** - See query execution across subgraphs
-- ✅ **Field Usage** - Track which fields clients actually use
+1. **Apollo GraphOS Account** - Free schema registry (cloud)
+2. **Hasura Subgraph** - Your existing API registered as "subgraph 1"
+3. **Providers Subgraph** - New Node.js service with ratings/reviews ("subgraph 2")
+4. **Unified Supergraph** - One API that queries both services seamlessly
 
-**Time to complete:** 15-20 minutes
+### Before Federation (Phase 1):
+```
+Client → Hasura GraphQL API → PostgreSQL
+```
 
-**Cost:** Free for teams <10 people, then $49/user/month
+### After Federation (Phase 2):
+```
+Client → Apollo Supergraph
+         ├─→ Hasura Subgraph (claims, members)
+         └─→ Providers Subgraph (ratings, reviews)
+```
+
+---
+
+## 🎓 What You'll Learn
+
+✅ **Why Federation Matters** - When and why to use multiple GraphQL services
+✅ **Apollo Federation Directives** - `@key`, `@extends`, entity resolution
+✅ **Supergraph Composition** - How Apollo combines multiple schemas
+✅ **Schema Registry** - Version control for GraphQL schemas
+✅ **Cross-Service Queries** - Fetching data from multiple services in one query
+
+---
+
+## ⏱️ Time & Cost
+
+**Time:** 45 minutes
+**Cost:** **FREE** ⭐ (for teams <10 people)
+
+**Free Tier Includes:**
+- Unlimited subgraph publishes
+- Supergraph composition
+- Schema checks
+- Query analytics
+- Distributed tracing
 
 ---
 
 ## 🎯 Prerequisites
 
-- [x] Hasura Cloud deployment complete ([see guide](../hasura-cloud/README.md))
-- [x] Providers subgraph deployed ([see render guide](../render/README.md))
-- [x] Apollo Studio account (sign up at https://studio.apollographql.com/)
-- [x] Node.js 18+ installed locally
+**Required:**
+- ✅ **Phase 1 Complete** - Hasura Cloud deployment ([guide](../hasura-cloud/README.md))
+- ✅ **Hasura Endpoint** - Your `https://your-project.hasura.app/v1/graphql` URL
+- ✅ **Admin Secret** - From Hasura Cloud project settings
+- ✅ **Node.js 18+** installed locally
+- ✅ **Project cloned** - The poc-has-apal repository on your machine
+
+**Optional (for later deployment):**
+- Render.com account (free - for deploying Providers subgraph)
+- Git/GitHub (for version control)
+
+---
+
+## 💡 Why Federation? The Problem We're Solving
+
+In Phase 1, you built a complete GraphQL API with Hasura. So why add federation?
+
+**Scenario:** You want to add **provider ratings and reviews** to your system:
+
+**Option 1: Add to Hasura database** ❌
+- Ratings might come from a different data source (MongoDB, external API)
+- Managed by a different team
+- Requires custom business logic (average calculations, spam filtering)
+- Tightly couples all data to one database
+
+**Option 2: Create separate GraphQL service** ❌
+- Now clients need to call TWO APIs
+- Frontend must merge data from both
+- Can't query providers with ratings in one request
+
+**Option 3: Apollo Federation** ✅
+- Keep Hasura managing healthcare data
+- Create separate Providers subgraph for ratings
+- Apollo Gateway combines both into ONE API
+- Frontend queries ONE endpoint, gets data from both
+
+**Result:** One unified API, multiple specialized services!
 
 ---
 
@@ -42,80 +106,35 @@ Set up Apollo GraphOS for schema registry, managed federation, and observability
    - Google
    - Email
 
-### 1.2 Create Organization
+### 1.2 Welcome Screen
 
-1. After sign-up, you'll be prompted to create an organization
-2. **Organization name**: `claimsight` (or your company name)
-3. **Plan**: Select **"Free"** (upgradable later)
-4. Click **"Create organization"**
+After signing up, you'll see **"Welcome to GraphOS Studio"** with a 3-step onboarding:
 
----
-
-## 📊 Step 2: Create Graph
-
-### 2.1 Create New Graph
-
-1. In Apollo Studio dashboard, click **"New Graph"**
-2. **Graph title**: `ClaimSight API`
-3. **Graph ID**: `claimsight-api` (lowercase, no spaces)
-4. **Graph type**: Select **"Supergraph (Federation)"**
-5. Click **"Create"**
-
-### 2.2 Note Your Graph Ref
-
-Your **graph ref** format: `{graph-id}@{variant}`
-
-Example: `claimsight-api@main`
-
-- `claimsight-api`: Your graph ID
-- `main`: Variant (environment - use `main` for production, `staging` for staging)
-
-**Save this!** You'll need it for publishing schemas.
-
----
-
-## 🔑 Step 3: Generate API Key
-
-### 3.1 Create Graph API Key
-
-1. In your graph dashboard, click **"Settings"** (gear icon)
-2. Go to **"API Keys"** tab
-3. Click **"Create New Key"**
-4. **Key name**: `Rover CLI` (or descriptive name)
-5. **Role**: **"Graph Admin"** (needed for schema publishing)
-6. Click **"Create Key"**
-
-### 3.2 Save API Key
-
-**Copy the API key immediately!** It's only shown once.
-
-Store securely:
-```bash
-# .env.apollo
-APOLLO_KEY=service:claimsight-api:your-api-key-here
-APOLLO_GRAPH_REF=claimsight-api@main
+```
+Step one: Install the Rover CLI
+Step two: Authenticate
+Step three: Add your first graph
 ```
 
-**⚠️ Never commit API keys to Git!** Add `.env.apollo` to `.gitignore`.
+**Don't worry!** We'll walk through these steps together.
 
 ---
 
-## 🛠️ Step 4: Install Rover CLI
+## 🛠️ Step 2: Install Rover CLI
 
-**Rover** is Apollo's CLI for interacting with GraphOS.
+Apollo Studio will show you installation instructions. Follow along:
 
-### 4.1 Install Rover Locally
+### 2.1 Install Rover
 
-**Recommended: npm install (all platforms)**
+**Option 1: npm (Recommended - Works on all platforms)**
 ```bash
-# Install locally in your project
 npm install --save-dev @apollo/rover
 
 # Or use npx directly (no installation needed)
 npx @apollo/rover --version
 ```
 
-**Alternative: System-wide install (optional)**
+**Option 2: System-wide install (as shown in Apollo Studio)**
 
 *macOS / Linux:*
 ```bash
@@ -127,10 +146,10 @@ curl -sSL https://rover.apollo.dev/nix/latest | sh
 iwr 'https://rover.apollo.dev/win/latest' | iex
 ```
 
-### 4.2 Verify Installation
+### 2.2 Verify Installation
 
 ```bash
-# If installed locally
+# If using npm
 npx @apollo/rover --version
 
 # If installed system-wide
@@ -139,33 +158,361 @@ rover --version
 
 **Expected:** `Rover 0.x.x`
 
-### 4.3 Configure Rover
+---
 
-Set your API key as environment variable:
+## 🔑 Step 3: Authenticate Rover & Create Graph
+
+### 3.1 Create Personal API Key
+
+Apollo Studio will prompt you to authenticate. Here's how:
+
+1. In Apollo Studio, you should see **"Step two: Authenticate"**
+2. Click **"Create a personal API key"** or go to your profile settings
+3. **User Settings** → **Personal API Keys** → **Create New Key**
+4. **Key name**: `My Development Key` or `Rover CLI`
+5. Click **"Create Key"**
+6. **Copy the key immediately!** It's only shown once.
+
+**Format:** `user:gh.YourUsername:xxxxxxxxxxxxx`
+
+### 3.2 Authenticate Rover
+
+Back in your terminal, run:
 
 ```bash
-# macOS / Linux
-export APOLLO_KEY=service:claimsight-api:your-api-key-here
-export APOLLO_GRAPH_REF=claimsight-api@main
-
-# Windows (PowerShell)
-$env:APOLLO_KEY="service:claimsight-api:your-api-key-here"
-$env:APOLLO_GRAPH_REF="claimsight-api@main"
+rover config auth
 ```
 
-**Or create Rover config:**
+**Prompt:**
+```
+Go to https://studio.apollographql.com/user-settings/api-keys
+to get your API key.
+
+Apollo Studio API key:
+```
+
+**Paste your personal API key and press Enter.**
+
+**Expected output:**
+```
+Successfully saved API key.
+```
+
+### 3.3 Create Your First Graph
+
+Now you're ready to create a graph! Apollo Studio shows two options:
+
+1. **Add existing graph** - Create/register a supergraph in Apollo Studio
+2. **rover init** - Create a demo graph locally (skip this)
+
+**Choose: "Add existing graph"** (we'll create a new supergraph)
+
+You'll see a form like this:
+
+```
+Add a graph
+Adding your graph to GraphOS lets you explore it in Studio...
+
+Graph title: My Graph
+Graph ID: My-Graph-ly6ftf
+Graph architecture: Supergraph
+Default federation version: Federation 2.12
+Visibility: Public to organization
+```
+
+**Fill in the form:**
+
+1. **Graph title:** `ClaimSight API`
+2. **Graph ID:** Change to `claimsight-api` (lowercase, no random suffix)
+   - Delete the auto-generated ID
+   - Type: `claimsight-api`
+3. **Graph architecture:** Keep **"Supergraph"** selected ✅
+4. **Default federation version:** Keep **"Federation 2.12"** (or latest) ✅
+5. **Visibility:** Keep **"Public"** (visible to your organization)
+6. Click **"Next"** or **"Create Graph"**
+
+**Important:** Make sure "Supergraph" is selected for Graph architecture - this enables federation!
+
+### 3.4 Graph Created - Next Steps Screen
+
+After clicking "Create Graph", you'll see a screen with:
+
+```
+Think of this as your README. It lets you add notes, usage tips,
+or setup instructions to help your team...
+
+To continue, publish your first subgraph:
+
+$ APOLLO_KEY=service:claimsight-api:•••••••••••••••••••••• \
+  rover subgraph publish claimsight-api@current \
+  --schema "path-to-your-subgraph-schema.{graphql,gql}" \
+  --name your-subgraph-name \
+  --routing-url "your-subgraph-public-endpoint"
+```
+
+**Don't run this command yet!** We'll publish subgraphs in Step 7.
+
+**What to note:**
+
+1. **APOLLO_KEY** - Apollo shows your graph API key here (dots for security)
+   - Copy this key! It's the same format as: `service:claimsight-api:xxxxx`
+   - Save it to `.env.apollo` (if you didn't in Step 4)
+
+2. **Graph ref** - Look at the command: `claimsight-api@current`
+   - Format: `{graph-id}@{variant}`
+   - Your graph ID: `claimsight-api`
+   - Variant name: `current` (Apollo's default - same as `main`)
+
+**Save these values:**
+
 ```bash
-# Create config file
-npx @apollo/rover config auth
-
-# Enter your API key when prompted
+# .env.apollo (project root)
+APOLLO_KEY=service:claimsight-api:your-key-from-screen
+APOLLO_GRAPH_REF=claimsight-api@current
 ```
+
+**Note:** Apollo uses `@current` as the default variant. You can use `@current` or `@main` - they work the same way.
+
+**You can close this screen or leave it open.** We'll come back to publish schemas in Step 7!
 
 ---
 
-## 📤 Step 5: Publish Subgraph Schemas
+## 🔐 Step 4: Save Your Graph API Key
 
-### 5.1 Export Hasura Schema
+**Good news!** Apollo automatically created a **graph API key** when you created the graph (shown in Step 3.4).
+
+### 4.1 Copy the API Key
+
+On the "Next Steps" screen from Step 3.4, Apollo shows:
+
+```bash
+APOLLO_KEY=service:claimsight-api:••••••••••••••••••••••
+```
+
+**To reveal and copy the full key:**
+
+1. Click on the key (the dots) or look for a "copy" button
+2. **Copy the entire key** - format: `service:claimsight-api:xxxxxxxxxxxxx`
+
+**Alternative:** If you can't see the full key:
+
+1. In your graph, click **"Settings"** (gear icon)
+2. Go to **"This Graph"** → **"API Keys"** tab
+3. You'll see your automatically-created key
+4. Click to copy it
+
+### 4.2 Save to .env.apollo
+
+Create your Apollo configuration file:
+
+```bash
+# From project root
+cp .env.apollo.example .env.apollo
+```
+
+Then edit `.env.apollo` with your actual values:
+
+```bash
+# .env.apollo (project root)
+APOLLO_KEY=service:claimsight-api:your-full-key-here
+APOLLO_GRAPH_REF=claimsight-api@current
+```
+
+**⚠️ Never commit API keys to Git!**
+- ✅ `.env.apollo` is already in `.gitignore`
+- ✅ `.env.apollo.example` is committed (safe template)
+
+### 4.3 Key Types Summary
+
+You now have **two API keys**:
+
+| Key Type | Format | Purpose |
+|----------|--------|---------|
+| **Personal API key** | `user:gh.YourName:xxxxx` | Rover CLI authentication (Step 3.2) |
+| **Graph API key** | `service:claimsight-api:xxxxx` | Publishing schemas, CI/CD (this step) |
+
+**For the rest of this guide, we'll use the graph API key.**
+
+---
+
+**✅ Checkpoint:** You should now have:
+- [ ] Apollo Studio account created
+- [ ] Rover CLI installed and authenticated
+- [ ] Graph created: `claimsight-api`
+- [ ] Graph API key saved in `.env.apollo`
+
+---
+
+## 🏗️ Step 5: Create Providers Subgraph
+
+Now let's create the **second subgraph** that will add ratings to providers!
+
+### 5.1 Understand the Providers Subgraph
+
+The Providers subgraph is already built in the project at `app/server/`.
+
+**What it does:**
+- Extends `ProviderRecord` type from Hasura with ratings data
+- Stores ratings in memory (for demo - could use MongoDB, Redis, etc.)
+- Implements Apollo Federation `@key` directive for entity resolution
+
+**Schema preview:**
+```graphql
+# app/server/src/schema.graphql
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external"])
+
+type ProviderRecord @key(fields: "id") {
+  id: ID! @external
+  rating: Float
+  reviewCount: Int
+  reviews: [Review!]!
+}
+
+type Review {
+  id: ID!
+  providerId: ID!
+  memberName: String
+  rating: Int!
+  comment: String
+  createdAt: String
+}
+```
+
+**Key concepts:**
+- `@key(fields: "id")` - Tells Apollo how to identify ProviderRecords across subgraphs
+- `@external` - The `id` field comes from Hasura, not this subgraph
+- `extend` - This subgraph adds to existing ProviderRecord type
+
+### 5.2 Install Subgraph Dependencies
+
+```bash
+# Navigate to Providers subgraph directory
+cd app/server
+
+# Install dependencies
+npm install
+```
+
+**Installed packages include:**
+- `@apollo/subgraph` - Federation support
+- `graphql` - GraphQL execution
+- `express` - HTTP server
+
+### 5.3 Run Providers Subgraph Locally
+
+```bash
+# From app/server directory
+npm start
+
+# Or from project root
+npm run server
+```
+
+**Expected output:**
+```
+🚀 Providers Subgraph ready at http://localhost:3002/
+```
+
+**Test it:**
+```bash
+# Health check
+curl http://localhost:3002/health
+
+# GraphQL query (check if schema is valid)
+curl -X POST http://localhost:3002/ \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ _service { sdl } }"}'
+```
+
+### 5.4 Add Sample Ratings Data
+
+The subgraph starts with some seed data. Let's verify it:
+
+```bash
+# Query available ratings
+curl -X POST http://localhost:3002/ \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ allRatings { providerId rating reviewCount } }"}'
+```
+
+**Note:** The Providers subgraph doesn't resolve full provider data alone - it only adds ratings. Apollo Gateway will combine it with Hasura's provider data!
+
+---
+
+## 🔄 Step 6: Test Federation Locally
+
+Before publishing to Apollo GraphOS, test federation on your machine.
+
+### 6.1 Run Gateway Locally
+
+The gateway combines Hasura + Providers subgraphs.
+
+```bash
+# From project root - runs ALL services
+npm run federated:dev
+```
+
+**This starts:**
+- ✅ Providers Subgraph (port 3002)
+- ✅ Apollo Gateway (port 4000)
+- ✅ React Frontend (port 5173)
+
+**Hasura runs separately** in Hasura Cloud (from Phase 1).
+
+### 6.2 Configure Gateway for Your Hasura Endpoint
+
+Update `app/gateway/.env`:
+
+```bash
+# app/gateway/.env
+HASURA_ENDPOINT=https://your-project.hasura.app/v1/graphql
+HASURA_ADMIN_SECRET=your-admin-secret-from-phase-1
+PROVIDERS_SUBGRAPH_URL=http://localhost:3002
+PORT=4000
+```
+
+### 6.3 Test Federated Query
+
+Open http://localhost:4000/graphql in your browser (Apollo Explorer).
+
+**Try this query:**
+```graphql
+query FederatedProviders {
+  provider_records(limit: 5) {
+    id
+    name              # From Hasura subgraph
+    specialty         # From Hasura subgraph
+    npi               # From Hasura subgraph
+    rating            # From Providers subgraph! 🎉
+    reviewCount       # From Providers subgraph! 🎉
+  }
+}
+```
+
+**What's happening:**
+1. Gateway receives query
+2. Sends `provider_records` query to **Hasura** → gets `id`, `name`, `specialty`, `npi`
+3. For each provider, sends `id` to **Providers subgraph** → gets `rating`, `reviewCount`
+4. Gateway merges results into one response!
+
+This is **entity resolution** - the core of Apollo Federation!
+
+### 6.4 Checkpoint ✅
+
+Before continuing, verify:
+- [ ] Providers subgraph running on port 3002
+- [ ] Gateway running on port 4000
+- [ ] Federated query returns data from BOTH Hasura and Providers
+
+**If working:** Continue to publish schemas to Apollo GraphOS!
+
+---
+
+## 📤 Step 7: Publish Subgraph Schemas to Apollo GraphOS
+
+Now that federation works locally, let's publish schemas to Apollo GraphOS so you can deploy to the cloud!
+
+### 7.1 Export Hasura Schema
 
 First, get your Hasura schema in GraphQL SDL format:
 
@@ -195,14 +542,18 @@ curl -X POST \
 # Convert introspection JSON to SDL using graphql-cli or similar tool
 ```
 
-### 5.2 Publish Hasura Subgraph
+### 7.2 Publish Hasura Subgraph
 
 ```bash
 # Navigate to project root
 cd /path/to/poc-has-apal
 
+# Set environment variables (if not already set)
+export APOLLO_KEY=service:claimsight-api:your-key-from-step-4
+export APOLLO_GRAPH_REF=claimsight-api@current
+
 # Publish Hasura subgraph
-npx @apollo/npx @apollo/rover subgraph publish $APOLLO_GRAPH_REF \
+npx @apollo/rover subgraph publish $APOLLO_GRAPH_REF \
   --name hasura \
   --routing-url https://your-project.hasura.app/v1/graphql \
   --schema ./schemas/hasura-schema.graphql
@@ -210,33 +561,35 @@ npx @apollo/npx @apollo/rover subgraph publish $APOLLO_GRAPH_REF \
 
 **Expected output:**
 ```
-Publishing SDL to claimsight-api@main using credentials from the default profile.
-A new subgraph called 'hasura' was created in 'claimsight-api@main'
-The gateway for 'claimsight-api@main' was updated with a new schema, composed from the updated 'hasura' subgraph
+Publishing SDL to claimsight-api@current using credentials from the default profile.
+A new subgraph called 'hasura' was created in 'claimsight-api@current'
+The gateway for 'claimsight-api@current' was updated with a new schema, composed from the updated 'hasura' subgraph
 
 ✅ Subgraph 'hasura' published successfully!
 ```
 
-### 5.3 Publish Providers Subgraph
+### 7.3 Publish Providers Subgraph
 
 ```bash
 # Publish Providers subgraph
 npx @apollo/rover subgraph publish $APOLLO_GRAPH_REF \
   --name providers \
-  --routing-url https://your-providers-subgraph.onrender.com \
+  --routing-url http://localhost:3002 \
   --schema ./app/server/src/schema.graphql
 ```
 
+**Note:** We're using `http://localhost:3002` as the routing URL for now (local testing). When you deploy to Render.com in Phase 3, you'll update this to the production URL.
+
 **Expected output:**
 ```
-Publishing SDL to claimsight-api@main using credentials from the default profile.
-A new subgraph called 'providers' was created in 'claimsight-api@main'
-The gateway for 'claimsight-api@main' was updated with a new schema, composed from the updated 'providers' subgraph
+Publishing SDL to claimsight-api@current using credentials from the default profile.
+A new subgraph called 'providers' was created in 'claimsight-api@current'
+The gateway for 'claimsight-api@current' was updated with a new schema, composed from the updated 'providers' subgraph
 
 ✅ Subgraph 'providers' published successfully!
 ```
 
-### 5.4 Verify Supergraph Composition
+### 7.4 Verify Supergraph Composition
 
 ```bash
 # Check composition status
@@ -249,47 +602,100 @@ npx @apollo/rover subgraph check $APOLLO_GRAPH_REF \
 
 ---
 
-## 🌐 Step 6: View Schema in Apollo Studio
+## 🌐 Step 8: View Schema in Apollo Studio
 
-### 6.1 Open Schema Tab
+### 8.1 Open Schema Tab
 
 1. Go to https://studio.apollographql.com/
 2. Select your graph: **ClaimSight API**
 3. Click **"Schema"** tab
 
-### 6.2 Explore Federated Schema
+### 8.2 Explore Federated Schema
 
 You'll see:
 - **Supergraph SDL**: Combined schema from all subgraphs
 - **Subgraphs**: List of subgraphs (hasura, providers)
 - **Federation Directives**: `@key`, `@external`, `@requires`
 
-### 6.3 Inspect Entity Resolution
+### 8.3 Inspect Entity Resolution
 
 1. Click **"Types"** in left sidebar
-2. Find **"Provider"** type
+2. Find **"ProviderRecord"** type
 3. You'll see:
    ```graphql
-   type Provider @key(fields: "id") {
+   type ProviderRecord @key(fields: "id") {
      id: ID!
      name: String           # From Hasura
      specialty: String      # From Hasura
      npi: String            # From Hasura
-     rating: Float          # From Providers subgraph
-     ratingCount: Int       # From Providers subgraph
-     reviews: [Review!]!    # From Providers subgraph
+     rating: Float          # From Providers subgraph 🎉
+     reviewCount: Int       # From Providers subgraph 🎉
+     reviews: [Review!]!    # From Providers subgraph 🎉
    }
    ```
 
-### 6.4 View Subgraph Distribution
+### 8.4 View Subgraph Distribution
 
 Click on any field to see which subgraph resolves it:
-- `Provider.name` → **hasura**
-- `Provider.rating` → **providers**
+- `ProviderRecord.name` → **hasura**
+- `ProviderRecord.rating` → **providers**
+
+**This is the power of federation!** One type, data from multiple services.
 
 ---
 
-## 🔄 Step 7: Configure Gateway to Use Managed Federation
+## 🎉 Phase 2 Complete - What You've Learned
+
+**Congratulations!** You've successfully implemented GraphQL Federation.
+
+**What you built:**
+- ✅ Apollo GraphOS account with supergraph
+- ✅ Hasura Cloud as federated subgraph #1
+- ✅ Custom Providers subgraph #2 (ratings/reviews)
+- ✅ Local federation testing
+- ✅ Schemas published to Apollo Studio
+
+**What you learned:**
+- ✅ Why federation matters (multiple data sources, teams)
+- ✅ Entity resolution with `@key` directive
+- ✅ Supergraph composition
+- ✅ Schema registry benefits
+
+**Try this query in Apollo Studio Explorer:**
+```graphql
+query PhaseComplete {
+  provider_records(limit: 3) {
+    name
+    rating        # This comes from a DIFFERENT service!
+    reviewCount   # Federation makes it seamless
+  }
+}
+```
+
+---
+
+## 🚀 Next Steps - Phase 3: Production Deployment
+
+**What you have now:**
+- Federation working locally
+- Schemas in Apollo Studio
+
+**What's next:**
+- Deploy Providers subgraph to Render.com (cloud)
+- Deploy Apollo Gateway to Render.com (cloud)
+- Deploy React frontend to Vercel
+
+**Continue when ready:** [Phase 3: Full Stack Deployment](../render/README.md)
+
+---
+
+## 📚 Advanced Topics (Optional)
+
+The sections below are optional enhancements for production deployments.
+
+---
+
+## 🔄 Advanced: Configure Gateway for Managed Federation
 
 Update your Apollo Gateway to pull schema from GraphOS instead of using local files.
 
@@ -338,13 +744,13 @@ Set `APOLLO_KEY` and `APOLLO_GRAPH_REF` in your gateway deployment:
 2. Navigate to **Environment** tab
 3. Add:
    - `APOLLO_KEY`: Your graph API key
-   - `APOLLO_GRAPH_REF`: `claimsight-api@main`
+   - `APOLLO_GRAPH_REF`: `claimsight-api@current`
 
 **For local development:**
 ```bash
 # .env
 APOLLO_KEY=service:claimsight-api:your-key
-APOLLO_GRAPH_REF=claimsight-api@main
+APOLLO_GRAPH_REF=claimsight-api@current
 ```
 
 ### 7.3 Redeploy Gateway
@@ -531,8 +937,14 @@ APOLLO_GRAPH_REF=claimsight-api@staging
 
 **Production gateway:**
 ```bash
-APOLLO_GRAPH_REF=claimsight-api@main
+APOLLO_GRAPH_REF=claimsight-api@current
+# or use @main if you prefer (they're equivalent)
 ```
+
+**Variant naming is flexible!** Use whatever makes sense for your team:
+- `@current` - Apollo's default (same as production)
+- `@main` or `@prod` - Common for production
+- `@staging` or `@dev` - Pre-production environments
 
 Now you can test schema changes in staging before promoting to production!
 
@@ -612,11 +1024,15 @@ Connect React app to your federated gateway:
 **Solution:**
 ```bash
 # Correct format: {graph-id}@{variant}
+export APOLLO_GRAPH_REF=claimsight-api@current
+# or
 export APOLLO_GRAPH_REF=claimsight-api@main
 
 # NOT: claimsight-api/main (wrong separator)
 # NOT: claimsight-api (missing variant)
 ```
+
+**Note:** Apollo Studio now uses `@current` by default, but `@main`, `@staging`, `@prod` all work - they're just labels for different environments.
 
 ### Issue: "Composition failed" error
 

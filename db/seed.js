@@ -91,11 +91,11 @@ async function main() {
 
   // Create client
   const client = new Client({
-    host: process.env.PGHOST || 'localhost',
-    port: process.env.PGPORT || 5432,
-    user: process.env.PGUSER || 'claimsight',
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE || 'claimsight'
+    connectionString: process.env.DATABASE_URL || 'your connection string',
+    ssl: {
+      rejectUnauthorized: false,
+      require: true
+    }
   });
 
   try {
@@ -103,23 +103,38 @@ async function main() {
     await client.connect();
     console.log('✓ Connected\n');
 
-    // Run schema
-    console.log('Creating schema...');
-    const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf8');
-    await client.query(schema);
-    console.log('✓ Schema created\n');
+    // Check if tables already exist
+    const tableCheck = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'members'
+      );
+    `);
 
-    // Run indexes
-    console.log('Creating indexes...');
-    const indexes = readFileSync(join(__dirname, 'indexes.sql'), 'utf8');
-    await client.query(indexes);
-    console.log('✓ Indexes created\n');
+    const tablesExist = tableCheck.rows[0].exists;
 
-    // Run RLS
-    console.log('Setting up row-level security...');
-    const rls = readFileSync(join(__dirname, 'rls.sql'), 'utf8');
-    await client.query(rls);
-    console.log('✓ RLS configured\n');
+    if (!tablesExist) {
+      // Run schema
+      console.log('Creating schema...');
+      const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf8');
+      await client.query(schema);
+      console.log('✓ Schema created\n');
+
+      // Run indexes
+      console.log('Creating indexes...');
+      const indexes = readFileSync(join(__dirname, 'indexes.sql'), 'utf8');
+      await client.query(indexes);
+      console.log('✓ Indexes created\n');
+
+      // Run RLS
+      console.log('Setting up row-level security...');
+      const rls = readFileSync(join(__dirname, 'rls.sql'), 'utf8');
+      await client.query(rls);
+      console.log('✓ RLS configured\n');
+    } else {
+      console.log('ℹ Schema already exists, skipping creation\n');
+    }
 
     // Seed members
     console.log('Seeding members...');
@@ -148,7 +163,7 @@ async function main() {
       const specialty = randomChoice(SPECIALTIES);
       const lastName = randomChoice(LAST_NAMES);
       const result = await client.query(
-        `INSERT INTO providers (npi, name, specialty)
+        `INSERT INTO provider_records (npi, name, specialty)
          VALUES ($1, $2, $3)
          RETURNING id`,
         [

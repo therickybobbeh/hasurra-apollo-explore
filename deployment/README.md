@@ -2,6 +2,8 @@
 
 Complete guide to deploying ClaimSight to production using managed cloud services.
 
+> **💻 Looking for local development?** See the [local-lab](./local-lab/) subdirectory for Docker and native PostgreSQL setup. This guide focuses exclusively on **cloud deployment**.
+
 ---
 
 ## 📋 Overview
@@ -353,31 +355,130 @@ See [Challenge 15: HIPAA Compliance Checklist](../DOCUMENTS/CHALLENGES.md#part-6
 
 ---
 
-## 🎓 Learning Path
+## 🎓 Sequential Learning Path
 
-### Beginner (Challenges 1-6)
-**Deploy:** Quick Start (Hasura Cloud + Vercel)
-- Learn GraphQL basics
-- Explore Hasura console
-- Build React UI with Apollo Client
+Follow these phases in order to build understanding progressively:
 
-### Intermediate (Challenges 7-9)
-**Deploy:** Managed Services (Hasura Cloud + Apollo GraphOS + Vercel)
-- Implement Apollo Federation
-- Add custom subgraphs
-- Use Apollo Studio for monitoring
+---
 
-### Advanced (Challenges 10-12)
-**Deploy:** Render.com Full Stack
-- Full control over deployment
-- Infrastructure as Code (render.yaml)
-- Multi-environment setup (staging + production)
+### 📍 Phase 1: Single GraphQL Endpoint (Start Here!)
+**Time:** 30 minutes | **Cost:** Free | **Difficulty:** 🟢 Beginner
 
-### Expert (Challenges 13-15)
-**Deploy:** Azure Enterprise
-- Enterprise-grade security
-- HIPAA compliance
-- Advanced networking and monitoring
+**What You'll Build:**
+- Hasura Cloud with Neon PostgreSQL database
+- Auto-generated GraphQL API from database tables
+- Sample data (members, claims, providers)
+
+**What You'll Learn:**
+- How Hasura auto-generates GraphQL from your database
+- GraphQL queries, mutations, and subscriptions
+- Row-level security and permissions
+
+**Deployment Guide:** [Hasura Cloud Setup](./hasura-cloud/README.md)
+
+**Testing Your Work:**
+```graphql
+# Try this query in Hasura Console
+query GetMembers {
+  members {
+    id
+    first_name
+    last_name
+    claims {
+      cpt
+      status
+    }
+  }
+}
+```
+
+**✅ Checkpoint:** You have a working GraphQL API! Continue when ready.
+
+---
+
+### 📍 Phase 2: GraphQL Federation (Add Second Service)
+**Time:** 45 minutes | **Cost:** Free | **Difficulty:** 🟡 Intermediate
+
+**What You'll Build:**
+- Apollo GraphOS account with Supergraph
+- Register Hasura Cloud as a federated subgraph
+- Custom Providers subgraph (Node.js) with ratings/reviews
+- Unified supergraph combining both services
+
+**What You'll Learn:**
+- Why federation matters (multiple teams, services)
+- Apollo Federation directives (`@key`, `@extends`)
+- Entity resolution across subgraphs
+- Supergraph composition
+
+**Deployment Guide:** [Apollo GraphOS Federation](./apollo-graphos/README.md)
+
+**Before Starting:** Complete Phase 1 (you need working Hasura Cloud)
+
+**Testing Your Work:**
+```graphql
+# Query data from BOTH subgraphs in one request!
+query FederatedQuery {
+  providerRecords {
+    id
+    name              # From Hasura subgraph
+    rating            # From Providers subgraph 🎉
+    reviewCount       # From Providers subgraph 🎉
+  }
+}
+```
+
+**✅ Checkpoint:** You understand GraphQL federation! Continue when ready.
+
+---
+
+### 📍 Phase 3: Production Deployment (Full Stack)
+**Time:** 1-2 hours | **Cost:** Free | **Difficulty:** 🟡 Intermediate
+
+**What You'll Build:**
+- Apollo Gateway deployed to Render.com
+- React frontend connected to gateway
+- All services integrated and working together
+
+**What You'll Learn:**
+- Deploying Apollo Gateway
+- Frontend integration with Apollo Client
+- Environment configuration across services
+
+**Deployment Guides:**
+- [Render.com Full Stack](./render/README.md)
+- [Vercel Frontend](./vercel/README.md)
+
+**Before Starting:** Complete Phase 2 (you need Apollo GraphOS supergraph)
+
+---
+
+### 📍 Phase 4: Enterprise & Security (Optional - Advanced)
+**Time:** 2-4 hours | **Cost:** $264+/mo | **Difficulty:** 🔴 Advanced
+
+**What You'll Build:**
+- Azure enterprise deployment
+- HIPAA-compliant infrastructure
+- Advanced monitoring and security
+
+**What You'll Learn:**
+- Enterprise-grade cloud architecture
+- HIPAA compliance requirements
+- Advanced security hardening
+
+**Deployment Guide:** [Azure Enterprise](./azure/README.md)
+
+**⚠️ Enterprise Only:** Requires Azure subscription and production use case
+
+---
+
+## 🚀 Quick Start Recommendation
+
+**For Learning:** Start with Phase 1 → Phase 2 (100% free, ~1 hour total)
+
+**For MVPs/Demos:** Complete Phase 1 → Phase 2 → Phase 3 (100% free)
+
+**For Production:** All phases + [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
 
 ---
 
@@ -461,12 +562,15 @@ Use this checklist when deploying to any environment:
 
 ## 📚 Resources
 
-### Deployment Guides (This Repository)
+### Cloud Deployment Guides (This Directory)
 - [Hasura Cloud Deployment](./hasura-cloud/README.md)
 - [Apollo GraphOS Setup](./apollo-graphos/README.md)
 - [Vercel Deployment](./vercel/README.md)
 - [Render.com Deployment](./render/README.md)
 - [Azure Enterprise Deployment](./azure/README.md)
+
+### Local Development
+- [Local Lab Setup](./local-lab/README.md) - Docker & native PostgreSQL setup for local development
 
 ### Official Documentation
 - [Hasura Cloud Docs](https://hasura.io/docs/latest/graphql/cloud/index.html)

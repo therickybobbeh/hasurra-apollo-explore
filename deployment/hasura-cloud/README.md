@@ -97,34 +97,65 @@ hasura version
 2. You should see your database connected (usually named **"default"**)
 3. ✅ Database is ready!
 
-### 2.4 Note Your Project Details
+### 2.4 Save Your Project Credentials
 
-**⚠️ Save these important details:**
+**⚠️ IMPORTANT: You need to save these credentials to deploy later!**
 
-- **GraphQL Endpoint:** `https://your-project-name.hasura.app/v1/graphql`
-- **Admin Secret:** Find in Project Settings → Env Vars (click "Show" to reveal)
-- **Project ID:** In the URL `cloud.hasura.io/project/{PROJECT_ID}`
-
-Store in `.env.cloud` file:
+Create a file named `.env.cloud` in your **project root directory**:
 
 ```bash
-# .env.cloud
+# Location: /Users/bobbycole/github/medica/poc-has-apal/.env.cloud
+# This file is already in .gitignore (never commits to Git)
+
+# Hasura Cloud Endpoint
 HASURA_GRAPHQL_ENDPOINT=https://your-project-name.hasura.app/v1/graphql
+
+# Admin Secret (get from: Hasura Console → Project Settings → Env Vars)
 HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret-here
-```
 
-### 2.5 Get Database Connection String (Optional)
-
-If you need direct database access for debugging:
-
-1. In **Data** tab, click your database name
-2. Click **"Connection Settings"** or **"Edit"**
-3. Copy **Database URL**: `postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb`
-
-```bash
-# Add to .env.cloud
+# Optional: Database URL (get from: Data tab → Database → Connection Settings)
 DATABASE_URL=postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
 ```
+
+**How to get these values:**
+
+1. **GraphQL Endpoint:**
+   - Copy from Hasura Cloud dashboard
+   - Format: `https://your-project-name.hasura.app/v1/graphql`
+
+2. **Admin Secret:**
+   - In Hasura Cloud → Click your project
+   - Go to **Project Settings** (gear icon)
+   - Click **"Env Vars"** tab
+   - Find `HASURA_GRAPHQL_ADMIN_SECRET`
+   - Click **"Show"** to reveal the secret
+   - Copy the value
+
+3. **Database URL (Optional):**
+   - In Hasura Console → **Data** tab
+   - Click your database name (usually "default")
+   - Click **"Connection Settings"** or **"Edit"**
+   - Copy **Database URL**
+   - Make sure it ends with `?sslmode=require`
+
+**Create the file now:**
+
+```bash
+# From your project root
+cd /Users/bobbycole/github/medica/poc-has-apal
+
+# Copy the example template
+cp .env.cloud.example .env.cloud
+
+# Open in your editor and replace the placeholder values
+code .env.cloud  # VS Code
+# or
+nano .env.cloud  # Terminal editor
+```
+
+✅ **This file is safe** - it's already in `.gitignore` and won't be committed to Git!
+
+**Quick Reference:** See `.env.cloud.example` in the project root for the template.
 
 ---
 
@@ -229,21 +260,23 @@ The metadata includes complex configurations (permissions, relationships, action
 #### Import Metadata with CLI Flags
 
 ```bash
-# Navigate to project root
-cd /Users/bobbycole/github/medica/poc-has-apal
+# Navigate to hasura directory (where config.yaml lives)
+cd /Users/bobbycole/github/medica/poc-has-apal/hasura
 
-# Import metadata using command-line flags (doesn't touch config.yaml)
+# Import metadata using command-line flags (overrides config.yaml endpoint)
 npx hasura-cli metadata apply \
   --endpoint https://your-project-name.hasura.app \
   --admin-secret your-admin-secret-from-step-2.4
 ```
 
 **What this does:**
-- Reads configuration from `hasura/metadata/`
+- Reads the `hasura/` directory structure (config.yaml, metadata/)
+- **Uses --endpoint flag to override** the `http://localhost:8080` in config.yaml
+- Sends metadata to your **Hasura Cloud** instance instead of localhost
 - Sets up table relationships (member → claims, claim → notes, etc.)
 - Configures permissions (admin, member, provider roles)
 - Registers Hasura Actions (checkEligibility)
-- Leaves `hasura/config.yaml` alone (still points to localhost for local labs)
+- ✅ **Leaves `config.yaml` unchanged** - still points to localhost for local labs
 
 **Expected output:**
 ```
@@ -252,6 +285,7 @@ INFO metadata applied
 
 **Verify metadata:**
 ```bash
+# Still in hasura/ directory
 npx hasura-cli metadata diff \
   --endpoint https://your-project-name.hasura.app \
   --admin-secret your-admin-secret
@@ -263,15 +297,43 @@ npx hasura-cli metadata diff \
 
 ### 3.4 Load Sample Data (Optional)
 
-Load sample members, claims, and providers for testing:
+Load sample data: 50 members, 20 providers, 150 claims, 30 eligibility checks, 25 notes.
 
-1. **Open `db/seeds.sql`** (if it exists) in text editor
-2. **In Hasura Console → Data → SQL tab**
-3. **Paste and run** the seed SQL
+**Run the Node.js seeder script:**
 
-**Or use the data entry in the Console:**
+```bash
+# From project root
+cd /Users/bobbycole/github/medica/poc-has-apal
+
+# Get your Neon database connection string from .env.cloud
+# Format: postgres://user:password@ep-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+
+# Set DATABASE_URL (or parse into individual PG* variables)
+export DATABASE_URL="your-neon-connection-string-from-step-2.4"
+
+# Run seeder
+node db/seed.js
+```
+
+**Expected output:**
+```
+=== ClaimSight Database Seeder ===
+
+Seeding members...
+✓ Created 50 members
+
+Seeding providers...
+✓ Created 20 providers
+
+Seeding claims...
+✓ Created 150 claims
+
+=== Seeding Complete ===
+```
+
+**Or manually add data in Hasura Console:**
 - Go to Data → members → Insert Row
-- Add sample members manually
+- Add sample members one at a time
 
 ---
 
@@ -675,6 +737,142 @@ npx hasura-cli migrate apply --database-name default
 
 ---
 
-**Hasura Cloud deployment complete!** 🎉
+## 🎉 Congratulations - Phase 1 Complete!
 
-Your GraphQL API is now live at `https://your-project.hasura.app/v1/graphql`
+**Your Hasura Cloud GraphQL API is live!**
+
+Endpoint: `https://your-project.hasura.app/v1/graphql`
+
+---
+
+## ✅ What You Just Built
+
+You now have a **fully functional GraphQL API** with:
+- ✅ PostgreSQL database (Neon - 0.5GB free)
+- ✅ Auto-generated GraphQL queries, mutations, subscriptions
+- ✅ Row-level security (RLS) policies
+- ✅ Sample data (members, claims, providers, notes)
+- ✅ Hasura Console for testing queries
+
+---
+
+## 🧪 Test Your GraphQL API
+
+Open your Hasura Console and try these queries:
+
+### Query 1: Get All Members with Claims
+```graphql
+query GetMembersWithClaims {
+  members(limit: 5) {
+    id
+    first_name
+    last_name
+    plan
+    claims {
+      cpt
+      status
+      dos
+      charge_cents
+    }
+  }
+}
+```
+
+### Query 2: Get Provider Records
+```graphql
+query GetProviders {
+  provider_records(limit: 10) {
+    id
+    name
+    specialty
+    npi
+  }
+}
+```
+
+### Query 3: Get Claims by Status
+```graphql
+query GetDeniedClaims {
+  claims(where: {status: {_eq: "DENIED"}}, limit: 10) {
+    id
+    cpt
+    denial_reason
+    member {
+      first_name
+      last_name
+    }
+    provider_record {
+      name
+      specialty
+    }
+  }
+}
+```
+
+**Try it now!** Go to your Hasura Console → API tab → Enter a query above
+
+---
+
+## 🎯 What You Learned
+
+✅ **Database-First GraphQL**: Hasura auto-generates GraphQL from your database schema
+✅ **Instant API**: No resolvers to write - queries work immediately
+✅ **Relationships**: Foreign keys become GraphQL relationships automatically
+✅ **Permissions**: Row-level security enforces data access rules
+
+---
+
+## 🚀 Next Steps - Phase 2: GraphQL Federation
+
+**You currently have:** A single GraphQL API serving all data from one database
+
+**Next, you'll learn:** How to combine **multiple GraphQL services** into one unified API
+
+### Why Federation?
+
+Imagine you want to add **provider ratings and reviews** to your system:
+- Ratings might come from a different database
+- Managed by a different team
+- Updated on a different schedule
+- Requires custom business logic
+
+**Solution: Apollo Federation!**
+
+### What You'll Build in Phase 2:
+
+1. **Apollo GraphOS** - Schema registry in the cloud (free)
+2. **Register Hasura** as "subgraph 1" (your existing API)
+3. **Create Providers Subgraph** - New Node.js service with ratings
+4. **Query Both Together** - One query fetches from both services:
+
+```graphql
+query FederatedExample {
+  provider_records {
+    name              # From Hasura subgraph
+    specialty         # From Hasura subgraph
+    rating            # From Providers subgraph 🆕
+    reviewCount       # From Providers subgraph 🆕
+    topReview {       # From Providers subgraph 🆕
+      author
+      comment
+      stars
+    }
+  }
+}
+```
+
+**Ready?** → Continue to [Apollo GraphOS Federation Guide](../apollo-graphos/README.md)
+
+**Not ready?** That's OK! Your Hasura API works standalone. You can:
+- Complete more challenges (1-6)
+- Connect a React frontend
+- Come back to federation later
+
+---
+
+## 📚 Resources
+
+- [Hasura Cloud Documentation](https://hasura.io/docs/latest/graphql/cloud/index.html)
+- [Hasura CLI Reference](https://hasura.io/docs/latest/graphql/core/hasura-cli/index.html)
+- [Hasura Migrations Guide](https://hasura.io/docs/latest/graphql/core/migrations/index.html)
+- [Challenge 15: Security Hardening](../../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)

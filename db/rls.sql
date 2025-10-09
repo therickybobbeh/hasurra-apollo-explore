@@ -24,7 +24,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO hasura_admin, hasura_me
 
 -- Enable RLS on all tables
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE providers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE provider_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE claims ENABLE ROW LEVEL SECURITY;
 ALTER TABLE eligibility_checks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
@@ -34,9 +34,9 @@ DROP POLICY IF EXISTS members_admin_all ON members;
 DROP POLICY IF EXISTS members_member_own ON members;
 DROP POLICY IF EXISTS members_provider_via_claims ON members;
 
-DROP POLICY IF EXISTS providers_admin_all ON providers;
-DROP POLICY IF EXISTS providers_member_via_claims ON providers;
-DROP POLICY IF EXISTS providers_provider_own ON providers;
+DROP POLICY IF EXISTS providers_admin_all ON provider_records;
+DROP POLICY IF EXISTS providers_member_via_claims ON provider_records;
+DROP POLICY IF EXISTS providers_provider_own ON provider_records;
 
 DROP POLICY IF EXISTS claims_admin_all ON claims;
 DROP POLICY IF EXISTS claims_member_own ON claims;
@@ -71,25 +71,25 @@ CREATE POLICY members_provider_via_claims ON members
     )
   );
 
--- Providers policies
-CREATE POLICY providers_admin_all ON providers
+-- Provider Records policies
+CREATE POLICY providers_admin_all ON provider_records
   FOR ALL
   TO hasura_admin
   USING (true)
   WITH CHECK (true);
 
-CREATE POLICY providers_member_via_claims ON providers
+CREATE POLICY providers_member_via_claims ON provider_records
   FOR SELECT
   TO hasura_member
   USING (
     EXISTS (
       SELECT 1 FROM claims
-      WHERE claims.provider_id = providers.id
+      WHERE claims.provider_id = provider_records.id
       AND claims.member_id = current_setting('hasura.user.x-hasura-user-id', true)::uuid
     )
   );
 
-CREATE POLICY providers_provider_own ON providers
+CREATE POLICY providers_provider_own ON provider_records
   FOR SELECT
   TO hasura_provider
   USING (id = current_setting('hasura.user.x-hasura-provider-id', true)::uuid);
