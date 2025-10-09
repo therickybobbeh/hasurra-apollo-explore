@@ -583,9 +583,11 @@ Before continuing, verify:
 
 Now that federation works locally, let's publish schemas to Apollo GraphOS so you can deploy to the cloud!
 
-### 7.1 Export Hasura Schema
+### 7.1 Export Hasura Schema (OPTIONAL)
 
-First, get your Hasura schema in GraphQL SDL format:
+**NOTE: This step is optional.** The gateway automatically introspects and fetches schemas when it starts. This is only if you want a local copy for reference.
+
+If you want to export the schema manually:
 
 ```bash
 # Install dependencies
