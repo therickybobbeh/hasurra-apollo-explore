@@ -26,6 +26,106 @@
           "date": "2024-01-05"
         }
       ]
+    },
+    "bc6630ae-d320-4693-906a-9ab0c7f7eb51": {
+      "rating": 4.5,
+      "ratingCount": 89,
+      "reviews": [
+        {
+          "id": "r4",
+          "providerId": "bc6630ae-d320-4693-906a-9ab0c7f7eb51",
+          "rating": 5,
+          "comment": "Excellent radiologist! Very detailed imaging reports.",
+          "date": "2024-01-20"
+        },
+        {
+          "id": "r5",
+          "providerId": "bc6630ae-d320-4693-906a-9ab0c7f7eb51",
+          "rating": 4,
+          "comment": "Professional and efficient service.",
+          "date": "2024-01-18"
+        }
+      ]
+    },
+    "ed70e072-cc35-4267-a667-860768d58510": {
+      "rating": 4.8,
+      "ratingCount": 156,
+      "reviews": [
+        {
+          "id": "r6",
+          "providerId": "ed70e072-cc35-4267-a667-860768d58510",
+          "rating": 5,
+          "comment": "Dr. Williams is amazing! Best primary care doctor I've had.",
+          "date": "2024-01-22"
+        },
+        {
+          "id": "r7",
+          "providerId": "ed70e072-cc35-4267-a667-860768d58510",
+          "rating": 5,
+          "comment": "Always takes time to listen and explain things.",
+          "date": "2024-01-19"
+        }
+      ]
+    },
+    "c31196e4-5f2d-43aa-aace-25c4a0ea93d2": {
+      "rating": 4.6,
+      "ratingCount": 203,
+      "reviews": [
+        {
+          "id": "r8",
+          "providerId": "c31196e4-5f2d-43aa-aace-25c4a0ea93d2",
+          "rating": 5,
+          "comment": "Quick response times in emergency situations.",
+          "date": "2024-01-21"
+        },
+        {
+          "id": "r9",
+          "providerId": "c31196e4-5f2d-43aa-aace-25c4a0ea93d2",
+          "rating": 4,
+          "comment": "Professional emergency care, though very busy.",
+          "date": "2024-01-17"
+        }
+      ]
+    },
+    "bc9213fe-9d5a-4574-af19-e65b82fe7079": {
+      "rating": 4.9,
+      "ratingCount": 142,
+      "reviews": [
+        {
+          "id": "r10",
+          "providerId": "bc9213fe-9d5a-4574-af19-e65b82fe7079",
+          "rating": 5,
+          "comment": "Dr. Martin is wonderful with kids! My children love visiting.",
+          "date": "2024-01-23"
+        },
+        {
+          "id": "r11",
+          "providerId": "bc9213fe-9d5a-4574-af19-e65b82fe7079",
+          "rating": 5,
+          "comment": "Patient and caring pediatrician. Highly recommend!",
+          "date": "2024-01-16"
+        }
+      ]
+    },
+    "88e8b60e-a6de-4e15-b604-b4367f0d013a": {
+      "rating": 4.7,
+      "ratingCount": 98,
+      "reviews": [
+        {
+          "id": "r12",
+          "providerId": "88e8b60e-a6de-4e15-b604-b4367f0d013a",
+          "rating": 5,
+          "comment": "Dr. Williams provided excellent oncology care during my treatment.",
+          "date": "2024-01-24"
+        },
+        {
+          "id": "r13",
+          "providerId": "88e8b60e-a6de-4e15-b604-b4367f0d013a",
+          "rating": 4,
+          "comment": "Compassionate and knowledgeable oncologist.",
+          "date": "2024-01-14"
+        }
+      ]
     }
   }
 }

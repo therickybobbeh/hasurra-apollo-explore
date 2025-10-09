@@ -53,57 +53,25 @@ const typeDefs = gql`
   }
 `;
 
-// Mock provider data (in real app, this would come from Hasura or a database)
-const providers = [
-  {
-    id: '734f62da-879d-45bb-b07b-8163182ef917',
-    name: 'Dr. Sarah Smith',
-    specialty: 'Cardiology',
-    npi: '1234567890'
-  },
-  {
-    id: 'provider-2',
-    name: 'Dr. John Doe',
-    specialty: 'Pediatrics',
-    npi: '0987654321'
-  }
-];
+// NOTE: In federation, we don't need mock provider data
+// Hasura provides the base provider data, we just add ratings
 
 // Resolvers
 const resolvers = {
   Query: {
-    provider(_: any, { id }: { id: string }) {
-      const provider = providers.find(p => p.id === id);
-      if (!provider) return null;
-
-      const ratingInfo = ratingsData.ratings[id];
-      return {
-        ...provider,
-        rating: ratingInfo?.rating || null,
-        reviewCount: ratingInfo?.ratingCount || 0,
-        reviews: ratingInfo?.reviews || []
-      };
-    },
-    providers() {
-      return providers.map(provider => {
-        const ratingInfo = ratingsData.ratings[provider.id];
-        return {
-          ...provider,
-          rating: ratingInfo?.rating || null,
-          reviewCount: ratingInfo?.ratingCount || 0,
-          reviews: ratingInfo?.reviews || []
-        };
-      });
-    }
+    _empty: () => null
   },
   provider_records: {
+    // This is the key resolver for Apollo Federation
+    // Hasura sends us provider entities, we add rating fields
     __resolveReference(reference: { id: string }) {
-      const provider = providers.find(p => p.id === reference.id);
-      if (!provider) return null;
-
+      // Get rating info for this provider ID
       const ratingInfo = ratingsData.ratings[reference.id];
+
+      // Always return an object with rating fields
+      // Even if we don't have ratings, return safe defaults
       return {
-        ...provider,
+        id: reference.id,
         rating: ratingInfo?.rating || null,
         reviewCount: ratingInfo?.ratingCount || 0,
         reviews: ratingInfo?.reviews || []
