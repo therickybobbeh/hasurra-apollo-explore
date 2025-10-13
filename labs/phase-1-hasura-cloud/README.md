@@ -813,6 +813,22 @@ query GetDeniedClaims {
 
 ---
 
+## 🚀 Step 5: Run the Client Application (Optional)
+
+You can also run the React client application to interact with your Hasura GraphQL API through a UI:
+
+```bash
+# From project root
+npm run phase1:dev
+```
+
+This starts the client on `http://localhost:5173` connected directly to your Hasura Cloud endpoint.
+
+**What's running:**
+- ✅ Client (port 5173) → connects to Hasura Cloud
+
+---
+
 ## 🎯 What You Learned
 
 ✅ **Database-First GraphQL**: Hasura auto-generates GraphQL from your database schema

@@ -468,13 +468,17 @@ Before publishing to Apollo GraphOS, test federation on your machine.
 The gateway combines Hasura + Providers subgraphs.
 
 ```bash
-# From project root - runs ALL services
+# From project root - runs ALL services for Phase 2
+npm run phase2:dev
+
+# Alternative (same result)
 npm run federated:dev
 ```
 
 **This starts:**
+- ✅ Action Handler (port 3001)
 - ✅ Providers Subgraph (port 3002)
-- ✅ Apollo Gateway (port 4000)
+- ✅ Apollo Gateway (port 4000) - connects to Hasura Cloud + Providers
 - ✅ React Frontend (port 5173)
 
 **Hasura runs separately** in Hasura Cloud (from Phase 1).
@@ -496,7 +500,67 @@ Before the gateway can connect, you need to enable Apollo Federation in your Has
 
 **Why needed?** This tells Hasura to expose the `_service { sdl }` query that Apollo Gateway uses for federation.
 
-### 6.3 Configure Gateway for Your Hasura Endpoint
+### 6.3 Configure Hasura Tables for Federation
+
+Now you need to enable Apollo Federation on specific tables so other subgraphs can reference them.
+
+**Option 1: Apply Pre-Configured Metadata (Fastest)** ⚡
+
+The project includes metadata files with federation already configured. Use the Hasura CLI to apply them:
+
+```bash
+# Install Hasura CLI
+npm install -g hasura-cli
+
+# Configure (one-time setup)
+cd hasura
+nano config.yaml  # Edit with your Hasura endpoint and admin secret
+
+# Apply metadata (includes federation config)
+hasura metadata apply
+```
+
+✅ This automatically enables federation on members, providers, and claims tables!
+
+📖 **See:** [Hasura Metadata Setup Guide](../../docs/hasura-metadata-setup.md) for detailed instructions.
+
+**Option 2: Using the Hasura Console (Manual)**
+
+1. In Hasura Console, click **"Data"** → **"public"** → **"members"**
+2. Click the **"Modify"** tab
+3. Scroll to **"Enable Apollo Federation"** section
+4. **Toggle the switch to ON** ✅
+5. Click **"Save"**
+
+Repeat for these tables:
+- ✅ `members` - Will be referenced by Appointments and Medications subgraphs
+- ✅ `providers` - Will be extended by Providers subgraph with ratings
+
+**Option 3: Using the Automation Script**
+
+Run this from the project root:
+```bash
+./scripts/configure-hasura-federation.sh
+```
+
+This automatically enables federation on members, providers, and claims tables via Metadata API.
+
+**Verify configuration:**
+
+In Hasura Console → API tab, run:
+```graphql
+{
+  _service {
+    sdl
+  }
+}
+```
+
+Look for `@key(fields: "id")` directives on `member_records` and `provider_records` types. ✅
+
+**📖 Detailed Guide:** See [Configure Hasura Federation](./configure-hasura-federation.md) for troubleshooting and more methods.
+
+### 6.4 Configure Gateway for Your Hasura Endpoint
 
 The gateway loads environment variables from the **project root `.env`** file. Update it to use Hasura Cloud:
 
@@ -521,13 +585,13 @@ HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret-from-phase-1
 
 **Note:** The `.env` file is gitignored - your secrets are safe!
 
-### 6.4 Test Federated Query
+### 6.5 Test Federated Query
 
 Now start the federated stack:
 
 ```bash
 # From project root
-npm run federated:dev
+npm run phase2:dev
 ```
 
 **Expected output:**
@@ -568,7 +632,7 @@ query FederatedProviders {
 
 This is **entity resolution** - the core of Apollo Federation!
 
-### 6.5 Checkpoint ✅
+### 6.6 Checkpoint ✅
 
 Before continuing, verify:
 - [ ] Providers subgraph running on port 3002

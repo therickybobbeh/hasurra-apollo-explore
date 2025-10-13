@@ -1,7 +1,15 @@
 version: 3
-endpoint: http://localhost:8080
+
+# For local Hasura instance (Phase 1 - Docker)
+# endpoint: http://localhost:8080
+# admin_secret: claimsight_admin_secret_change_me
+
+# For Hasura Cloud (Phase 2 - Federation)
+# Replace with your Hasura Cloud endpoint from Phase 1
+endpoint: https://your-project.hasura.app
+admin_secret: your-admin-secret-from-hasura-cloud
+
 metadata_directory: metadata
 actions:
   kind: synchronous
   handler_webhook_baseurl: http://localhost:3001
-admin_secret: claimsight_admin_secret_change_me

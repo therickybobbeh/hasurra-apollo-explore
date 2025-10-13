@@ -1,0 +1,123 @@
+# Medications Service GraphQL Schema (Federation-enabled)
+#
+# This demonstrates building a federated GraphQL schema with Spring Boot.
+# The schema includes @key directives for federation and references to
+# external entities (Member, Provider) from other subgraphs.
+
+"""
+A prescription for a member from a provider
+"""
+type Prescription @key(fields: "id") {
+    id: ID!
+    memberId: ID!
+    providerId: ID!
+    medicationName: String!
+    dosage: String!
+    frequency: String!
+    startDate: String!
+    endDate: String
+    refillsRemaining: Int!
+    pharmacy: String!
+    status: PrescriptionStatus!
+    notes: String
+    createdAt: String!
+    updatedAt: String!
+    member: Member
+    provider: Provider
+}
+
+"""
+Member entity (extended from Hasura subgraph)
+"""
+type Member @key(fields: "id", resolvable: false) @extends {
+    id: ID! @external
+}
+
+"""
+Provider entity (extended from Hasura/Providers subgraph)
+"""
+type Provider @key(fields: "id", resolvable: false) @extends {
+    id: ID! @external
+}
+
+"""
+Prescription status values
+"""
+enum PrescriptionStatus {
+    ACTIVE
+    EXPIRED
+    CANCELLED
+    COMPLETED
+}
+
+"""
+Input for creating a new prescription
+"""
+input CreatePrescriptionInput {
+    memberId: ID!
+    providerId: ID!
+    medicationName: String!
+    dosage: String!
+    frequency: String!
+    startDate: String!
+    endDate: String
+    pharmacy: String!
+    notes: String
+}
+
+"""
+Input for updating prescription refills
+"""
+input RefillPrescriptionInput {
+    prescriptionId: ID!
+    additionalRefills: Int!
+}
+
+type Query {
+    """
+    Get all prescriptions
+    """
+    prescriptions: [Prescription!]!
+
+    """
+    Get a single prescription by ID
+    """
+    prescription(id: ID!): Prescription
+
+    """
+    Get prescriptions for a specific member
+    """
+    prescriptionsByMember(memberId: ID!): [Prescription!]!
+
+    """
+    Get prescriptions from a specific provider
+    """
+    prescriptionsByProvider(providerId: ID!): [Prescription!]!
+
+    """
+    Get prescriptions by status
+    """
+    prescriptionsByStatus(status: PrescriptionStatus!): [Prescription!]!
+}
+
+type Mutation {
+    """
+    Create a new prescription
+    """
+    createPrescription(input: CreatePrescriptionInput!): Prescription!
+
+    """
+    Cancel a prescription
+    """
+    cancelPrescription(id: ID!): Prescription!
+
+    """
+    Add refills to a prescription
+    """
+    refillPrescription(input: RefillPrescriptionInput!): Prescription!
+
+    """
+    Mark prescription as completed
+    """
+    completePrescription(id: ID!): Prescription!
+}

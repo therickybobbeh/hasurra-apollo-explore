@@ -1,6 +1,8 @@
 table:
   name: members
   schema: public
+apollo_federation_config:
+  enable: v1
 array_relationships:
   - name: claims
     using:

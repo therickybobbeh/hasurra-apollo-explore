@@ -1,6 +1,8 @@
 table:
   name: claims
   schema: public
+apollo_federation_config:
+  enable: v1
 object_relationships:
   - name: member
     using:

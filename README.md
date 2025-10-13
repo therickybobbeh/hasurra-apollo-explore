@@ -12,7 +12,8 @@ A comprehensive learning application that teaches modern GraphQL development wit
 - ✅ **Custom Actions** - Eligibility verification via REST API integration
 - ✅ **Apollo Client** - HTTP + WebSocket links, optimistic updates, normalized cache
 - ✅ **React + TypeScript** - Modern frontend with TailwindCSS
-- ✅ **Apollo Federation** - TRUE federation with `@key` directive, demonstrates Hasura limitation workaround
+- ✅ **Apollo Federation** - TRUE federation with `@key` directive, polyglot microservices
+- ✅ **Spring Boot GraphQL** - Java-based GraphQL service with JPA
 - ✅ **PromptQL Examples** - Natural language to SQL query concepts
 - ✅ **Cross-Platform** - Native setup for Windows, macOS, Linux (no Docker)
 - ✅ **Learning Challenges** - 12+ hands-on exercises from beginner to expert
@@ -38,8 +39,12 @@ A comprehensive learning application that teaches modern GraphQL development wit
 |-----|-------|------|------------|
 | **[Phase 1](labs/phase-1-hasura-cloud/README.md)** | Hasura Cloud + PostgreSQL | 30 min | 🟢 Beginner |
 | **[Phase 2](labs/phase-2-apollo-federation/README.md)** | Apollo GraphOS Federation | 45 min | 🟡 Intermediate |
-| **[Phase 3](labs/phase-3-hasura-ddn/README.md)** | Hasura DDN Migration | 2-3 hrs | 🔴 Advanced |
-| **[Phase 4](labs/phase-4-promptql/README.md)** | PromptQL + AI Integration | 1-2 hrs | 🔴 Advanced |
+| **[Phase 3](labs/phase-3-apollo-server/README.md)** | Apollo Server from Scratch | 1 hr | 🟡 Intermediate |
+| **[Phase 4](labs/phase-4-add-to-federation/README.md)** | Add Apollo to Federation | 45 min | 🟡 Intermediate |
+| **[Phase 5](labs/phase-5-spring-boot-graphql/README.md)** | Spring Boot GraphQL | 1 hr | 🟡 Intermediate |
+| **[Phase 6](labs/phase-6-add-spring-boot-to-federation/README.md)** | Add Spring Boot to Federation | 45 min | 🟡 Intermediate |
+| **[Phase 7](labs/phase-7-hasura-ddn/README.md)** | Hasura DDN Migration | 2-3 hrs | 🔴 Advanced |
+| **[Phase 8](labs/phase-8-promptql/README.md)** | PromptQL + AI Integration | 1-2 hrs | 🔴 Advanced |
 
 👉 **Start here:** [Labs Overview](labs/README.md)
 

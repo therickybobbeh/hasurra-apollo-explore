@@ -2,27 +2,37 @@
 
 **Learn GraphQL, Federation, and AI Integration** through hands-on cloud deployment labs.
 
-This learning path takes you from GraphQL basics to advanced federation and AI-powered queries in 4 progressive labs. Each lab builds real cloud infrastructure you can use for demos and learning.
+This learning path takes you from GraphQL basics to advanced federation and AI-powered queries in 8 progressive labs. Each lab builds real cloud infrastructure demonstrating polyglot microservices.
 
 ---
 
 ## 🎯 Learning Path Overview
 
 ```
-Phase 1 (30 min)          Phase 2 (45 min)          Phase 3 (2-3 hrs)         Phase 4 (1-2 hrs)
+Phase 1 (30 min)          Phase 2 (45 min)          Phase 3 (1 hr)            Phase 4 (45 min)
 ┌────────────────┐       ┌────────────────┐       ┌────────────────┐       ┌────────────────┐
-│  Hasura Cloud  │  -->  │     Apollo     │  -->  │  Hasura DDN    │       │   PromptQL +   │
-│   + Neon DB    │       │   Federation   │       │   Migration    │       │   AI Queries   │
-│                │       │                │       │                │       │                │
-│   GraphQL      │       │   Supergraph   │       │  Connectors    │       │   OpenAI/      │
-│   Basics       │       │   Stitching    │       │  Metadata v3   │       │   Anthropic    │
+│  Hasura Cloud  │  -->  │     Apollo     │  -->  │  Apollo Server │  -->  │   Add Apollo   │
+│   + Neon DB    │       │   Federation   │       │  from Scratch  │       │      to        │
+│                │       │                │       │                │       │   Federation   │
+│   GraphQL      │       │   Supergraph   │       │ Manual Schema  │       │  3-Subgraph    │
+│   Basics       │       │   Stitching    │       │   Node.js      │       │  Integration   │
+└────────────────┘       └────────────────┘       └────────────────┘       └────────────────┘
+      REQUIRED                REQUIRED                 REQUIRED                 REQUIRED
+
+Phase 5 (1 hr)            Phase 6 (45 min)          Phase 7 (2-3 hrs)         Phase 8 (1-2 hrs)
+┌────────────────┐       ┌────────────────┐       ┌────────────────┐       ┌────────────────┐
+│  Spring Boot   │  -->  │ Add Spring Boot│       │  Hasura DDN    │       │   PromptQL +   │
+│    GraphQL     │       │      to        │       │   Migration    │       │   AI Queries   │
+│                │       │   Federation   │       │                │       │                │
+│ Manual Schema  │       │  4-Subgraph    │       │  Connectors    │       │   OpenAI/      │
+│     Java       │       │  Polyglot      │       │  Metadata v3   │       │   Anthropic    │
 └────────────────┘       └────────────────┘       └────────────────┘       └────────────────┘
       REQUIRED                REQUIRED                 OPTIONAL                 OPTIONAL
 ```
 
-**Required Labs:** Phase 1 + Phase 2
-**Optional Advanced:** Phase 3 OR Phase 4 (or both!)
-**Integration Challenge:** Complete both Phase 3 & 4, then integrate them
+**Core Path:** Phase 1-6 (Required - full polyglot federation: Go + Node.js + Java)
+**Advanced Options:** Phase 7 (DDN) OR Phase 8 (AI) or both!
+**Integration Challenge:** Complete all 8 phases for production-ready architecture
 
 ---
 
@@ -108,7 +118,110 @@ query FederatedProviders {
 
 ---
 
-## 📍 Phase 3: Hasura DDN Migration (Advanced)
+## 📍 Phase 3: Apollo Server from Scratch
+
+**🎓 What You'll Learn:**
+- Building GraphQL APIs manually (code-first approach)
+- Writing GraphQL schemas and resolvers from scratch
+- Direct database access with node-postgres
+- Key differences between Hasura (database-first) and Apollo (code-first)
+- Manual query optimization and SQL control
+
+**🏗️ What You'll Build:**
+- Standalone Appointments Service with Apollo Server
+- Custom GraphQL schema for appointments and billing
+- Manual resolvers with raw SQL queries
+- PostgreSQL connection with connection pooling
+- New database in Neon for appointments data
+
+**⏱️ Time:** 1 hour
+**💰 Cost:** FREE (uses existing Neon account)
+**🔧 Difficulty:** 🟡 Intermediate
+
+**📖 Lab Guide:** [phase-3-apollo-server/README.md](./phase-3-apollo-server/README.md)
+
+**Prerequisites:** Complete Phase 1 + Phase 2
+
+### Testing Your Work:
+```graphql
+query GetAppointments {
+  appointments {
+    id
+    appointment_date
+    status
+    notes
+  }
+}
+
+mutation CreateAppointment {
+  createAppointment(input: {
+    member_id: "550e8400-e29b-41d4-a716-446655440000"
+    provider_id: "bc6630ae-d320-4693-906a-9ab0c7f7eb51"
+    appointment_date: "2025-11-15T10:00:00Z"
+    notes: "Annual checkup"
+  }) {
+    id
+    status
+  }
+}
+```
+
+**✅ Checkpoint:** You can build GraphQL APIs manually and understand the tradeoffs vs Hasura!
+
+---
+
+## 📍 Phase 4: Add Appointments to Federation
+
+**🎓 What You'll Learn:**
+- Enabling Apollo Federation on existing Apollo Server
+- Federation directives (`@key`, `@extends`, `@external`)
+- Entity reference resolvers (`__resolveReference`)
+- Cross-subgraph relationships
+- Querying across 3 services through unified gateway
+
+**🏗️ What You'll Build:**
+- Enable federation on Appointments service
+- Add entity relationships (Appointment → Member, Provider)
+- Update gateway to include appointments subgraph
+- Cross-subgraph queries spanning all 3 services
+- Unified query experience
+
+**⏱️ Time:** 45 minutes
+**💰 Cost:** FREE
+**🔧 Difficulty:** 🟡 Intermediate
+
+**📖 Lab Guide:** [phase-4-add-to-federation/README.md](./phase-4-add-to-federation/README.md)
+
+**Prerequisites:** Complete Phase 1 + Phase 2 + Phase 3
+
+### Testing Your Work:
+```graphql
+query AppointmentsWithDetails {
+  appointments {
+    id
+    appointment_date
+    status
+    # Cross-subgraph to Hasura
+    member {
+      first_name
+      last_name
+    }
+    # Cross-subgraph to Hasura + Providers
+    provider {
+      name
+      specialty
+      rating
+      reviewCount
+    }
+  }
+}
+```
+
+**✅ Checkpoint:** You can build and federate custom GraphQL services!
+
+---
+
+## 📍 Phase 5: Hasura DDN Migration (Advanced)
 
 **🎓 What You'll Learn:**
 - Hasura DDN (Data Delivery Network) architecture
@@ -127,9 +240,9 @@ query FederatedProviders {
 **💰 Cost:** FREE (Hasura DDN free tier)
 **🔧 Difficulty:** 🔴 Advanced
 
-**📖 Lab Guide:** [phase-3-hasura-ddn/README.md](./phase-3-hasura-ddn/README.md)
+**📖 Lab Guide:** [phase-5-hasura-ddn/README.md](./phase-5-hasura-ddn/README.md)
 
-**Prerequisites:** Complete Phase 1 + Phase 2
+**Prerequisites:** Complete Phase 1 + Phase 2 + Phase 3 + Phase 4
 
 ### Why DDN?
 - **Modern architecture:** Connector-based, not limited to PostgreSQL
@@ -141,7 +254,7 @@ query FederatedProviders {
 
 ---
 
-## 📍 Phase 4: PromptQL + AI Integration (Advanced)
+## 📍 Phase 6: PromptQL + AI Integration (Advanced)
 
 **🎓 What You'll Learn:**
 - Natural language to SQL with LLMs (OpenAI/Anthropic)
@@ -161,9 +274,9 @@ query FederatedProviders {
 **💰 Cost:** ~$1-5 for API calls (OpenAI/Anthropic)
 **🔧 Difficulty:** 🔴 Advanced
 
-**📖 Lab Guide:** [phase-4-promptql/README.md](./phase-4-promptql/README.md)
+**📖 Lab Guide:** [phase-6-promptql/README.md](./phase-6-promptql/README.md)
 
-**Prerequisites:** Complete Phase 1 + Phase 2 (Phase 3 optional)
+**Prerequisites:** Complete Phase 1 + Phase 2 (Phases 3-5 optional)
 
 ### Example Prompts:
 ```
@@ -179,30 +292,44 @@ query FederatedProviders {
 
 ## 🎯 Recommended Learning Paths
 
-### Path A: Federation Focus (Most Popular)
+### Path A: Core Federation Path (Recommended)
 1. ✅ Phase 1: Hasura Cloud Basics (30 min)
 2. ✅ Phase 2: Apollo Federation (45 min)
-3. ✅ Phase 3: Hasura DDN Migration (2-3 hrs)
+3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
+4. ✅ Phase 4: Add to Federation (45 min)
 
-**Best for:** Learning modern GraphQL federation architecture
+**Best for:** Understanding GraphQL federation end-to-end (auto-generated + manual)
 
 ---
 
-### Path B: AI Integration Focus
+### Path B: DDN Migration Focus
 1. ✅ Phase 1: Hasura Cloud Basics (30 min)
 2. ✅ Phase 2: Apollo Federation (45 min)
-3. ✅ Phase 4: PromptQL + AI (1-2 hrs)
+3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
+4. ✅ Phase 4: Add to Federation (45 min)
+5. ✅ Phase 5: Hasura DDN Migration (2-3 hrs)
+
+**Best for:** Learning modern GraphQL architecture with Hasura DDN
+
+---
+
+### Path C: AI Integration Focus
+1. ✅ Phase 1: Hasura Cloud Basics (30 min)
+2. ✅ Phase 2: Apollo Federation (45 min)
+3. ✅ Phase 6: PromptQL + AI (1-2 hrs)
 
 **Best for:** Learning AI-powered data access patterns
 
 ---
 
-### Path C: Complete Mastery (Challenge Mode)
+### Path D: Complete Mastery (Challenge Mode)
 1. ✅ Phase 1: Hasura Cloud Basics (30 min)
 2. ✅ Phase 2: Apollo Federation (45 min)
-3. ✅ Phase 3: Hasura DDN Migration (2-3 hrs)
-4. ✅ Phase 4: PromptQL + AI (1-2 hrs)
-5. 🏆 **Integration Challenge:** Integrate PromptQL with DDN (bonus)
+3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
+4. ✅ Phase 4: Add to Federation (45 min)
+5. ✅ Phase 5: Hasura DDN Migration (2-3 hrs)
+6. ✅ Phase 6: PromptQL + AI (1-2 hrs)
+7. 🏆 **Integration Challenge:** Integrate all services (bonus)
 
 **Best for:** Building complete production-ready architecture
 
@@ -210,17 +337,18 @@ query FederatedProviders {
 
 ## 🆚 Lab Comparison
 
-| Feature | Phase 1 | Phase 2 | Phase 3 | Phase 4 |
-|---------|---------|---------|---------|---------|
-| **Time** | 30 min | 45 min | 2-3 hrs | 1-2 hrs |
-| **Cost** | FREE | FREE | FREE | $1-5 |
-| **Difficulty** | 🟢 Beginner | 🟡 Intermediate | 🔴 Advanced | 🔴 Advanced |
-| **GraphQL Basics** | ✅ | ✅ | ✅ | ✅ |
-| **Federation** | ❌ | ✅ | ✅ | ❌ |
-| **Cloud Deploy** | ✅ | ✅ | ✅ | ✅ |
-| **AI Integration** | ❌ | ❌ | ❌ | ✅ |
-| **Modern Architecture** | ❌ | ✅ | ✅ | ✅ |
-| **Production Ready** | ⚠️ | ✅ | ✅ | ⚠️ |
+| Feature | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 5 | Phase 6 |
+|---------|---------|---------|---------|---------|---------|---------|
+| **Time** | 30 min | 45 min | 1 hr | 45 min | 2-3 hrs | 1-2 hrs |
+| **Cost** | FREE | FREE | FREE | FREE | FREE | $1-5 |
+| **Difficulty** | 🟢 Beginner | 🟡 Intermediate | 🟡 Intermediate | 🟡 Intermediate | 🔴 Advanced | 🔴 Advanced |
+| **GraphQL Basics** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Manual Schema** | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
+| **Federation** | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ |
+| **Cloud Deploy** | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
+| **AI Integration** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Modern Architecture** | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Production Ready** | ⚠️ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ |
 
 ---
 
@@ -235,8 +363,10 @@ query FederatedProviders {
 ### Phase-Specific:
 - **Phase 1:** Hasura Cloud account (free)
 - **Phase 2:** Apollo GraphOS account (free)
-- **Phase 3:** Hasura DDN CLI installed
-- **Phase 4:** OpenAI or Anthropic API key (~$5 credit to start)
+- **Phase 3:** Neon PostgreSQL account (free - reuse from Phase 1)
+- **Phase 4:** All services from Phases 1-3 running
+- **Phase 5:** Hasura DDN CLI installed
+- **Phase 6:** OpenAI or Anthropic API key (~$5 credit to start)
 
 ---
 
@@ -247,7 +377,9 @@ query FederatedProviders {
 1. Read the main [README.md](../README.md) for project overview
 2. Complete [Phase 1: Hasura Cloud](./phase-1-hasura-cloud/README.md)
 3. Move to [Phase 2: Apollo Federation](./phase-2-apollo-federation/README.md)
-4. Choose your path: Phase 3 (DDN) or Phase 4 (AI) or both!
+4. Continue to [Phase 3: Apollo Server from Scratch](./phase-3-apollo-server/README.md)
+5. Then [Phase 4: Add to Federation](./phase-4-add-to-federation/README.md)
+6. Choose advanced path: Phase 5 (DDN) or Phase 6 (AI) or both!
 
 ---
 
@@ -269,17 +401,19 @@ query FederatedProviders {
 
 ## 🏆 Bonus: Integration Challenge
 
-**For learners who complete both Phase 3 AND Phase 4:**
+**For learners who complete all 6 phases:**
 
 Build a unified system that uses:
-- Hasura DDN (Phase 3) as the data source
-- PromptQL (Phase 4) for natural language queries
-- Apollo Federation to combine DDN + PromptQL subgraph
+- Hasura DDN (Phase 5) as the data source
+- Custom Appointments service (Phase 3 & 4) with manual schema
+- PromptQL (Phase 6) for natural language queries
+- Apollo Federation to combine all subgraphs
 
 **Benefits:**
 - Modern DDN architecture
 - AI-powered queries
-- Federated data access
+- Mix of auto-generated and manual GraphQL
+- Federated data access across 4+ subgraphs
 - Production-ready stack
 
 **Guide:** See [Challenge 16: DDN + PromptQL Integration](../DOCUMENTS/CHALLENGES.md#challenge-16-ddn-promptql-integration)

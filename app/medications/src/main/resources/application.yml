@@ -1,0 +1,43 @@
+server:
+  port: ${MEDICATIONS_PORT:3005}
+
+spring:
+  application:
+    name: medications-service
+
+  # Database Configuration
+  datasource:
+    url: ${MEDICATIONS_DATABASE_URL:jdbc:postgresql://localhost:5432/medications}
+    username: ${MEDICATIONS_DB_USER:claimsight}
+    password: ${MEDICATIONS_DB_PASSWORD:claimsight_dev}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # GraphQL Configuration
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    path: /graphql
+    schema:
+      printer:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    com.claimsight.medications: DEBUG
+    org.springframework.graphql: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
