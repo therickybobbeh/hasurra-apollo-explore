@@ -1,0 +1,557 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsComment
+  description: Update the 'comment' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsComment
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsCommentInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_comment
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsComment
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsCreatedAt
+  description: Update the 'created_at' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsCreatedAt
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsCreatedAtInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_created_at
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsCreatedAt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsHeaderConf
+  description: Update the 'header_conf' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsHeaderConf
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsHeaderConfInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_header_conf
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsHeaderConf
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsId
+  description: Update the 'id' column in the 'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsId
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsNextRetryAt
+  description: Update the 'next_retry_at' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsNextRetryAt
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsNextRetryAtInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_next_retry_at
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsNextRetryAt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsPayload
+  description: Update the 'payload' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsPayload
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsPayloadInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_payload
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsPayload
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsRetryConf
+  description: Update the 'retry_conf' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsRetryConf
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsRetryConfInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_retry_conf
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsRetryConf
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsScheduledTime
+  description: Update the 'scheduled_time' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsScheduledTime
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsScheduledTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_scheduled_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsScheduledTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsStatus
+  description: Update the 'status' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsStatus
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsStatusInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_status
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsStatus
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsTries
+  description: Update the 'tries' column in the 'hdb_catalog_hdb_scheduled_events'
+    collection
+  fields:
+    - name: set
+      type: Int32!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsTries
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsTriesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_tries
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsTries
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventsWebhookConf
+  description: Update the 'webhook_conf' column in the
+    'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: set
+      type: Json!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventsWebhookConf
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventsWebhookConfInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_events_webhook_conf
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventsWebhookConf
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventsByIdUpdateColumns
+  description: Update the columns of the 'hdb_catalog_hdb_scheduled_events' collection
+  fields:
+    - name: comment
+      type: UpdateColumnHdbCatalogHdbScheduledEventsComment
+      description: Update the 'comment' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: createdAt
+      type: UpdateColumnHdbCatalogHdbScheduledEventsCreatedAt
+      description: Update the 'created_at' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: headerConf
+      type: UpdateColumnHdbCatalogHdbScheduledEventsHeaderConf
+      description: Update the 'header_conf' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: id
+      type: UpdateColumnHdbCatalogHdbScheduledEventsId
+      description: Update the 'id' column in the 'hdb_catalog_hdb_scheduled_events'
+        collection.
+    - name: nextRetryAt
+      type: UpdateColumnHdbCatalogHdbScheduledEventsNextRetryAt
+      description: Update the 'next_retry_at' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: payload
+      type: UpdateColumnHdbCatalogHdbScheduledEventsPayload
+      description: Update the 'payload' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: retryConf
+      type: UpdateColumnHdbCatalogHdbScheduledEventsRetryConf
+      description: Update the 'retry_conf' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: scheduledTime
+      type: UpdateColumnHdbCatalogHdbScheduledEventsScheduledTime
+      description: Update the 'scheduled_time' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: status
+      type: UpdateColumnHdbCatalogHdbScheduledEventsStatus
+      description: Update the 'status' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+    - name: tries
+      type: UpdateColumnHdbCatalogHdbScheduledEventsTries
+      description: Update the 'tries' column in the 'hdb_catalog_hdb_scheduled_events'
+        collection.
+    - name: webhookConf
+      type: UpdateColumnHdbCatalogHdbScheduledEventsWebhookConf
+      description: Update the 'webhook_conf' column in the
+        'hdb_catalog_hdb_scheduled_events' collection.
+  graphql:
+    typeName: UpdateHdbCatalogHdbScheduledEventsByIdUpdateColumns
+    inputTypeName: UpdateHdbCatalogHdbScheduledEventsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_scheduled_events_by_id_update_columns
+      fieldMapping:
+        comment:
+          column:
+            name: comment
+        createdAt:
+          column:
+            name: created_at
+        headerConf:
+          column:
+            name: header_conf
+        id:
+          column:
+            name: id
+        nextRetryAt:
+          column:
+            name: next_retry_at
+        payload:
+          column:
+            name: payload
+        retryConf:
+          column:
+            name: retry_conf
+        scheduledTime:
+          column:
+            name: scheduled_time
+        status:
+          column:
+            name: status
+        tries:
+          column:
+            name: tries
+        webhookConf:
+          column:
+            name: webhook_conf
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbScheduledEventsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - comment
+          - createdAt
+          - headerConf
+          - id
+          - nextRetryAt
+          - payload
+          - retryConf
+          - scheduledTime
+          - status
+          - tries
+          - webhookConf
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventsByIdResponse
+  description: Responses from the 'update_hdb_catalog_hdb_scheduled_events_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbScheduledEvents!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateHdbCatalogHdbScheduledEventsByIdResponse
+    inputTypeName: UpdateHdbCatalogHdbScheduledEventsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_scheduled_events_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbScheduledEventsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventsById
+  outputType: UpdateHdbCatalogHdbScheduledEventsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: HdbCatalogHdbScheduledEventsBoolExp
+      description: Update permission post-condition predicate over the
+        'hdb_catalog_hdb_scheduled_events' collection
+    - name: preCheck
+      type: HdbCatalogHdbScheduledEventsBoolExp
+      description: Update permission pre-condition predicate over the
+        'hdb_catalog_hdb_scheduled_events' collection
+    - name: updateColumns
+      type: UpdateHdbCatalogHdbScheduledEventsByIdUpdateColumns!
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: update_hdb_catalog_hdb_scheduled_events_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateHdbCatalogHdbScheduledEventsById
+    rootFieldKind: Mutation
+  description: Update any row on the 'hdb_catalog_hdb_scheduled_events' collection
+    using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateHdbCatalogHdbScheduledEventsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

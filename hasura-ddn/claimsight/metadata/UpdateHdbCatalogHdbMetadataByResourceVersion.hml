@@ -1,0 +1,131 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbMetadataByResourceVersionUpdateColumns
+  description: Update the columns of the 'hdb_catalog_hdb_metadata' collection
+  fields:
+    - name: id
+      type: UpdateColumnHdbCatalogHdbMetadataId
+      description: Update the 'id' column in the 'hdb_catalog_hdb_metadata' collection.
+    - name: metadata
+      type: UpdateColumnHdbCatalogHdbMetadataMetadata
+      description: Update the 'metadata' column in the 'hdb_catalog_hdb_metadata'
+        collection.
+    - name: resourceVersion
+      type: UpdateColumnHdbCatalogHdbMetadataResourceVersion
+      description: Update the 'resource_version' column in the
+        'hdb_catalog_hdb_metadata' collection.
+  graphql:
+    typeName: UpdateHdbCatalogHdbMetadataByResourceVersionUpdateColumns
+    inputTypeName: UpdateHdbCatalogHdbMetadataByResourceVersionUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_metadata_by_resource_version_update_columns
+      fieldMapping:
+        id:
+          column:
+            name: id
+        metadata:
+          column:
+            name: metadata
+        resourceVersion:
+          column:
+            name: resource_version
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbMetadataByResourceVersionUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - id
+          - metadata
+          - resourceVersion
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbMetadataByResourceVersionResponse
+  description: Responses from the
+    'update_hdb_catalog_hdb_metadata_by_resource_version' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbMetadata!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateHdbCatalogHdbMetadataByResourceVersionResponse
+    inputTypeName: UpdateHdbCatalogHdbMetadataByResourceVersionResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_metadata_by_resource_version_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbMetadataByResourceVersionResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbMetadataByResourceVersion
+  outputType: UpdateHdbCatalogHdbMetadataByResourceVersionResponse!
+  arguments:
+    - name: keyResourceVersion
+      type: Int32!
+    - name: postCheck
+      type: HdbCatalogHdbMetadataBoolExp
+      description: Update permission post-condition predicate over the
+        'hdb_catalog_hdb_metadata' collection
+    - name: preCheck
+      type: HdbCatalogHdbMetadataBoolExp
+      description: Update permission pre-condition predicate over the
+        'hdb_catalog_hdb_metadata' collection
+    - name: updateColumns
+      type: UpdateHdbCatalogHdbMetadataByResourceVersionUpdateColumns!
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: update_hdb_catalog_hdb_metadata_by_resource_version
+    argumentMapping:
+      keyResourceVersion: key_resource_version
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateHdbCatalogHdbMetadataByResourceVersion
+    rootFieldKind: Mutation
+  description: Update any row on the 'hdb_catalog_hdb_metadata' collection using
+    the 'resource_version' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateHdbCatalogHdbMetadataByResourceVersion
+  permissions:
+    - role: admin
+      allowExecution: true
+

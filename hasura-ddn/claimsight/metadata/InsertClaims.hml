@@ -1,0 +1,167 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertClaimsObject
+  fields:
+    - name: allowedCents
+      type: Int32!
+      description: Amount allowed by plan in cents
+    - name: chargeCents
+      type: Int32!
+      description: Amount charged by provider in cents
+    - name: cpt
+      type: String_1!
+      description: Current Procedural Terminology code
+    - name: createdAt
+      type: Timestamptz
+    - name: denialReason
+      type: String_1
+      description: Reason for claim denial (required when status is DENIED)
+    - name: dos
+      type: Date!
+      description: Date of Service
+    - name: id
+      type: Uuid
+    - name: memberId
+      type: Uuid!
+    - name: providerId
+      type: Uuid!
+    - name: status
+      type: String_1!
+    - name: updatedAt
+      type: Timestamptz
+  graphql:
+    typeName: InsertClaimsObject
+    inputTypeName: InsertClaimsObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_claims_object
+      fieldMapping:
+        allowedCents:
+          column:
+            name: allowed_cents
+        chargeCents:
+          column:
+            name: charge_cents
+        cpt:
+          column:
+            name: cpt
+        createdAt:
+          column:
+            name: created_at
+        denialReason:
+          column:
+            name: denial_reason
+        dos:
+          column:
+            name: dos
+        id:
+          column:
+            name: id
+        memberId:
+          column:
+            name: member_id
+        providerId:
+          column:
+            name: provider_id
+        status:
+          column:
+            name: status
+        updatedAt:
+          column:
+            name: updated_at
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertClaimsObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - allowedCents
+          - chargeCents
+          - cpt
+          - createdAt
+          - denialReason
+          - dos
+          - id
+          - memberId
+          - providerId
+          - status
+          - updatedAt
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertClaimsResponse
+  description: Responses from the 'insert_claims' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[Claims!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertClaimsResponse
+    inputTypeName: InsertClaimsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_claims_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertClaimsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertClaims
+  outputType: InsertClaimsResponse!
+  arguments:
+    - name: objects
+      type: "[InsertClaimsObject!]!"
+    - name: postCheck
+      type: ClaimsBoolExp
+      description: Insert permission predicate over the 'claims' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: insert_claims
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertClaims
+    rootFieldKind: Mutation
+  description: Insert into the claims table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertClaims
+  permissions:
+    - role: admin
+      allowExecution: true
+

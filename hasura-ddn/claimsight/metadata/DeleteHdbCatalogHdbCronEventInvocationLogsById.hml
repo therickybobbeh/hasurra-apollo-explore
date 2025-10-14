@@ -1,0 +1,164 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: HdbCatalogHdbCronEventInvocationLogs
+  fields:
+    - name: createdAt
+      type: Timestamptz
+    - name: eventId
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: request
+      type: Json
+    - name: response
+      type: Json
+    - name: status
+      type: Int32
+  graphql:
+    typeName: HdbCatalogHdbCronEventInvocationLogs
+    inputTypeName: HdbCatalogHdbCronEventInvocationLogsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: hdb_catalog_hdb_cron_event_invocation_logs
+      fieldMapping:
+        createdAt:
+          column:
+            name: created_at
+        eventId:
+          column:
+            name: event_id
+        id:
+          column:
+            name: id
+        request:
+          column:
+            name: request
+        response:
+          column:
+            name: response
+        status:
+          column:
+            name: status
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: HdbCatalogHdbCronEventInvocationLogs
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createdAt
+          - eventId
+          - id
+          - request
+          - response
+          - status
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: HdbCatalogHdbCronEventInvocationLogsBoolExp
+  operand:
+    object:
+      type: HdbCatalogHdbCronEventInvocationLogs
+      comparableFields:
+        - fieldName: createdAt
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: eventId
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: request
+          booleanExpressionType: JsonBoolExp
+        - fieldName: response
+          booleanExpressionType: JsonBoolExp
+        - fieldName: status
+          booleanExpressionType: Int4BoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: HdbCatalogHdbCronEventInvocationLogsBoolExp
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteHdbCatalogHdbCronEventInvocationLogsByIdResponse
+  description: Responses from the
+    'delete_hdb_catalog_hdb_cron_event_invocation_logs_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbCronEventInvocationLogs!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteHdbCatalogHdbCronEventInvocationLogsByIdResponse
+    inputTypeName: DeleteHdbCatalogHdbCronEventInvocationLogsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: delete_hdb_catalog_hdb_cron_event_invocation_logs_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteHdbCatalogHdbCronEventInvocationLogsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteHdbCatalogHdbCronEventInvocationLogsById
+  outputType: DeleteHdbCatalogHdbCronEventInvocationLogsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: HdbCatalogHdbCronEventInvocationLogsBoolExp
+      description: Delete permission predicate over the
+        'hdb_catalog_hdb_cron_event_invocation_logs' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: delete_hdb_catalog_hdb_cron_event_invocation_logs_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteHdbCatalogHdbCronEventInvocationLogsById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'hdb_catalog_hdb_cron_event_invocation_logs'
+    collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteHdbCatalogHdbCronEventInvocationLogsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

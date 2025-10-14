@@ -28,10 +28,7 @@
     "docs:generate": "magidoc generate",
     "docs:preview": "magidoc preview",
     "docs:serve": "http-server docs -p 8081 -o",
-    "docs:build": "npm run docs:generate",
-    "test:challenges": "vitest run --config tests/vitest.config.ts",
-    "test:challenge": "vitest run --config tests/vitest.config.ts --grep",
-    "test:progress": "tsx tests/runner.ts"
+    "docs:build": "npm run docs:generate"
   },
   "keywords": [
     "graphql",
@@ -55,8 +52,7 @@
     "graphql-voyager": "^2.1.0",
     "http-server": "^14.1.1",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "cross-fetch": "^4.0.0",

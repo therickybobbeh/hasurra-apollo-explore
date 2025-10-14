@@ -161,7 +161,7 @@ In the "Environment Variables" section, add:
 **⚠️ Security Note:**
 - Don't use admin secret in production! Use JWT authentication instead.
 - For production, only set `VITE_GRAPHQL_ENDPOINT`
-- See [Challenge 15: JWT Authentication](../../DOCUMENTS/CHALLENGES.md#task-21-jwt-authentication-setup)
+- Implement JWT authentication for secure production use
 
 #### 2.4 Deploy
 
@@ -606,7 +606,6 @@ npm run build
 - [Vite Documentation](https://vitejs.dev/)
 - [Apollo Client + Vercel](https://www.apollographql.com/docs/react/deployment/vercel)
 - [Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
-- [Challenge 6: Apollo Client](../../DOCUMENTS/CHALLENGES.md#challenge-6-apollo-client-optimistic-updates)
 
 ---
 

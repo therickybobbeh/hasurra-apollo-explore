@@ -443,7 +443,7 @@ For production, limit database connections:
 
 ### 4.3 Enable JWT Authentication
 
-See [Challenge 15: JWT Authentication](../../DOCUMENTS/CHALLENGES.md#task-21-jwt-authentication-setup).
+Implement JWT authentication for production use.
 
 Remove admin secret from frontend environment variables.
 
@@ -609,7 +609,7 @@ If you outgrow the free tier:
 2. **Set up Apollo GraphOS** for schema management ([guide](../apollo-graphos/README.md))
 3. **Enable Hasura Cloud** for better Hasura management ([guide](../hasura-cloud/README.md))
 4. **Add monitoring** (Sentry, DataDog, New Relic)
-5. **Complete security hardening** ([Challenge 15](../../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance))
+5. **Complete security hardening** (implement comprehensive security best practices)
 
 ---
 
@@ -705,7 +705,6 @@ Redeploy gateway.
 - [Render Blueprint Reference](https://render.com/docs/blueprint-spec)
 - [PostgreSQL on Render](https://render.com/docs/databases)
 - [Deploy Node.js on Render](https://render.com/docs/deploy-node-express-app)
-- [Challenge 13: Cloud Deployment](../../DOCUMENTS/CHALLENGES.md#challenge-13-cloud-deployment-windows)
 
 ---
 

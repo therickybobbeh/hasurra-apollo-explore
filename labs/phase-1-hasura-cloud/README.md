@@ -462,7 +462,7 @@ For production, replace admin secret with JWT:
 
 3. Restart your project (automatic after env var change)
 
-See [Challenge 15: JWT Authentication](../../DOCUMENTS/CHALLENGES.md#task-21-jwt-authentication-setup) for complete setup.
+Refer to JWT authentication best practices and documentation for complete setup.
 
 ### 5.3 Set Query Limits
 
@@ -733,7 +733,6 @@ npx hasura-cli migrate apply --database-name default
 - [Hasura Cloud Documentation](https://hasura.io/docs/latest/graphql/cloud/index.html)
 - [Hasura CLI Reference](https://hasura.io/docs/latest/graphql/core/hasura-cli/index.html)
 - [Hasura Migrations Guide](https://hasura.io/docs/latest/graphql/core/migrations/index.html)
-- [Challenge 15: Security Hardening](../../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
 
 ---
 
@@ -891,4 +890,3 @@ query FederatedExample {
 - [Hasura Cloud Documentation](https://hasura.io/docs/latest/graphql/cloud/index.html)
 - [Hasura CLI Reference](https://hasura.io/docs/latest/graphql/core/hasura-cli/index.html)
 - [Hasura Migrations Guide](https://hasura.io/docs/latest/graphql/core/migrations/index.html)
-- [Challenge 15: Security Hardening](../../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)

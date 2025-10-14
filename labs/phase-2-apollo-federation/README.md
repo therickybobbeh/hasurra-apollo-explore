@@ -1228,7 +1228,6 @@ export APOLLO_GRAPH_REF=claimsight-api@main
 - [Rover CLI Reference](https://www.apollographql.com/docs/rover/)
 - [Federation Specification](https://www.apollographql.com/docs/federation/)
 - [Apollo Schema Checks](https://www.apollographql.com/docs/graphos/delivery/schema-checks/)
-- [Challenge 7: Apollo Federation](../../DOCUMENTS/CHALLENGES.md#challenge-7-apollo-federation)
 
 ---
 

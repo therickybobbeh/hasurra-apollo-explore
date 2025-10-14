@@ -1,0 +1,138 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertHdbCatalogHdbVersionObject
+  fields:
+    - name: cliState
+      type: Json
+    - name: consoleState
+      type: Json
+    - name: eeClientId
+      type: String_1
+    - name: eeClientSecret
+      type: String_1
+    - name: hasuraUuid
+      type: Uuid
+    - name: upgradedOn
+      type: Timestamptz!
+    - name: version
+      type: String_1!
+  graphql:
+    typeName: InsertHdbCatalogHdbVersionObject
+    inputTypeName: InsertHdbCatalogHdbVersionObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_hdb_catalog_hdb_version_object
+      fieldMapping:
+        cliState:
+          column:
+            name: cli_state
+        consoleState:
+          column:
+            name: console_state
+        eeClientId:
+          column:
+            name: ee_client_id
+        eeClientSecret:
+          column:
+            name: ee_client_secret
+        hasuraUuid:
+          column:
+            name: hasura_uuid
+        upgradedOn:
+          column:
+            name: upgraded_on
+        version:
+          column:
+            name: version
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertHdbCatalogHdbVersionObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - cliState
+          - consoleState
+          - eeClientId
+          - eeClientSecret
+          - hasuraUuid
+          - upgradedOn
+          - version
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertHdbCatalogHdbVersionResponse
+  description: Responses from the 'insert_hdb_catalog_hdb_version' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbVersion!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertHdbCatalogHdbVersionResponse
+    inputTypeName: InsertHdbCatalogHdbVersionResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_hdb_catalog_hdb_version_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertHdbCatalogHdbVersionResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertHdbCatalogHdbVersion
+  outputType: InsertHdbCatalogHdbVersionResponse!
+  arguments:
+    - name: objects
+      type: "[InsertHdbCatalogHdbVersionObject!]!"
+    - name: postCheck
+      type: HdbCatalogHdbVersionBoolExp
+      description: Insert permission predicate over the 'hdb_catalog_hdb_version' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: insert_hdb_catalog_hdb_version
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertHdbCatalogHdbVersion
+    rootFieldKind: Mutation
+  description: Insert into the hdb_catalog_hdb_version table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertHdbCatalogHdbVersion
+  permissions:
+    - role: admin
+      allowExecution: true
+

@@ -791,7 +791,6 @@ az postgres flexible-server restore \
 - [Azure for Healthcare](https://azure.microsoft.com/en-us/industries/healthcare/)
 - [HIPAA on Azure](https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-hipaa-us)
 - [Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/)
-- [Challenge 15: HIPAA Compliance](../../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
 
 ---
 

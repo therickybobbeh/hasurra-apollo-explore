@@ -295,13 +295,6 @@ curl http://localhost:8080/v1/version
 
 ## 📚 Related Documentation
 
-### Learning Challenges (Local Focus)
-- [Challenge 1: Basic Queries](../../DOCUMENTS/CHALLENGES.md#challenge-1-basic-graphql-queries)
-- [Challenge 2: Subscriptions](../../DOCUMENTS/CHALLENGES.md#challenge-2-real-time-subscriptions)
-- [Challenge 3: Mutations](../../DOCUMENTS/CHALLENGES.md#challenge-3-mutations)
-- [Challenge 4: Row-Level Security](../../DOCUMENTS/CHALLENGES.md#challenge-4-row-level-security-rls)
-- [Challenge 8: Apollo Federation](../../DOCUMENTS/CHALLENGES.md#challenge-8-apollo-federation-setup)
-
 ### Guides
 - [Testing Guide](../../DOCUMENTS/TESTING_GUIDE.md) - Local testing strategies
 - [Best Practices](../../DOCUMENTS/BEST_PRACTICES.md) - Code quality standards

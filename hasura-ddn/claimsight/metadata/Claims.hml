@@ -1,0 +1,113 @@
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: ClaimsAggExp
+  operand:
+    object:
+      aggregatedType: Claims
+      aggregatableFields:
+        - fieldName: allowedCents
+          aggregateExpression: Int4AggExp
+        - fieldName: chargeCents
+          aggregateExpression: Int4AggExp
+        - fieldName: cpt
+          aggregateExpression: TextAggExp
+        - fieldName: createdAt
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: denialReason
+          aggregateExpression: TextAggExp
+        - fieldName: dos
+          aggregateExpression: DateAggExp
+        - fieldName: id
+          aggregateExpression: UuidAggExp
+        - fieldName: memberId
+          aggregateExpression: UuidAggExp
+        - fieldName: providerId
+          aggregateExpression: UuidAggExp
+        - fieldName: status
+          aggregateExpression: TextAggExp
+        - fieldName: updatedAt
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: ClaimsAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: ClaimsOrderByExp
+  operand:
+    object:
+      orderedType: Claims
+      orderableFields:
+        - fieldName: allowedCents
+          orderByExpression: Int32OrderByExp
+        - fieldName: chargeCents
+          orderByExpression: Int32OrderByExp
+        - fieldName: cpt
+          orderByExpression: String1OrderByExp
+        - fieldName: createdAt
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: denialReason
+          orderByExpression: String1OrderByExp
+        - fieldName: dos
+          orderByExpression: DateOrderByExp
+        - fieldName: id
+          orderByExpression: UuidOrderByExp
+        - fieldName: memberId
+          orderByExpression: UuidOrderByExp
+        - fieldName: providerId
+          orderByExpression: UuidOrderByExp
+        - fieldName: status
+          orderByExpression: String1OrderByExp
+        - fieldName: updatedAt
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: ClaimsOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: Claims
+  objectType: Claims
+  source:
+    dataConnectorName: postgres
+    collection: claims
+  filterExpressionType: ClaimsBoolExp
+  aggregateExpression: ClaimsAggExp
+  orderByExpression: ClaimsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: claims
+      subscription:
+        rootField: claims
+    selectUniques:
+      - queryRootField: claimsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: claimsById
+    filterInputTypeName: ClaimsFilterInput
+    aggregate:
+      queryRootField: claimsAggregate
+      subscription:
+        rootField: claimsAggregate
+  description: Medical claims submitted for services
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: Claims
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

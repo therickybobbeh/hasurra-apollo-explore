@@ -221,7 +221,86 @@ query AppointmentsWithDetails {
 
 ---
 
-## 📍 Phase 5: Hasura DDN Migration (Advanced)
+## 📍 Phase 5: Spring Boot GraphQL
+
+**🎓 What You'll Learn:**
+- Building GraphQL APIs with Spring Boot and Java
+- Schema-first vs code-first GraphQL development
+- JPA/Hibernate for database access
+- Spring Boot GraphQL auto-configuration
+- Comparing Spring Boot vs Apollo Server approaches
+
+**🏗️ What You'll Build:**
+- Medications Service with Spring Boot GraphQL
+- Manual GraphQL schema design (schema-first)
+- JPA entities and repositories
+- GraphQL resolvers with Spring annotations
+- PostgreSQL integration with Spring Data JPA
+
+**⏱️ Time:** 1 hour
+**💰 Cost:** FREE (uses existing Neon account)
+**🔧 Difficulty:** 🟡 Intermediate
+
+**📖 Lab Guide:** [phase-5-spring-boot-graphql/README.md](./phase-5-spring-boot-graphql/README.md)
+
+**Prerequisites:** Complete Phase 1 + Phase 2 + Phase 3 + Phase 4
+
+### Why Spring Boot?
+- **Enterprise-ready:** Industry standard for Java microservices
+- **Type-safe:** Compile-time validation with Java
+- **Ecosystem:** Leverage Spring's vast ecosystem
+- **Polyglot federation:** Demonstrate cross-language GraphQL
+
+**✅ Checkpoint:** You can build GraphQL APIs with Java and Spring Boot!
+
+---
+
+## 📍 Phase 6: Add Spring Boot to Federation
+
+**🎓 What You'll Learn:**
+- Enabling Apollo Federation on Spring Boot GraphQL
+- Apollo Federation Java library integration
+- Entity reference resolvers in Spring Boot
+- Cross-subgraph queries (Go + Node.js + Java)
+- Polyglot microservices architecture
+
+**🏗️ What You'll Build:**
+- Enable federation on Medications service
+- Add `@key`, `@extends`, `@external` directives
+- Implement entity resolvers for Member and Provider
+- Update gateway to include 4th subgraph
+- Query medications with cross-subgraph member/provider data
+
+**⏱️ Time:** 45 minutes
+**💰 Cost:** FREE
+**🔧 Difficulty:** 🟡 Intermediate
+
+**📖 Lab Guide:** [phase-6-add-spring-boot-to-federation/README.md](./phase-6-add-spring-boot-to-federation/README.md)
+
+**Prerequisites:** Complete Phase 1 + Phase 2 + Phase 3 + Phase 4 + Phase 5
+
+### Testing Your Work:
+```graphql
+query PrescriptionsWithMembers {
+  prescriptions {
+    id
+    medicationName
+    dosage
+    # Cross-subgraph to Hasura
+    member {
+      first_name
+      last_name
+      dob
+    }
+  }
+}
+```
+
+**✅ Checkpoint:** You have a 4-subgraph polyglot federation (Go + Node.js + Node.js + Java)!
+
+---
+
+## 📍 Phase 7: Hasura DDN Migration (Advanced)
 
 **🎓 What You'll Learn:**
 - Hasura DDN (Data Delivery Network) architecture
@@ -240,7 +319,7 @@ query AppointmentsWithDetails {
 **💰 Cost:** FREE (Hasura DDN free tier)
 **🔧 Difficulty:** 🔴 Advanced
 
-**📖 Lab Guide:** [phase-5-hasura-ddn/README.md](./phase-5-hasura-ddn/README.md)
+**📖 Lab Guide:** [phase-7-hasura-ddn/README.md](./phase-7-hasura-ddn/README.md)
 
 **Prerequisites:** Complete Phase 1 + Phase 2 + Phase 3 + Phase 4
 
@@ -254,7 +333,7 @@ query AppointmentsWithDetails {
 
 ---
 
-## 📍 Phase 6: PromptQL + AI Integration (Advanced)
+## 📍 Phase 8: PromptQL + AI Integration (Advanced)
 
 **🎓 What You'll Learn:**
 - Natural language to SQL with LLMs (OpenAI/Anthropic)
@@ -274,9 +353,9 @@ query AppointmentsWithDetails {
 **💰 Cost:** ~$1-5 for API calls (OpenAI/Anthropic)
 **🔧 Difficulty:** 🔴 Advanced
 
-**📖 Lab Guide:** [phase-6-promptql/README.md](./phase-6-promptql/README.md)
+**📖 Lab Guide:** [phase-8-promptql/README.md](./phase-8-promptql/README.md)
 
-**Prerequisites:** Complete Phase 1 + Phase 2 (Phases 3-5 optional)
+**Prerequisites:** Complete Phase 1 + Phase 2 (Phases 3-6 optional)
 
 ### Example Prompts:
 ```
@@ -297,8 +376,10 @@ query AppointmentsWithDetails {
 2. ✅ Phase 2: Apollo Federation (45 min)
 3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
 4. ✅ Phase 4: Add to Federation (45 min)
+5. ✅ Phase 5: Spring Boot GraphQL (1 hr)
+6. ✅ Phase 6: Add Spring Boot to Federation (45 min)
 
-**Best for:** Understanding GraphQL federation end-to-end (auto-generated + manual)
+**Best for:** Understanding polyglot GraphQL federation end-to-end (Go + Node.js + Java)
 
 ---
 
@@ -307,7 +388,7 @@ query AppointmentsWithDetails {
 2. ✅ Phase 2: Apollo Federation (45 min)
 3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
 4. ✅ Phase 4: Add to Federation (45 min)
-5. ✅ Phase 5: Hasura DDN Migration (2-3 hrs)
+5. ✅ Phase 7: Hasura DDN Migration (2-3 hrs)
 
 **Best for:** Learning modern GraphQL architecture with Hasura DDN
 
@@ -316,7 +397,7 @@ query AppointmentsWithDetails {
 ### Path C: AI Integration Focus
 1. ✅ Phase 1: Hasura Cloud Basics (30 min)
 2. ✅ Phase 2: Apollo Federation (45 min)
-3. ✅ Phase 6: PromptQL + AI (1-2 hrs)
+3. ✅ Phase 8: PromptQL + AI (1-2 hrs)
 
 **Best for:** Learning AI-powered data access patterns
 
@@ -327,9 +408,11 @@ query AppointmentsWithDetails {
 2. ✅ Phase 2: Apollo Federation (45 min)
 3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
 4. ✅ Phase 4: Add to Federation (45 min)
-5. ✅ Phase 5: Hasura DDN Migration (2-3 hrs)
-6. ✅ Phase 6: PromptQL + AI (1-2 hrs)
-7. 🏆 **Integration Challenge:** Integrate all services (bonus)
+5. ✅ Phase 5: Spring Boot GraphQL (1 hr)
+6. ✅ Phase 6: Add Spring Boot to Federation (45 min)
+7. ✅ Phase 7: Hasura DDN Migration (2-3 hrs)
+8. ✅ Phase 8: PromptQL + AI (1-2 hrs)
+9. 🏆 **Integration Challenge:** Integrate all services (bonus)
 
 **Best for:** Building complete production-ready architecture
 
@@ -395,28 +478,27 @@ query AppointmentsWithDetails {
 ### Related Guides
 - [Deployment Options](../deployment/README.md) - Production deployment strategies
 - [Local Development](../deployment/local-lab/README.md) - Run everything locally
-- [Challenges](../DOCUMENTS/CHALLENGES.md) - Additional learning exercises
 
 ---
 
 ## 🏆 Bonus: Integration Challenge
 
-**For learners who complete all 6 phases:**
+**For learners who complete all 8 phases:**
 
-Build a unified system that uses:
-- Hasura DDN (Phase 5) as the data source
+Build a unified production system that integrates:
+- Hasura DDN (Phase 7) as a modern data source
 - Custom Appointments service (Phase 3 & 4) with manual schema
-- PromptQL (Phase 6) for natural language queries
+- Spring Boot Medications service (Phase 5 & 6) with JPA
+- PromptQL (Phase 8) for natural language queries
 - Apollo Federation to combine all subgraphs
 
 **Benefits:**
-- Modern DDN architecture
-- AI-powered queries
-- Mix of auto-generated and manual GraphQL
+- Modern DDN architecture with connector-based data access
+- AI-powered natural language queries
+- Mix of auto-generated and manual GraphQL schemas
+- Polyglot microservices (Go, Node.js, Java)
 - Federated data access across 4+ subgraphs
 - Production-ready stack
-
-**Guide:** See [Challenge 16: DDN + PromptQL Integration](../DOCUMENTS/CHALLENGES.md#challenge-16-ddn-promptql-integration)
 
 ---
 
@@ -439,9 +521,10 @@ Build a unified system that uses:
 After completing the labs:
 
 1. **Deploy to production** - Use [deployment guides](../deployment/) for Vercel, Render, or Azure
-2. **Add security** - Complete [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
-3. **Build features** - Work through [other challenges](../DOCUMENTS/CHALLENGES.md)
-4. **Contribute back** - Share improvements via pull requests!
+2. **Add authentication** - Implement JWT-based auth with Hasura session variables
+3. **Implement security** - Add HIPAA-compliant RLS policies and audit logging
+4. **Build custom features** - Extend the system with your own requirements
+5. **Contribute back** - Share improvements via pull requests!
 
 ---
 

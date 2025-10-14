@@ -452,7 +452,7 @@ curl -X POST https://your-project.hasura.app/v1/graphql \
 ## 🎓 What's Next?
 
 ### Option A: Integration Challenge
-Complete [Challenge 16: Integrate DDN + PromptQL](../../DOCUMENTS/CHALLENGES.md)
+Integrate DDN and PromptQL for advanced AI-powered data querying capabilities
 
 ### Option B: Production Deployment
 Follow [deployment guides](../../deployment/) for Render.com / Vercel

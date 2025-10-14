@@ -1,0 +1,154 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: EligibilityChecks
+  description: Member eligibility verification results
+  fields:
+    - name: checkedAt
+      type: Timestamptz!
+    - name: createdAt
+      type: Timestamptz!
+    - name: id
+      type: Uuid!
+    - name: memberId
+      type: Uuid!
+    - name: result
+      type: Json!
+  graphql:
+    typeName: EligibilityChecks
+    inputTypeName: EligibilityChecksInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: eligibility_checks
+      fieldMapping:
+        checkedAt:
+          column:
+            name: checked_at
+        createdAt:
+          column:
+            name: created_at
+        id:
+          column:
+            name: id
+        memberId:
+          column:
+            name: member_id
+        result:
+          column:
+            name: result
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: EligibilityChecks
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - checkedAt
+          - createdAt
+          - id
+          - memberId
+          - result
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: EligibilityChecksBoolExp
+  operand:
+    object:
+      type: EligibilityChecks
+      comparableFields:
+        - fieldName: checkedAt
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: createdAt
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: id
+          booleanExpressionType: UuidBoolExp
+        - fieldName: memberId
+          booleanExpressionType: UuidBoolExp
+        - fieldName: result
+          booleanExpressionType: JsonbBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: EligibilityChecksBoolExp
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteEligibilityChecksByIdResponse
+  description: Responses from the 'delete_eligibility_checks_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[EligibilityChecks!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteEligibilityChecksByIdResponse
+    inputTypeName: DeleteEligibilityChecksByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: delete_eligibility_checks_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteEligibilityChecksByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteEligibilityChecksById
+  outputType: DeleteEligibilityChecksByIdResponse!
+  arguments:
+    - name: keyId
+      type: Uuid!
+    - name: preCheck
+      type: EligibilityChecksBoolExp
+      description: Delete permission predicate over the 'eligibility_checks' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: delete_eligibility_checks_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteEligibilityChecksById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'eligibility_checks' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteEligibilityChecksById
+  permissions:
+    - role: admin
+      allowExecution: true
+

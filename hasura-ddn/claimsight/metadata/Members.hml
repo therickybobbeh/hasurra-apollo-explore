@@ -1,0 +1,97 @@
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: MembersAggExp
+  operand:
+    object:
+      aggregatedType: Members
+      aggregatableFields:
+        - fieldName: createdAt
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: dob
+          aggregateExpression: DateAggExp
+        - fieldName: firstName
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: UuidAggExp
+        - fieldName: lastName
+          aggregateExpression: TextAggExp
+        - fieldName: plan
+          aggregateExpression: TextAggExp
+        - fieldName: updatedAt
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: MembersAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: MembersOrderByExp
+  operand:
+    object:
+      orderedType: Members
+      orderableFields:
+        - fieldName: createdAt
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: dob
+          orderByExpression: DateOrderByExp
+        - fieldName: firstName
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: UuidOrderByExp
+        - fieldName: lastName
+          orderByExpression: String1OrderByExp
+        - fieldName: plan
+          orderByExpression: String1OrderByExp
+        - fieldName: updatedAt
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: MembersOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: Members
+  objectType: Members
+  source:
+    dataConnectorName: postgres
+    collection: members
+  filterExpressionType: MembersBoolExp
+  aggregateExpression: MembersAggExp
+  orderByExpression: MembersOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: members
+      subscription:
+        rootField: members
+    selectUniques:
+      - queryRootField: membersById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: membersById
+    filterInputTypeName: MembersFilterInput
+    aggregate:
+      queryRootField: membersAggregate
+      subscription:
+        rootField: membersAggregate
+  description: Health plan members/patients
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: Members
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

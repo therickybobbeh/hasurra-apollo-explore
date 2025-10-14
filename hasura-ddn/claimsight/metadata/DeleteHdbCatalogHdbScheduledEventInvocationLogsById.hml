@@ -1,0 +1,165 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: HdbCatalogHdbScheduledEventInvocationLogs
+  fields:
+    - name: createdAt
+      type: Timestamptz
+    - name: eventId
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: request
+      type: Json
+    - name: response
+      type: Json
+    - name: status
+      type: Int32
+  graphql:
+    typeName: HdbCatalogHdbScheduledEventInvocationLogs
+    inputTypeName: HdbCatalogHdbScheduledEventInvocationLogsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: hdb_catalog_hdb_scheduled_event_invocation_logs
+      fieldMapping:
+        createdAt:
+          column:
+            name: created_at
+        eventId:
+          column:
+            name: event_id
+        id:
+          column:
+            name: id
+        request:
+          column:
+            name: request
+        response:
+          column:
+            name: response
+        status:
+          column:
+            name: status
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: HdbCatalogHdbScheduledEventInvocationLogs
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createdAt
+          - eventId
+          - id
+          - request
+          - response
+          - status
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: HdbCatalogHdbScheduledEventInvocationLogsBoolExp
+  operand:
+    object:
+      type: HdbCatalogHdbScheduledEventInvocationLogs
+      comparableFields:
+        - fieldName: createdAt
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: eventId
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: request
+          booleanExpressionType: JsonBoolExp
+        - fieldName: response
+          booleanExpressionType: JsonBoolExp
+        - fieldName: status
+          booleanExpressionType: Int4BoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: HdbCatalogHdbScheduledEventInvocationLogsBoolExp
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+  description: Responses from the
+    'delete_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbScheduledEventInvocationLogs!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+    inputTypeName: DeleteHdbCatalogHdbScheduledEventInvocationLogsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: delete_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteHdbCatalogHdbScheduledEventInvocationLogsById
+  outputType: DeleteHdbCatalogHdbScheduledEventInvocationLogsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: HdbCatalogHdbScheduledEventInvocationLogsBoolExp
+      description: Delete permission predicate over the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: delete_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteHdbCatalogHdbScheduledEventInvocationLogsById
+    rootFieldKind: Mutation
+  description: Delete any row on the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection using the 'id'
+    key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteHdbCatalogHdbScheduledEventInvocationLogsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

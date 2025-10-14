@@ -25,7 +25,7 @@ This guide covers deploying ClaimSight's federated GraphQL stack using **100% fr
 - 🎯 **Managed services** (Hasura Cloud, Apollo GraphOS, Vercel, Render.com)
 - 🚀 **Quick to deploy** (<30 minutes for full stack)
 - 🎓 **Perfect for learning** - No credit card required for most services
-- 🔒 **Security by default** (see [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance))
+- 🔒 **Security by default** - Follow security best practices and implement proper hardening before production use
 
 ---
 
@@ -120,7 +120,7 @@ VITE_HASURA_ADMIN_SECRET=your-admin-secret
 **Limitations:**
 - No Apollo Federation (single Hasura endpoint only)
 - No custom subgraphs (Providers subgraph not deployed)
-- Good for learning Challenges 1-6
+- Good for learning basic GraphQL concepts
 
 ---
 
@@ -322,7 +322,7 @@ See detailed guide: **[azure/README.md](./azure/README.md)**
 
 ## 🔒 Security Considerations
 
-**Before deploying to production**, complete [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance).
+**Before deploying to production**, implement comprehensive security hardening measures.
 
 ### Minimum Security Requirements
 
@@ -355,7 +355,7 @@ If handling Protected Health Information (PHI):
 
 5. **Test 72-hour restoration** requirement (2024 HIPAA rule)
 
-See [Challenge 15: HIPAA Compliance Checklist](../DOCUMENTS/CHALLENGES.md#part-6-hipaa-compliance-checklist) for details.
+Consult HIPAA compliance documentation and legal counsel for complete requirements.
 
 ---
 
@@ -482,7 +482,7 @@ query FederatedQuery {
 
 **For MVPs/Demos:** Complete Phase 1 → Phase 2 → Phase 3 (100% free)
 
-**For Production:** All phases + [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
+**For Production:** All phases + implement comprehensive security hardening
 
 ---
 
@@ -491,7 +491,7 @@ query FederatedQuery {
 Use this checklist when deploying to any environment:
 
 ### Pre-Deployment
-- [ ] Complete [Challenge 15: Security Hardening](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
+- [ ] Implement security hardening best practices
 - [ ] Run `npm audit fix` to patch vulnerabilities
 - [ ] Test locally with `npm run federated:dev`
 - [ ] Review environment variables (no hardcoded secrets)
@@ -557,7 +557,7 @@ Use this checklist when deploying to any environment:
 - [ ] Uptime monitoring (UptimeRobot, Pingdom, etc.)
 
 ### Documentation
-- [ ] API documentation published (see [Challenge 14](../DOCUMENTS/CHALLENGES.md#challenge-14-modern--auto-generated))
+- [ ] API documentation published
 - [ ] Deployment runbook documented
 - [ ] Incident response plan defined
 - [ ] Team trained on deployment process
@@ -586,11 +586,6 @@ Use this checklist when deploying to any environment:
 - [Vercel Docs](https://vercel.com/docs)
 - [Render.com Docs](https://render.com/docs)
 - [Azure Docs](https://learn.microsoft.com/en-us/azure/)
-
-### Related Challenges
-- [Challenge 13: Cloud Deployment](../DOCUMENTS/CHALLENGES.md#challenge-13-cloud-deployment-windows)
-- [Challenge 14: API Documentation](../DOCUMENTS/CHALLENGES.md#challenge-14-modern--auto-generated)
-- [Challenge 15: Security Hardening & HIPAA Compliance](../DOCUMENTS/CHALLENGES.md#challenge-15--security-hardening--hipaa-compliance)
 
 ---
 

@@ -1,0 +1,138 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertMembersObject
+  fields:
+    - name: createdAt
+      type: Timestamptz
+    - name: dob
+      type: Date!
+    - name: firstName
+      type: String_1!
+    - name: id
+      type: Uuid
+    - name: lastName
+      type: String_1!
+    - name: plan
+      type: String_1!
+    - name: updatedAt
+      type: Timestamptz
+  graphql:
+    typeName: InsertMembersObject
+    inputTypeName: InsertMembersObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_members_object
+      fieldMapping:
+        createdAt:
+          column:
+            name: created_at
+        dob:
+          column:
+            name: dob
+        firstName:
+          column:
+            name: first_name
+        id:
+          column:
+            name: id
+        lastName:
+          column:
+            name: last_name
+        plan:
+          column:
+            name: plan
+        updatedAt:
+          column:
+            name: updated_at
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertMembersObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createdAt
+          - dob
+          - firstName
+          - id
+          - lastName
+          - plan
+          - updatedAt
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertMembersResponse
+  description: Responses from the 'insert_members' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[Members!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertMembersResponse
+    inputTypeName: InsertMembersResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: insert_members_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertMembersResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertMembers
+  outputType: InsertMembersResponse!
+  arguments:
+    - name: objects
+      type: "[InsertMembersObject!]!"
+    - name: postCheck
+      type: MembersBoolExp
+      description: Insert permission predicate over the 'members' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: insert_members
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertMembers
+    rootFieldKind: Mutation
+  description: Insert into the members table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertMembers
+  permissions:
+    - role: admin
+      allowExecution: true
+

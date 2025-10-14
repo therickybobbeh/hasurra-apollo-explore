@@ -123,113 +123,100 @@ ddn whoami
 
 ---
 
-## 📚 Part 2: Create DDN Project
+## 📚 Part 2: Working with the DDN Project
 
-### 2.1 Initialize DDN Project
+### 2.1 Navigate to DDN Directory
 
-Our project already has a `ddn/` directory with example configs. Let's initialize it:
+Our project already has a fully configured DDN project in the `hasura-ddn/` directory:
 
 ```bash
-cd ddn/
-
-# Initialize DDN project (interactive)
-ddn project init
+cd hasura-ddn/
 ```
 
-**Prompts:**
-- **Project name:** `claimsight-ddn`
-- **Description:** `ClaimSight Healthcare Management System - DDN`
-- **Connector:** Select `PostgreSQL`
-
-This creates:
-- `ddn/` directory structure
-- Initial configuration files
-- Connector scaffolding
+This directory contains a complete, working Hasura DDN v3 setup that's ready to use.
 
 ### 2.2 Review Project Structure
 
 ```bash
-tree ddn/
+ls -la
 ```
 
-Expected output:
+Expected structure:
 ```
-ddn/
-├── connector/
-│   └── postgres/
-│       └── connector.yaml
-├── metadata/
-│   ├── models/
-│   │   ├── Members.hml
-│   │   └── Providers.hml
-│   └── relationships/
-│       └── MembersClaims.hml
-├── subgraph.yaml
-└── .env.example
-```
-
----
-
-## 📚 Part 3: Configure PostgreSQL Connector
-
-### 3.1 Get Your Neon Connection String
-
-From **Phase 1**, you should have a Neon PostgreSQL database. Get the connection string:
-
-**Option A: From Hasura Cloud Console**
-1. Go to https://cloud.hasura.io
-2. Select your project from Phase 1
-3. Click "Data" tab → "Manage" → "Edit" on your database
-4. Copy the connection string
-
-**Option B: From Neon Dashboard**
-1. Go to https://neon.tech
-2. Select your database
-3. Copy connection string from dashboard
-
-**Format:**
-```
-postgresql://user:password@ep-example-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
-```
-
-### 3.2 Configure Environment
-
-```bash
-cd ddn/
-
-# Copy example env file
-cp .env.example .env
-
-# Edit .env
-nano .env  # or use your preferred editor
-```
-
-Update with your connection string:
-```bash
-POSTGRESQL_CONNECTION_STRING=postgresql://your-user:your-password@your-host.neon.tech/your-db?sslmode=require
-```
-
-### 3.3 Test Connector
-
-```bash
-ddn connector introspect postgres
-```
-
-This should show all your tables:
-```
-✓ Connected to PostgreSQL
-✓ Found 6 tables:
-  - members
-  - provider_records
-  - claims
-  - notes
-  - eligibility_checks
-  - migrations
+hasura-ddn/
+├── hasura.yaml              # Supergraph configuration
+├── supergraph.yaml          # Supergraph definition
+├── .env                     # Environment variables
+├── claimsight/              # Subgraph directory
+│   ├── subgraph.yaml
+│   ├── auth_config.hml      # Authentication config
+│   ├── connector/
+│   │   └── postgres/        # PostgreSQL connector
+│   │       ├── connector.yaml
+│   │       ├── compose.yaml
+│   │       └── ...
+│   └── metadata/            # All models and commands
+│       ├── Claims.hml
+│       ├── Members.hml
+│       ├── Notes.hml
+│       ├── ProviderRecords.hml
+│       └── ... (100+ files)
+├── engine/                  # Build artifacts
+│   └── build/
+└── compose.yaml            # Docker services
 ```
 
 ---
 
-## 📚 Part 4: Migrate Metadata from v2 to v3
+## 📚 Part 3: Start PostgreSQL Database & Connector
+
+### 3.1 Start PostgreSQL Database
+
+The DDN connector needs a running PostgreSQL database. Start it using the project's docker-compose:
+
+```bash
+# Navigate to project root
+cd ..
+
+# Start PostgreSQL
+docker compose up -d
+
+# Verify it's running
+docker compose ps
+```
+
+### 3.2 Start the PostgreSQL Connector
+
+The connector runs as a Docker service and connects the DDN engine to your database:
+
+```bash
+cd hasura-ddn/claimsight/connector/postgres
+
+# Start the connector
+docker compose --env-file ../../../.env up -d
+
+# Verify it's running
+docker compose ps
+```
+
+You should see `postgres-claimsight_postgres-1` running on port 4313.
+
+### 3.3 Verify the Setup
+
+The connector is already configured and introspected. You can verify the configuration:
+
+```bash
+cd ../../../  # Back to hasura-ddn/
+
+# Check the connector link
+cat claimsight/metadata/postgres.hml | head -20
+```
+
+You should see the PostgreSQL connector definition with all your tables (claims, members, notes, etc.) already configured.
+
+---
+
+## 📚 Part 4: Explore the Metadata
 
 ### 4.1 Understand the Difference
 
@@ -250,92 +237,71 @@ This should show all your tables:
 **Hasura DDN Metadata (.hml files):**
 ```yaml
 kind: Model
-version: v1
+version: v2
 definition:
-  name: Members
-  objectType: members
+  name: Claims
+  objectType: Claims
   source:
     dataConnectorName: postgres
-    collection: members
-```
-
-### 4.2 Generate Models from Database
-
-```bash
-# Auto-generate models for all tables
-ddn connector introspect postgres --output metadata/models/
-
-# This creates .hml files for each table
-```
-
-Expected output:
-```
-✓ Generated metadata/models/Members.hml
-✓ Generated metadata/models/ProviderRecords.hml
-✓ Generated metadata/models/Claims.hml
-✓ Generated metadata/models/Notes.hml
-✓ Generated metadata/models/EligibilityChecks.hml
-```
-
-### 4.3 Add Relationships
-
-The introspection detects foreign keys, but let's verify relationships:
-
-```bash
-ddn connector introspect postgres --detect-relationships
-```
-
-This updates files in `metadata/relationships/`.
-
-### 4.4 Add Apollo Federation Support
-
-Edit `metadata/models/ProviderRecords.hml` to add federation:
-
-```yaml
-kind: Model
-version: v1
-definition:
-  name: ProviderRecords
-  objectType: provider_records
-  source:
-    dataConnectorName: postgres
-    collection: provider_records
-
-  # Add Apollo Federation
-  apolloFederation:
-    entitySource:
-      - keyFields:
-          - id
-
+    collection: claims
+  filterExpressionType: ClaimsBoolExp
   graphql:
+    selectMany:
+      queryRootField: claims
     selectUniques:
-      - queryRootField: providerRecordById
+      - queryRootField: claimsById
         uniqueIdentifier:
           - id
-    selectMany:
-      queryRootField: provider_records
+```
+
+### 4.2 Review Generated Models
+
+The models have already been generated from your database. Let's explore them:
+
+```bash
+# List all generated models
+ls claimsight/metadata/*.hml | grep -E "(Claims|Members|Notes|Provider)"
+
+# View the Claims model
+cat claimsight/metadata/Claims.hml
+```
+
+You'll see:
+- **Model definitions** - How the table is exposed in GraphQL
+- **Permissions** - Role-based access control (admin role configured)
+- **Aggregate expressions** - For count, sum, avg operations
+- **Order by expressions** - For sorting
+- **Boolean expressions** - For filtering
+
+### 4.3 View Available Commands
+
+DDN also generated mutation commands:
+
+```bash
+# List commands (Insert, Update, Delete)
+ls claimsight/metadata/ | grep -E "(Insert|Update|Delete)" | head -10
+```
+
+These provide type-safe mutations for your tables.
+
+### 4.4 Check Relationships
+
+Foreign key relationships were automatically detected:
+
+```bash
+# Check the connector link for relationship information
+grep -A 5 "foreign_keys" claimsight/connector/postgres/schema.json | head -30
 ```
 
 ---
 
-## 📚 Part 5: Deploy to Hasura DDN Cloud
+## 📚 Part 5: Build and Test Locally
 
-### 5.1 Create DDN Project in Cloud
-
-```bash
-ddn project create claimsight-ddn
-```
-
-This creates a project in Hasura DDN cloud.
-
-### 5.2 Build and Deploy
+### 5.1 Build the Supergraph
 
 ```bash
-# Build the supergraph locally (validates metadata)
+# Build the supergraph (validates all metadata)
 ddn supergraph build local
-
-# If successful, deploy to cloud
-ddn supergraph build create
 ```
 
 **Expected output:**
@@ -343,27 +309,53 @@ ddn supergraph build create
 ✓ Building supergraph...
 ✓ Validating metadata...
 ✓ Generating GraphQL schema...
-✓ Deploying to Hasura DDN...
-
-🚀 Deployment successful!
-
-GraphQL Endpoint: https://claimsight-ddn-abc123.ddn.hasura.app/graphql
-Console: https://console.hasura.io/project/claimsight-ddn
+Build artifacts exported to "engine/build"
 ```
 
-### 5.3 Test the DDN Endpoint
+This creates the build artifacts in `engine/build/` directory.
+
+### 5.2 Start the Local DDN Engine
 
 ```bash
-# Get your DDN endpoint
-ddn project info
+# Start the engine with Docker
+ddn run docker-start
 ```
 
-Test with curl:
+This starts:
+- **DDN Engine** on port 3280
+- **OpenTelemetry Collector** for observability
+
+The engine will use the build artifacts we just created.
+
+### 5.3 Test the Local Endpoint
+
+In a new terminal:
+
 ```bash
-curl -X POST https://your-project.ddn.hasura.app/graphql \
+# Test introspection
+curl -X POST http://localhost:3280/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query":"{ members { id first_name last_name } }"}'
+  -d '{"query":"{ __schema { queryType { name } } }"}'
+
+# Query claims
+curl -X POST http://localhost:3280/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ claims(limit: 5) { id dos cpt status chargeCents } }"}'
+
+# Query members
+curl -X POST http://localhost:3280/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ members(limit: 5) { id firstName lastName dob } }"}'
 ```
+
+### 5.4 Open the Local Console
+
+```bash
+# Open the DDN console in your browser
+ddn console --local
+```
+
+This opens a GraphiQL interface where you can explore the schema and run queries interactively.
 
 ---
 
@@ -468,13 +460,13 @@ Look for:
 ## 🎯 Next Steps
 
 ### Option A: Continue Learning
-- ✅ Complete [Phase 4: PromptQL + AI](../phase-4-promptql/README.md)
+- ✅ Complete [Phase 8: PromptQL + AI](../phase-8-promptql/README.md)
 
 ### Option B: Deploy to Production
 - See [Deployment Guides](../../deployment/README.md)
 
 ### Option C: Integration Challenge
-- Integrate DDN with PromptQL (see [Challenge 16](../../DOCUMENTS/CHALLENGES.md))
+- Integrate DDN with PromptQL for AI-powered queries
 
 ---
 

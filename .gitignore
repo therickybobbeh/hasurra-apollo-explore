@@ -62,9 +62,15 @@ coverage/
 # Optional eslint cache
 .eslintcache
 
-# Hasura
+# Hasura v2
 hasura/config.yaml
 .hasura/
+
+# Hasura DDN
+hasura-ddn/.env
+hasura-ddn/.hasura/
+hasura-ddn/engine/build/
+hasura-ddn/.ddn/
 
 # Database
 *.db
@@ -99,3 +105,5 @@ azure-pipelines.local.yml
 # Backup files
 *.backup
 *.bak
+*.backup/
+ddn.backup/

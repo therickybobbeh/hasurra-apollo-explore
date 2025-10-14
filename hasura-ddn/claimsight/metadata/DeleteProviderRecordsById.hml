@@ -1,0 +1,163 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: ProviderRecords
+  description: Legacy provider records from Hasura. Use federated Provider type
+    for new queries.
+  fields:
+    - name: createdAt
+      type: Timestamptz!
+    - name: id
+      type: Uuid!
+    - name: name
+      type: String_1!
+    - name: npi
+      type: String_1!
+    - name: specialty
+      type: String_1!
+    - name: updatedAt
+      type: Timestamptz!
+  graphql:
+    typeName: ProviderRecords
+    inputTypeName: ProviderRecordsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: provider_records
+      fieldMapping:
+        createdAt:
+          column:
+            name: created_at
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        npi:
+          column:
+            name: npi
+        specialty:
+          column:
+            name: specialty
+        updatedAt:
+          column:
+            name: updated_at
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: ProviderRecords
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createdAt
+          - id
+          - name
+          - npi
+          - specialty
+          - updatedAt
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: ProviderRecordsBoolExp
+  operand:
+    object:
+      type: ProviderRecords
+      comparableFields:
+        - fieldName: createdAt
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: id
+          booleanExpressionType: UuidBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: npi
+          booleanExpressionType: TextBoolExp
+        - fieldName: specialty
+          booleanExpressionType: TextBoolExp
+        - fieldName: updatedAt
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: ProviderRecordsBoolExp
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteProviderRecordsByIdResponse
+  description: Responses from the 'delete_provider_records_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[ProviderRecords!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteProviderRecordsByIdResponse
+    inputTypeName: DeleteProviderRecordsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: delete_provider_records_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteProviderRecordsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteProviderRecordsById
+  outputType: DeleteProviderRecordsByIdResponse!
+  arguments:
+    - name: keyId
+      type: Uuid!
+    - name: preCheck
+      type: ProviderRecordsBoolExp
+      description: Delete permission predicate over the 'provider_records' collection
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: delete_provider_records_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteProviderRecordsById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'provider_records' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteProviderRecordsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

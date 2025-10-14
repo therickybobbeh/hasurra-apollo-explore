@@ -1,0 +1,21 @@
+kind: Subgraph
+version: v2
+definition:
+  name: claimsight
+  generator:
+    rootPath: .
+    namingConvention: graphql
+  includePaths:
+    - metadata
+    - connector
+    - auth_config.hml
+  envMapping:
+    CLAIMSIGHT_POSTGRES_AUTHORIZATION_HEADER:
+      fromEnv: CLAIMSIGHT_POSTGRES_AUTHORIZATION_HEADER
+    CLAIMSIGHT_POSTGRES_READ_URL:
+      fromEnv: CLAIMSIGHT_POSTGRES_READ_URL
+    CLAIMSIGHT_POSTGRES_WRITE_URL:
+      fromEnv: CLAIMSIGHT_POSTGRES_WRITE_URL
+  connectors:
+    - path: connector/postgres/connector.yaml
+      connectorLinkName: postgres

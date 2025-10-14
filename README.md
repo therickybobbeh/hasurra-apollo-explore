@@ -16,7 +16,6 @@ A comprehensive learning application that teaches modern GraphQL development wit
 - ✅ **Spring Boot GraphQL** - Java-based GraphQL service with JPA
 - ✅ **PromptQL Examples** - Natural language to SQL query concepts
 - ✅ **Cross-Platform** - Native setup for Windows, macOS, Linux (no Docker)
-- ✅ **Learning Challenges** - 12+ hands-on exercises from beginner to expert
 
 ## Tech Stack
 
@@ -407,28 +406,7 @@ mutation CheckEligibility($memberId: uuid!) {
 
 ## Learning Path
 
-Follow the [LEARNING_CHECKLIST.md](DOCUMENTS/LEARNING_CHECKLIST.md) for a structured tutorial:
-
-1. **Setup & Exploration** (30 min) - Environment setup, database exploration
-2. **GraphQL Basics** (45 min) - Queries, filters, relationships
-3. **Mutations** (30 min) - Insert, update, delete operations
-4. **Hasura Features** (45 min) - Permissions, actions, subscriptions
-5. **Apollo Client** (60 min) - React integration, cache, optimistic updates
-6. **Advanced Features** (45 min) - Fragments, federation, PromptQL
-7. **Customize & Extend** - Build your own features
-
-Then test your skills with [CHALLENGES.md](DOCUMENTS/CHALLENGES.md):
-- 🟢 **Beginner** (3 challenges) - GraphQL queries, mutations, relationships
-- 🟡 **Intermediate** (7 challenges) - RLS, custom actions, optimistic updates, note CRUD
-- 🔴 **Advanced** (3 challenges) - Federation, subscriptions, performance
-- 🟣 **Expert** (3 challenges) - Multi-tenant security, N+1 problem, full features
-
-**New!** Verify your solutions with automated tests:
-```bash
-npm run test:progress    # Check your progress
-npm run test:progress 1  # Test specific challenge
-```
-See [TESTING_GUIDE.md](DOCUMENTS/TESTING_GUIDE.md) for details.
+Follow the [labs](labs/README.md) for a progressive learning experience, building from Hasura Cloud basics through Apollo Federation and polyglot microservices architecture.
 
 ## Apollo Federation (Optional)
 
@@ -478,9 +456,6 @@ Sign up for free at [studio.apollographql.com](https://studio.apollographql.com/
 
 - 📘 **[Best Practices](DOCUMENTS/BEST_PRACTICES.md)** - Development guidelines
 - 🏗️ **[Architecture Overview](DOCUMENTS/ARCHITECTURE_OVERVIEW.md)** - System design and data flow
-- ✅ **[Learning Checklist](DOCUMENTS/LEARNING_CHECKLIST.md)** - Step-by-step tutorial
-- 🎯 **[Challenges](DOCUMENTS/CHALLENGES.md)** - 12+ hands-on exercises with automated tests
-- 🧪 **[Testing Guide](DOCUMENTS/TESTING_GUIDE.md)** - Automated challenge verification
 - 🔄 **[Role Switcher](DOCUMENTS/ROLE_SWITCHER.md)** - Test different permissions in real-time
 - 🪟 **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** - Docker-free setup with Hasura Cloud
 - 🌐 **[Federation Guide](DOCUMENTS/FEDERATION_GUIDE.md)** - Apollo Federation setup and visualization
@@ -644,8 +619,7 @@ The `.gitignore` is configured to keep the repository in a fresh state - migrati
 
 - 📖 **Docs:** [DOCUMENTS/](DOCUMENTS/)
 - 💬 **Issues:** Create a GitHub issue
-- 🎓 **Learning:** [LEARNING_CHECKLIST.md](DOCUMENTS/LEARNING_CHECKLIST.md)
-- 🎯 **Challenges:** [CHALLENGES.md](DOCUMENTS/CHALLENGES.md)
+- 🎓 **Labs:** [labs/README.md](labs/README.md)
 
 ---
 

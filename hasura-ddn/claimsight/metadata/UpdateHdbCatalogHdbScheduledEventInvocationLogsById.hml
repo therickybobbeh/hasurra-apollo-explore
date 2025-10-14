@@ -1,0 +1,356 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsCreatedAt
+  description: Update the 'created_at' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsCreatedAt
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsCreatedAtInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_created_at
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsCreatedAt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsEventId
+  description: Update the 'event_id' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsEventId
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsEventIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_event_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsEventId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsId
+  description: Update the 'id' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsId
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsRequest
+  description: Update the 'request' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsRequest
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsRequestInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_request
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsRequest
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsResponse
+  description: Update the 'response' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsResponse
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_response
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsStatus
+  description: Update the 'status' column in the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: set
+      type: Int32
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsStatus
+    inputTypeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsStatusInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_hdb_catalog_hdb_scheduled_event_invocation_logs_status
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsStatus
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdUpdateColumns
+  description: Update the columns of the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+  fields:
+    - name: createdAt
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsCreatedAt
+      description: Update the 'created_at' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+    - name: eventId
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsEventId
+      description: Update the 'event_id' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+    - name: id
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsId
+      description: Update the 'id' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+    - name: request
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsRequest
+      description: Update the 'request' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+    - name: response
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsResponse
+      description: Update the 'response' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+    - name: status
+      type: UpdateColumnHdbCatalogHdbScheduledEventInvocationLogsStatus
+      description: Update the 'status' column in the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection.
+  graphql:
+    typeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdUpdateColumns
+    inputTypeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id_update_columns
+      fieldMapping:
+        createdAt:
+          column:
+            name: created_at
+        eventId:
+          column:
+            name: event_id
+        id:
+          column:
+            name: id
+        request:
+          column:
+            name: request
+        response:
+          column:
+            name: response
+        status:
+          column:
+            name: status
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createdAt
+          - eventId
+          - id
+          - request
+          - response
+          - status
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+  description: Responses from the
+    'update_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[HdbCatalogHdbScheduledEventInvocationLogs!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+    inputTypeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateHdbCatalogHdbScheduledEventInvocationLogsById
+  outputType: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: HdbCatalogHdbScheduledEventInvocationLogsBoolExp
+      description: Update permission post-condition predicate over the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+    - name: preCheck
+      type: HdbCatalogHdbScheduledEventInvocationLogsBoolExp
+      description: Update permission pre-condition predicate over the
+        'hdb_catalog_hdb_scheduled_event_invocation_logs' collection
+    - name: updateColumns
+      type: UpdateHdbCatalogHdbScheduledEventInvocationLogsByIdUpdateColumns!
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: update_hdb_catalog_hdb_scheduled_event_invocation_logs_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateHdbCatalogHdbScheduledEventInvocationLogsById
+    rootFieldKind: Mutation
+  description: Update any row on the
+    'hdb_catalog_hdb_scheduled_event_invocation_logs' collection using the 'id'
+    key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateHdbCatalogHdbScheduledEventInvocationLogsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

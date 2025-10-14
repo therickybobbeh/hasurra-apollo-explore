@@ -1,0 +1,533 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsAllowedCents
+  description: Update the 'allowed_cents' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Int32!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsAllowedCents
+    inputTypeName: UpdateColumnClaimsAllowedCentsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_allowed_cents
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsAllowedCents
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsChargeCents
+  description: Update the 'charge_cents' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Int32!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsChargeCents
+    inputTypeName: UpdateColumnClaimsChargeCentsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_charge_cents
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsChargeCents
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsCpt
+  description: Update the 'cpt' column in the 'claims' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsCpt
+    inputTypeName: UpdateColumnClaimsCptInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_cpt
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsCpt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsCreatedAt
+  description: Update the 'created_at' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsCreatedAt
+    inputTypeName: UpdateColumnClaimsCreatedAtInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_created_at
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsCreatedAt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsDenialReason
+  description: Update the 'denial_reason' column in the 'claims' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsDenialReason
+    inputTypeName: UpdateColumnClaimsDenialReasonInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_denial_reason
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsDenialReason
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsDos
+  description: Update the 'dos' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Date!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsDos
+    inputTypeName: UpdateColumnClaimsDosInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_dos
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsDos
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsId
+  description: Update the 'id' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Uuid!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsId
+    inputTypeName: UpdateColumnClaimsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsMemberId
+  description: Update the 'member_id' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Uuid!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsMemberId
+    inputTypeName: UpdateColumnClaimsMemberIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_member_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsMemberId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsProviderId
+  description: Update the 'provider_id' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Uuid!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsProviderId
+    inputTypeName: UpdateColumnClaimsProviderIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_provider_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsProviderId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsStatus
+  description: Update the 'status' column in the 'claims' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsStatus
+    inputTypeName: UpdateColumnClaimsStatusInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_status
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsStatus
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnClaimsUpdatedAt
+  description: Update the 'updated_at' column in the 'claims' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnClaimsUpdatedAt
+    inputTypeName: UpdateColumnClaimsUpdatedAtInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_column_claims_updated_at
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnClaimsUpdatedAt
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateClaimsByIdUpdateColumns
+  description: Update the columns of the 'claims' collection
+  fields:
+    - name: allowedCents
+      type: UpdateColumnClaimsAllowedCents
+      description: Update the 'allowed_cents' column in the 'claims' collection.
+    - name: chargeCents
+      type: UpdateColumnClaimsChargeCents
+      description: Update the 'charge_cents' column in the 'claims' collection.
+    - name: cpt
+      type: UpdateColumnClaimsCpt
+      description: Update the 'cpt' column in the 'claims' collection.
+    - name: createdAt
+      type: UpdateColumnClaimsCreatedAt
+      description: Update the 'created_at' column in the 'claims' collection.
+    - name: denialReason
+      type: UpdateColumnClaimsDenialReason
+      description: Update the 'denial_reason' column in the 'claims' collection.
+    - name: dos
+      type: UpdateColumnClaimsDos
+      description: Update the 'dos' column in the 'claims' collection.
+    - name: id
+      type: UpdateColumnClaimsId
+      description: Update the 'id' column in the 'claims' collection.
+    - name: memberId
+      type: UpdateColumnClaimsMemberId
+      description: Update the 'member_id' column in the 'claims' collection.
+    - name: providerId
+      type: UpdateColumnClaimsProviderId
+      description: Update the 'provider_id' column in the 'claims' collection.
+    - name: status
+      type: UpdateColumnClaimsStatus
+      description: Update the 'status' column in the 'claims' collection.
+    - name: updatedAt
+      type: UpdateColumnClaimsUpdatedAt
+      description: Update the 'updated_at' column in the 'claims' collection.
+  graphql:
+    typeName: UpdateClaimsByIdUpdateColumns
+    inputTypeName: UpdateClaimsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_claims_by_id_update_columns
+      fieldMapping:
+        allowedCents:
+          column:
+            name: allowed_cents
+        chargeCents:
+          column:
+            name: charge_cents
+        cpt:
+          column:
+            name: cpt
+        createdAt:
+          column:
+            name: created_at
+        denialReason:
+          column:
+            name: denial_reason
+        dos:
+          column:
+            name: dos
+        id:
+          column:
+            name: id
+        memberId:
+          column:
+            name: member_id
+        providerId:
+          column:
+            name: provider_id
+        status:
+          column:
+            name: status
+        updatedAt:
+          column:
+            name: updated_at
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateClaimsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - allowedCents
+          - chargeCents
+          - cpt
+          - createdAt
+          - denialReason
+          - dos
+          - id
+          - memberId
+          - providerId
+          - status
+          - updatedAt
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateClaimsByIdResponse
+  description: Responses from the 'update_claims_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[Claims!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateClaimsByIdResponse
+    inputTypeName: UpdateClaimsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: update_claims_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateClaimsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateClaimsById
+  outputType: UpdateClaimsByIdResponse!
+  arguments:
+    - name: keyId
+      type: Uuid!
+    - name: postCheck
+      type: ClaimsBoolExp
+      description: Update permission post-condition predicate over the 'claims' collection
+    - name: preCheck
+      type: ClaimsBoolExp
+      description: Update permission pre-condition predicate over the 'claims' collection
+    - name: updateColumns
+      type: UpdateClaimsByIdUpdateColumns!
+  source:
+    dataConnectorName: postgres
+    dataConnectorCommand:
+      procedure: update_claims_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateClaimsById
+    rootFieldKind: Mutation
+  description: Update any row on the 'claims' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateClaimsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

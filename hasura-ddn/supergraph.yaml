@@ -1,0 +1,5 @@
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - claimsight/subgraph.yaml
