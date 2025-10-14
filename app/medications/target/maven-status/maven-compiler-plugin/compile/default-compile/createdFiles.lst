@@ -1,4 +1,5 @@
 com/claimsight/medications/MedicationsApplication.class
+com/claimsight/medications/config/FederationConfig.class
 com/claimsight/medications/resolver/QueryResolver.class
 com/claimsight/medications/resolver/EntityResolver.class
 com/claimsight/medications/entity/Prescription.class

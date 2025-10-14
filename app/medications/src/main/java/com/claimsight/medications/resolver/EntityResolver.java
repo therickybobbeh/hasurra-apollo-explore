@@ -36,11 +36,12 @@ public class EntityResolver {
     /**
      * Resolve Member relationship
      * Returns a reference to the Member entity for the gateway to resolve
+     * IMPORTANT: Use Hasura's type name 'members' (lowercase plural)
      */
     @SchemaMapping(typeName = "Prescription", field = "member")
     public Map<String, Object> member(Prescription prescription) {
         Map<String, Object> memberReference = new HashMap<>();
-        memberReference.put("__typename", "Member");
+        memberReference.put("__typename", "members");
         memberReference.put("id", prescription.getMemberId().toString());
         return memberReference;
     }
@@ -48,11 +49,12 @@ public class EntityResolver {
     /**
      * Resolve Provider relationship
      * Returns a reference to the Provider entity for the gateway to resolve
+     * IMPORTANT: Use Hasura's type name 'provider_records'
      */
     @SchemaMapping(typeName = "Prescription", field = "provider")
     public Map<String, Object> provider(Prescription prescription) {
         Map<String, Object> providerReference = new HashMap<>();
-        providerReference.put("__typename", "Provider");
+        providerReference.put("__typename", "provider_records");
         providerReference.put("id", prescription.getProviderId().toString());
         return providerReference;
     }

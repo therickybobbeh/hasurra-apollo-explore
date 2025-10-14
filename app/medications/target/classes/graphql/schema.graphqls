@@ -1,17 +1,19 @@
-# Medications Service GraphQL Schema (Standalone)
+# Medications Service GraphQL Schema (Federated)
 #
-# This demonstrates building a GraphQL API with Spring Boot.
-# Phase 5: Runs standalone to show Spring Boot's schema-first approach
-# Phase 6: Will add Apollo Federation directives
+# This demonstrates building a federated GraphQL API with Spring Boot.
+# Phase 6: Integrated with Apollo Federation Gateway
 #
 # Compare with:
 # - Hasura (Phase 1): Database-first, auto-generated
-# - Appointments (Phase 3): Code-first, Node.js/TypeScript
+# - Appointments (Phase 3/4): Code-first, Node.js/TypeScript
+
+# IMPORTANT: Must match Hasura's scalar types for federation
+scalar uuid
 
 """
 A prescription for a member from a provider
 """
-type Prescription {
+type Prescription @key(fields: "id") {
     id: ID!
     memberId: ID!
     providerId: ID!
@@ -26,6 +28,24 @@ type Prescription {
     notes: String
     createdAt: String!
     updatedAt: String!
+    member: members
+    provider: provider_records
+}
+
+"""
+Member entity (extended from Hasura subgraph)
+Use Hasura's exact type name and scalar type: members, uuid!
+"""
+type members @key(fields: "id") @extends {
+    id: uuid! @external
+}
+
+"""
+Provider entity (extended from Hasura/Providers subgraph)
+Use Hasura's exact type name and scalar type: provider_records, uuid!
+"""
+type provider_records @key(fields: "id") @extends {
+    id: uuid! @external
 }
 
 """

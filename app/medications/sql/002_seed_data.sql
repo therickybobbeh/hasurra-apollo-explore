@@ -7,7 +7,7 @@
 INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_name, dosage, frequency, start_date, end_date, refills_remaining, pharmacy, status, notes) VALUES
   -- Active prescriptions
   ('11111111-1111-4111-8111-111111111111',
-   '550e8400-e29b-41d4-a716-446655440000',
+   'b240b73c-4903-48b2-a37d-ae1c1f0be0e5',  -- David Wilson
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Lisinopril',
    '10mg',
@@ -20,7 +20,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Take in the morning with food'),
 
   ('22222222-2222-4222-8222-222222222222',
-   '550e8400-e29b-41d4-a716-446655440000',
+   'b240b73c-4903-48b2-a37d-ae1c1f0be0e5',  -- David Wilson
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Metformin',
    '500mg',
@@ -33,7 +33,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Take with meals to reduce stomach upset'),
 
   ('33333333-3333-4333-8333-333333333333',
-   '550e8400-e29b-41d4-a716-446655440001',
+   'e8282f10-7b67-41d2-9508-b88ac965abb4',  -- Robert Davis
    'ed70e072-cc35-4267-a667-860768d58510',
    'Atorvastatin',
    '20mg',
@@ -46,7 +46,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Take in the evening'),
 
   ('44444444-4444-4444-8444-444444444444',
-   '550e8400-e29b-41d4-a716-446655440001',
+   'e8282f10-7b67-41d2-9508-b88ac965abb4',  -- Robert Davis
    'ed70e072-cc35-4267-a667-860768d58510',
    'Levothyroxine',
    '75mcg',
@@ -59,7 +59,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Take on empty stomach, 30 minutes before breakfast'),
 
   ('55555555-5555-4555-8555-555555555555',
-   '550e8400-e29b-41d4-a716-446655440002',
+   '7c965372-bf2d-4199-adc4-2d5cb43e7751',  -- James Martin
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Albuterol Inhaler',
    '90mcg',
@@ -73,7 +73,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
 
   -- Completed prescriptions
   ('66666666-6666-4666-8666-666666666666',
-   '550e8400-e29b-41d4-a716-446655440000',
+   '02c1b4fc-9607-458b-ac7d-acf15304d3c8',  -- William Rodriguez
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Amoxicillin',
    '500mg',
@@ -86,7 +86,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Completed 10-day course for infection'),
 
   ('77777777-7777-4777-8777-777777777777',
-   '550e8400-e29b-41d4-a716-446655440001',
+   '02c1b4fc-9607-458b-ac7d-acf15304d3c8',  -- William Rodriguez
    'ed70e072-cc35-4267-a667-860768d58510',
    'Prednisone',
    '20mg',
@@ -100,7 +100,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
 
   -- Cancelled prescriptions
   ('88888888-8888-4888-8888-888888888888',
-   '550e8400-e29b-41d4-a716-446655440002',
+   'c15f4869-412b-4949-ae7f-fbff581a3af3',  -- Thomas Miller
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Simvastatin',
    '40mg',
@@ -114,7 +114,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
 
   -- Expired prescriptions
   ('99999999-9999-4999-8999-999999999999',
-   '550e8400-e29b-41d4-a716-446655440003',
+   'c15f4869-412b-4949-ae7f-fbff581a3af3',  -- Thomas Miller
    'bc6630ae-d320-4693-906a-9ab0c7f7eb51',
    'Hydrocodone',
    '5mg',
@@ -127,7 +127,7 @@ INSERT INTO medications.prescriptions (id, member_id, provider_id, medication_na
    'Post-surgical pain management - expired'),
 
   ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-   '550e8400-e29b-41d4-a716-446655440002',
+   '7c965372-bf2d-4199-adc4-2d5cb43e7751',  -- James Martin
    'ed70e072-cc35-4267-a667-860768d58510',
    'Ibuprofen',
    '600mg',
