@@ -148,75 +148,66 @@ hasura-ddn/
 ├── supergraph.yaml          # Supergraph definition
 ├── .env                     # Environment variables
 ├── claimsight/              # Subgraph directory
-│   ├── subgraph.yaml
+│   ├── subgraph.yaml        # Subgraph config
 │   ├── auth_config.hml      # Authentication config
 │   ├── connector/
 │   │   └── postgres/        # PostgreSQL connector
-│   │       ├── connector.yaml
-│   │       ├── compose.yaml
-│   │       └── ...
-│   └── metadata/            # All models and commands
-│       ├── Claims.hml
-│       ├── Members.hml
-│       ├── Notes.hml
-│       ├── ProviderRecords.hml
-│       └── ... (100+ files)
-├── engine/                  # Build artifacts
+│   │       ├── connector.yaml      # Connector definition
+│   │       └── compose.yaml        # Connector Docker service
+│   └── metadata/            # Models & commands (will be generated)
+│       └── .keep            # Placeholder
+├── engine/                  # Build artifacts (generated)
 │   └── build/
 └── compose.yaml            # Docker services
 ```
 
+**Note:** The `metadata/` directory is mostly empty right now - we'll generate the models from the database in Part 4.
+
 ---
 
-## 📚 Part 3: Start PostgreSQL Database & Connector
+## 📚 Part 3: Start PostgreSQL Database
 
-### 3.1 Start PostgreSQL Database
+### 3.1 Start the Database
 
-The DDN connector needs a running PostgreSQL database. Start it using the project's docker-compose:
+The DDN connector needs a running PostgreSQL database. This database is already populated with ClaimSight data from previous labs.
 
 ```bash
 # Navigate to project root
 cd ..
 
-# Start PostgreSQL
+# Start PostgreSQL (and Hasura v2 from Lab 1)
 docker compose up -d
 
 # Verify it's running
 docker compose ps
 ```
 
-### 3.2 Start the PostgreSQL Connector
+You should see:
+- `claimsight-postgres` - PostgreSQL database (port 5432) - **healthy**
+- `claimsight-hasura` - Hasura v2 from Lab 1 (port 8080)
 
-The connector runs as a Docker service and connects the DDN engine to your database:
+### 3.2 Review Database Schema
 
-```bash
-cd hasura-ddn/claimsight/connector/postgres
-
-# Start the connector
-docker compose --env-file ../../../.env up -d
-
-# Verify it's running
-docker compose ps
-```
-
-You should see `postgres-claimsight_postgres-1` running on port 4313.
-
-### 3.3 Verify the Setup
-
-The connector is already configured and introspected. You can verify the configuration:
+Let's verify the pre-populated database has our tables:
 
 ```bash
-cd ../../../  # Back to hasura-ddn/
-
-# Check the connector link
-cat claimsight/metadata/postgres.hml | head -20
+# List all tables
+docker exec claimsight-postgres psql -U claimsight -d claimsight \
+  -c "\dt"
 ```
 
-You should see the PostgreSQL connector definition with all your tables (claims, members, notes, etc.) already configured.
+You should see 5 tables:
+- `claims` - Medical claims
+- `members` - Patient members
+- `notes` - Clinical notes
+- `provider_records` - Healthcare providers
+- `eligibility_checks` - Insurance eligibility
+
+**Note:** We're using the same database from Labs 1-6. DDN will connect to this existing database through a connector (which we'll start later in Part 5).
 
 ---
 
-## 📚 Part 4: Explore the Metadata
+## 📚 Part 4: Generate Metadata from Database
 
 ### 4.1 Understand the Difference
 
@@ -254,9 +245,62 @@ definition:
           - id
 ```
 
-### 4.2 Review Generated Models
+### 4.2 Introspect the Database
 
-The models have already been generated from your database. Let's explore them:
+Now let's introspect the database to discover its schema:</br>
+Introspect means automatically discovering and analyzing the database structure including </br>
+1. Schema Discovery: Examining tables, views, and stored procedures
+2. Metadata Extraction: Identifying columns, data types, and constraints
+3. Relationship Detection: Finding foreign keys and inferring connections between tables
+</br>
+
+This is the same as how we introsepct in hasura cloud, hasura builds directly from the graphql engine and happens when you connect a db, where as DDN will actually preform it through the connectors allowing a more flexable architecture. This approach with ddn will generate both the connector and configures the schema files
+
+```bash
+cd ../../../  # Back to hasura-ddn/
+
+# Update the connector (introspects database schema)
+ddn connector-link update postgres --subgraph claimsight
+```
+
+This command:
+1. Connects to your PostgreSQL database
+2. Discovers all tables, columns, and relationships
+3. Generates `configuration.json` and `schema.json` in the connector directory
+
+**Expected output:**
+```
+✓ Introspecting database...
+✓ Found 5 tables
+✓ Found 12 relationships
+✓ Configuration updated
+```
+
+### 4.3 Generate Models from Tables
+
+Now generate the GraphQL models from the discovered tables:
+
+```bash
+# Generate models for all tables
+ddn model add postgres '*' --subgraph claimsight
+```
+
+This creates `.hml` files in `claimsight/metadata/` for:
+- **Models** - `Claims.hml`, `Members.hml`, `Notes.hml`, etc.
+- **Commands** - `InsertClaims.hml`, `UpdateClaims.hml`, `DeleteClaims.hml`, etc.
+- **Type definitions** - `postgres-types.hml`
+
+**Expected output:**
+```
+✓ Generating models...
+✓ Created 5 models
+✓ Created 15 commands
+✓ Created type definitions
+```
+
+### 4.4 Review Generated Models
+
+Let's explore what was created:
 
 ```bash
 # List all generated models
@@ -273,7 +317,7 @@ You'll see:
 - **Order by expressions** - For sorting
 - **Boolean expressions** - For filtering
 
-### 4.3 View Available Commands
+### 4.5 View Available Commands
 
 DDN also generated mutation commands:
 
@@ -284,13 +328,13 @@ ls claimsight/metadata/ | grep -E "(Insert|Update|Delete)" | head -10
 
 These provide type-safe mutations for your tables.
 
-### 4.4 Check Relationships
+### 4.6 Check Relationships
 
 Foreign key relationships were automatically detected:
 
 ```bash
-# Check the connector link for relationship information
-grep -A 5 "foreign_keys" claimsight/connector/postgres/schema.json | head -30
+# Check the connector schema for relationship information
+grep -A 5 "foreign_keys" claimsight/connector/postgres/configuration.json | head -30
 ```
 
 ---
@@ -314,9 +358,29 @@ Build artifacts exported to "engine/build"
 
 This creates the build artifacts in `engine/build/` directory.
 
-### 5.2 Start the Local DDN Engine
+### 5.2 Start the PostgreSQL Connector
+
+The DDN engine needs the connector running to query the database:
 
 ```bash
+cd claimsight/connector/postgres
+
+# Start the connector service
+docker compose --env-file ../../../.env up -d
+
+# Verify it's running and healthy
+docker compose ps
+```
+
+You should see `postgres-claimsight_postgres-1` running on port 4313 with "healthy" status.
+
+**Architecture Note:** The connector translates DDN queries into PostgreSQL queries. It connects to `claimsight-postgres:5432` via Docker networking.
+
+### 5.3 Start the Local DDN Engine
+
+```bash
+cd ../../../  # Back to hasura-ddn/
+
 # Start the engine with Docker
 ddn run docker-start
 ```
@@ -325,9 +389,9 @@ This starts:
 - **DDN Engine** on port 3280
 - **OpenTelemetry Collector** for observability
 
-The engine will use the build artifacts we just created.
+The engine will use the build artifacts we created and connect to the connector on port 4313.
 
-### 5.3 Test the Local Endpoint
+### 5.4 Test the Local Endpoint
 
 In a new terminal:
 
@@ -348,7 +412,7 @@ curl -X POST http://localhost:3280/graphql \
   -d '{"query":"{ members(limit: 5) { id firstName lastName dob } }"}'
 ```
 
-### 5.4 Open the Local Console
+### 5.5 Open the Local Console
 
 ```bash
 # Open the DDN console in your browser
@@ -356,6 +420,16 @@ ddn console --local
 ```
 
 This opens a GraphiQL interface where you can explore the schema and run queries interactively.
+
+**What you've achieved:**
+- ✅ Introspected database schema (Part 4)
+- ✅ Generated GraphQL models (Part 4)
+- ✅ Built the supergraph (Part 5.1)
+- ✅ Started connector service (Part 5.2)
+- ✅ Started DDN engine (Part 5.3)
+- ✅ Tested GraphQL queries (Part 5.4)
+
+Your DDN stack is now fully operational locally!
 
 ---
 
