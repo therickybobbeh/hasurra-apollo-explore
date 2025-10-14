@@ -496,3 +496,4 @@ In Phase 7, you'll:
 - [GraphQL Java Federation](https://github.com/apollographql/federation-jvm)
 - [Spring for GraphQL](https://spring.io/projects/spring-graphql)
 - [Polyglot Microservices Patterns](https://microservices.io/patterns/index.html)
+- [Example of nextflix dgs architecture](https://netflix.github.io/dgs/)

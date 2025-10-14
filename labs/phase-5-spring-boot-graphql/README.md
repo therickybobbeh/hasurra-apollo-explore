@@ -25,17 +25,102 @@ This contrasts with:
 
 ## 🆚 Hasura vs Apollo Server vs Spring Boot
 
+### High-Level Comparison
+
 | Aspect | Hasura (Phase 1) | Apollo (Phase 3) | Spring Boot (Phase 5) |
 |--------|------------------|------------------|------------------------|
-| **Approach** | Database-first | Code-first | Schema-first |
+| **Approach** | Database-first | Code-first | Schema-first (default) |
 | **Language** | Go (compiled) | Node.js/TypeScript | Java/JVM |
 | **Schema** | Auto-generated from tables | Manually written (gql tagged template) | Separate .graphqls file |
 | **Resolvers** | Automatic | Manually written (functions) | Annotated methods (@QueryMapping) |
 | **Database** | Built-in connection | Manual setup (node-postgres) | Spring Data JPA (ORM) |
-| **Type Safety** | Database-driven | TypeScript types | Java classes |
+| **Type Safety** | Database-driven | TypeScript types | Java classes + compile-time checks |
 | **Speed** | Fastest initial setup | Fast with TypeScript | Slowest initial setup |
 | **Enterprise Use** | Startups, rapid prototyping | Node.js shops | Large enterprises, banks |
 | **Best For** | CRUD APIs, rapid development | Custom logic, Node ecosystems | Enterprise apps, strong typing |
+
+### Schema-First vs Code-First Explained
+
+**Spring Boot (Schema-First)**:
+- Write `.graphqls` schema files first
+- Generate or write Java classes to match
+- Resolvers reference schema with `@QueryMapping`, `@SchemaMapping`
+- **Advantages**:
+  - Clear contract-first API design
+  - Schema is the source of truth
+  - Easy to share schema with frontend teams before implementation
+  - GraphQL schema syntax is standard across all GraphQL implementations
+  - Better for teams with separate frontend/backend developers
+- **Disadvantages**:
+  - Need to keep schema and Java classes in sync manually
+  - More boilerplate (schema file + Java classes + resolvers)
+  - Changes require updates in multiple places
+
+**Apollo Server (Code-First)**:
+- Write TypeScript classes/interfaces first
+- Schema is generated from code (or written inline)
+- Resolvers are TypeScript functions
+- **Advantages**:
+  - Single source of truth (TypeScript types)
+  - Type safety across resolvers automatically
+  - Refactoring is easier (TypeScript compiler helps)
+  - Less duplication
+  - Faster iteration for small teams
+- **Disadvantages**:
+  - Schema can be harder to share with non-Node.js teams
+  - Generated schema might not match your ideal API design
+  - Learning curve for developers new to TypeScript
+
+**Hasura (Database-First)**:
+- PostgreSQL schema is the source of truth
+- GraphQL schema auto-generated from database
+- No resolver code needed for basic CRUD
+- **Advantages**:
+  - Fastest time-to-API (minutes, not hours)
+  - No resolver code for 80% of queries
+  - Database migrations automatically update GraphQL
+  - Built-in permissions and auth
+- **Disadvantages**:
+  - Limited to what database can express
+  - Complex business logic requires Actions/Remote Schemas
+  - Vendor lock-in (Hasura-specific features)
+
+### When to Use Each Approach
+
+**Use Spring Boot when**:
+- Building enterprise applications with strict compliance requirements
+- Team is already using Java/Spring ecosystem
+- Need compile-time type safety and refactoring support
+- Working in regulated industries (banking, healthcare, government)
+- Need integration with existing Java microservices
+- Schema design needs approval before implementation
+
+**Use Apollo Server (Node.js) when**:
+- Rapid development with TypeScript
+- Team is comfortable with JavaScript/Node.js ecosystem
+- Need custom business logic in resolvers
+- Building modern web applications with JavaScript everywhere
+- Want flexibility in schema design
+- Startup or small team that can move quickly
+
+**Use Hasura when**:
+- Need a GraphQL API in hours, not days
+- Most operations are standard CRUD
+- Want instant GraphQL from existing PostgreSQL database
+- Building MVPs or prototypes
+- Don't want to write resolver boilerplate
+- Need built-in real-time subscriptions
+
+### Can Spring Boot Be Code-First?
+
+**Yes!** Spring Boot can be code-first using:
+- **Netflix DGS Framework**: Code-first GraphQL for Spring Boot
+- **graphql-java-kickstart**: Older code-first approach
+- However, **schema-first is recommended** by Spring's official GraphQL support because:
+  - Better aligns with Spring's philosophy (configuration over convention)
+  - Clearer separation of concerns
+  - Easier to review API contracts
+  - Standard in enterprise Java development
 
 ---
 
