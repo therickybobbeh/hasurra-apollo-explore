@@ -1,0 +1,22 @@
+---
+kind: DataConnectorLink
+version: v1
+definition:
+  name: postgres
+  url:
+    readWriteUrls:
+      read:
+        valueFromEnv: CLAIMSIGHT_POSTGRES_READ_URL
+      write:
+        valueFromEnv: CLAIMSIGHT_POSTGRES_WRITE_URL
+  headers:
+    Authorization:
+      valueFromEnv: CLAIMSIGHT_POSTGRES_AUTHORIZATION_HEADER
+  schema:
+    version: v0.1
+    schema:
+      scalar_types: {}
+      object_types: {}
+      collections: []
+      functions: []
+      procedures: []

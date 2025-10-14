@@ -209,7 +209,20 @@ You should see 5 tables:
 
 ## 📚 Part 4: Generate Metadata from Database
 
-### 4.1 Understand the Difference
+### 4.1 Prepare the DataConnectorLink
+
+First, let's set up the DataConnectorLink file that will hold our database schema:
+
+```bash
+cd hasura-ddn/claimsight/metadata
+
+# Copy the template DataConnectorLink
+cp postgres.hml.template postgres.hml
+```
+
+This creates a minimal DataConnectorLink with an empty schema. The introspection command will populate it with your database structure.
+
+### 4.2 Understand the Difference
 
 **Hasura v2 Metadata (JSON):**
 ```json
@@ -245,22 +258,40 @@ definition:
           - id
 ```
 
-### 4.2 Introspect the Database
+### 4.3 Start the PostgreSQL Connector
 
-Now let's introspect the database to discover its schema:</br>
-Introspect means automatically discovering and analyzing the database structure including </br>
-1. Schema Discovery: Examining tables, views, and stored procedures
-2. Metadata Extraction: Identifying columns, data types, and constraints
-3. Relationship Detection: Finding foreign keys and inferring connections between tables
-</br>
+Before we can introspect, we need the connector service running:
 
-This is the same as how we introsepct in hasura cloud, hasura builds directly from the graphql engine and happens when you connect a db, where as DDN will actually preform it through the connectors allowing a more flexable architecture. This approach with ddn will generate both the connector and configures the schema files
+```bash
+cd hasura-ddn/claimsight/connector/postgres
+
+# Start the connector service
+docker compose --env-file ../../../.env up -d
+
+# Verify it's healthy
+docker compose ps
+```
+
+You should see `postgres-claimsight_postgres-1` running on port 4313 with **healthy** status.
+
+**Why start it now?** The introspection command needs to query the connector service to discover the database schema.
+
+### 4.4 Introspect the Database
+
+Now let's introspect the database to discover its schema:
+
+**What is introspection?** Automatically discovering and analyzing the database structure including:
+1. **Schema Discovery**: Examining tables, views, and stored procedures
+2. **Metadata Extraction**: Identifying columns, data types, and constraints
+3. **Relationship Detection**: Finding foreign keys and inferring connections between tables
+
+**DDN vs Hasura Cloud**: In Hasura Cloud v2, introspection happens directly in the GraphQL engine when you connect a database. In DDN v3, introspection happens through connectors, allowing a more flexible architecture that supports any data source.
 
 ```bash
 cd ../../../  # Back to hasura-ddn/
 
 # Update the connector (introspects database schema)
-ddn connector-link update postgres --subgraph claimsight
+ddn connector-link update postgres
 ```
 
 This command:
@@ -276,13 +307,13 @@ This command:
 ✓ Configuration updated
 ```
 
-### 4.3 Generate Models from Tables
+### 4.5 Generate Models from Tables
 
 Now generate the GraphQL models from the discovered tables:
 
 ```bash
 # Generate models for all tables
-ddn model add postgres '*' --subgraph claimsight
+ddn model add postgres '*'
 ```
 
 This creates `.hml` files in `claimsight/metadata/` for:
@@ -298,7 +329,7 @@ This creates `.hml` files in `claimsight/metadata/` for:
 ✓ Created type definitions
 ```
 
-### 4.4 Review Generated Models
+### 4.6 Review Generated Models
 
 Let's explore what was created:
 
@@ -317,7 +348,7 @@ You'll see:
 - **Order by expressions** - For sorting
 - **Boolean expressions** - For filtering
 
-### 4.5 View Available Commands
+### 4.7 View Available Commands
 
 DDN also generated mutation commands:
 
@@ -328,7 +359,7 @@ ls claimsight/metadata/ | grep -E "(Insert|Update|Delete)" | head -10
 
 These provide type-safe mutations for your tables.
 
-### 4.6 Check Relationships
+### 4.8 Check Relationships
 
 Foreign key relationships were automatically detected:
 
@@ -358,25 +389,9 @@ Build artifacts exported to "engine/build"
 
 This creates the build artifacts in `engine/build/` directory.
 
-### 5.2 Start the PostgreSQL Connector
+### 5.2 Start the Local DDN Engine
 
-The DDN engine needs the connector running to query the database:
-
-```bash
-cd claimsight/connector/postgres
-
-# Start the connector service
-docker compose --env-file ../../../.env up -d
-
-# Verify it's running and healthy
-docker compose ps
-```
-
-You should see `postgres-claimsight_postgres-1` running on port 4313 with "healthy" status.
-
-**Architecture Note:** The connector translates DDN queries into PostgreSQL queries. It connects to `claimsight-postgres:5432` via Docker networking.
-
-### 5.3 Start the Local DDN Engine
+The connector is already running from Part 4. Now let's start the DDN engine:
 
 ```bash
 cd ../../../  # Back to hasura-ddn/
@@ -391,7 +406,7 @@ This starts:
 
 The engine will use the build artifacts we created and connect to the connector on port 4313.
 
-### 5.4 Test the Local Endpoint
+### 5.3 Test the Local Endpoint
 
 In a new terminal:
 
@@ -412,7 +427,7 @@ curl -X POST http://localhost:3280/graphql \
   -d '{"query":"{ members(limit: 5) { id firstName lastName dob } }"}'
 ```
 
-### 5.5 Open the Local Console
+### 5.4 Open the Local Console
 
 ```bash
 # Open the DDN console in your browser
@@ -422,12 +437,13 @@ ddn console --local
 This opens a GraphiQL interface where you can explore the schema and run queries interactively.
 
 **What you've achieved:**
-- ✅ Introspected database schema (Part 4)
-- ✅ Generated GraphQL models (Part 4)
+- ✅ Prepared DataConnectorLink (Part 4.1)
+- ✅ Started connector service (Part 4.3)
+- ✅ Introspected database schema (Part 4.4)
+- ✅ Generated GraphQL models (Part 4.5)
 - ✅ Built the supergraph (Part 5.1)
-- ✅ Started connector service (Part 5.2)
-- ✅ Started DDN engine (Part 5.3)
-- ✅ Tested GraphQL queries (Part 5.4)
+- ✅ Started DDN engine (Part 5.2)
+- ✅ Tested GraphQL queries (Part 5.3)
 
 Your DDN stack is now fully operational locally!
 
