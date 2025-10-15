@@ -103,10 +103,14 @@ ddn version
 # Should show: Hasura DDN CLI v3.x.x
 ```
 
-### 1.2 Login to Hasura DDN
+### 1.2 Login to Hasura DDN (Optional for Local Development)
+
+**Note:** Login is only required if you plan to deploy to DDN Cloud. For local-only work (which we're doing in this lab), you can skip this step.
+
+If you want to login:
 
 ```bash
-ddn login
+ddn auth login
 ```
 
 This will:
@@ -117,9 +121,11 @@ This will:
 
 **Verify login:**
 ```bash
-ddn whoami
-# Should show your Hasura DDN username
+ddn auth print-access-token
+# Should show your access token
 ```
+
+**For this lab, you can skip login and work entirely locally.**
 
 ---
 
@@ -473,14 +479,63 @@ curl -X POST http://localhost:3280/graphql \
   -d '{"query":"{ members(limit: 5) { id firstName lastName dob } }"}'
 ```
 
-### 5.4 Open the Local Console
+### 5.4 Open the Console (Two Options)
+
+You have two ways to access the GraphQL console:
+
+**Option A: Cloud Console (Recommended - continues to Lab 8)**
+
+Navigate to the Hasura Cloud Console that connects to your **local** DDN:
+
+```
+https://console.hasura.io/local/graphql
+```
+
+**Important:** This is a cloud-hosted UI that connects to `localhost:3280`. Your data stays local!
+
+**Option B: Local Console (Alternative)**
 
 ```bash
 # Open the DDN console in your browser
 ddn console --local
 ```
 
-This opens a GraphiQL interface where you can explore the schema and run queries interactively.
+This opens a locally-hosted GraphiQL interface.
+
+**We recommend Option A (Cloud Console)** as it provides a better experience and is required for Lab 8 (PromptQL).
+
+### 5.5 Connect to Your Local DDN (Cloud Console)
+
+If you chose Option A (Cloud Console), configure the connection:
+
+1. On the connection screen, enter:
+   - **GraphQL Endpoint:** `http://localhost:3280/graphql`
+   - **Admin Secret:** Leave blank (not required for local)
+
+2. Click **Connect**
+
+You should see:
+```
+✓ Connected to local DDN instance
+✓ Schema loaded successfully
+✓ 5 models available: Claims, EligibilityChecks, Members, Notes, ProviderRecords
+```
+
+3. Try a sample query in the GraphiQL explorer:
+
+```graphql
+query TestConnection {
+  claims(limit: 5) {
+    id
+    dos
+    status
+    chargeCents
+    cpt
+  }
+}
+```
+
+4. You should see claim data returned from your local PostgreSQL database!
 
 **What you've achieved:**
 - ✅ Prepared DataConnectorLink (Part 4.1)
@@ -490,8 +545,9 @@ This opens a GraphiQL interface where you can explore the schema and run queries
 - ✅ Built the supergraph (Part 5.1)
 - ✅ Started DDN engine (Part 5.2)
 - ✅ Tested GraphQL queries (Part 5.3)
+- ✅ Connected cloud console to local DDN (Part 5.5)
 
-Your DDN stack is now fully operational locally!
+Your DDN stack is now fully operational locally and accessible through the cloud console!
 
 ---
 
@@ -681,10 +737,23 @@ This shows DDN data mixed with custom service data through Apollo Gateway.
 ✅ **DDN Architecture** - Connector-based data access separates concerns
 ✅ **Metadata-driven** - Declarative .hml files instead of JSON
 ✅ **CLI Workflow** - Modern CI/CD with `ddn` commands
+✅ **Local Development** - Full DDN stack running on localhost
+✅ **Cloud Console** - Access local DDN through `console.hasura.io/local/graphql`
 ✅ **Migration Path** - Clear v2 → v3 transformation process
 ✅ **DDN Supergraph** - Native federation for multiple data sources
 ✅ **Apollo Federation (Optional)** - When and why to add it on top of DDN
-✅ **Performance** - Built-in observability and optimization
+
+---
+
+## 🎯 Where You Are Now
+
+You have a **fully functional local DDN environment**:
+- ✅ DDN engine running on `localhost:3280`
+- ✅ PostgreSQL connector introspected and running
+- ✅ 5 models generated and queryable
+- ✅ Cloud console connected at `https://console.hasura.io/local/graphql`
+
+**Keep these running** for the next lab!
 
 ---
 
@@ -706,14 +775,29 @@ This shows DDN data mixed with custom service data through Apollo Gateway.
 
 ## 🎯 Next Steps
 
-### Option A: Continue Learning
-- ✅ Complete [Phase 8: PromptQL + AI](../phase-8-promptql/README.md)
+### Recommended: Continue to Phase 7.5
 
-### Option B: Deploy to Production
+**[Phase 7.5: Add PromptQL to Local DDN →](../phase-7.5-promptql/README.md)**
+
+Add AI-powered natural language queries to your local DDN! Phase 7.5 picks up exactly where you are now - with the console already connected to your local DDN.
+
+You'll learn to:
+- Configure OpenAI for natural language queries
+- Enhance semantic metadata for AI understanding
+- Chat with your data using the PromptQL console
+- Create reusable automation workflows
+
+**Keep your DDN services running and proceed to Lab 7.5!**
+
+### Alternative Options
+
+**Option B: Deploy to Production**
 - See [Deployment Guides](../../deployment/README.md)
 
-### Option C: Integration Challenge
-- Integrate DDN with PromptQL for AI-powered queries
+**Option C: Explore More Features**
+- Add custom business logic with Actions
+- Set up row-level security with permissions
+- Create scheduled triggers for automation
 
 ---
 
@@ -772,12 +856,7 @@ Then your engine is running successfully on **http://localhost:3280/graphql** (p
 Cannot print PromptQL secret key. PromptQL is not enabled for this project.
 ```
 
-**Solution:** This is informational only. PromptQL (AI-powered queries) is optional. To enable it:
-```bash
-ddn codemod enable-promptql
-```
-
-Or ignore it if you don't need AI query features for now.
+**Solution:** This is informational only. PromptQL (AI-powered queries) is optional and requires no special enable command - it's built into DDN CLI v2.28.0+. To use PromptQL features, continue to [Phase 8: PromptQL](../phase-8-promptql/README.md).
 
 ### Issue: "DDN CLI not found"
 **Solution:** Ensure DDN CLI is in your PATH:

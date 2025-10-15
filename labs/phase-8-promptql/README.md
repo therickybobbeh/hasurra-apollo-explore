@@ -1,8 +1,8 @@
-# Phase 4: PromptQL + AI Integration
+# Phase 8: PromptQL with Hasura DDN (Local Development)
 
-**Build an AI-powered natural language query interface using OpenAI or Anthropic Claude**
+**Add AI-powered natural language queries to your locally running ClaimSight GraphQL API**
 
-Learn how to create a production-ready natural language to SQL interface with query validation, security, and a chat-style UI.
+Learn how to enable Hasura's native PromptQL feature to chat with your data using natural language - all running locally on your machine with your own Anthropic API key.
 
 ---
 
@@ -10,461 +10,1381 @@ Learn how to create a production-ready natural language to SQL interface with qu
 
 By the end of this lab, you'll understand:
 
-- **Natural language to SQL** with LLMs (OpenAI GPT-4 / Anthropic Claude)
-- **Query validation** and SQL injection prevention
-- **Schema context building** for accurate AI-generated queries
-- **AI safety patterns** (SELECT-only, LIMIT clauses, validation)
-- **Cost management** for LLM API calls
-- **Chat-style UI** for data exploration
+- **Local PromptQL setup** - Running AI queries without cloud deployment
+- **Semantic metadata** - Describing your data for AI understanding
+- **Natural language queries** - Chat with your local database
+- **AI primitives** - Classify, summarize, and extract data
+- **Automations** - Create reusable workflows from conversations
+- **Artifacts** - Tables, visualizations, and structured outputs
 
 ---
 
 ## 📋 Prerequisites
 
 **Required:**
-- ✅ Completed [Phase 1: Hasura Cloud](../phase-1-hasura-cloud/README.md)
-- ✅ Completed [Phase 2: Apollo Federation](../phase-2-apollo-federation/README.md)
-- ✅ Node.js 18+ installed
-- ✅ OpenAI or Anthropic API key (get $5-10 credit to start)
+- ✅ Completed [Phase 7: Hasura DDN](../phase-7-hasura-ddn/README.md)
+- ✅ OpenAI or Anthropic API key (we'll set this up in Part 1)
 
-**Optional:**
-- Phase 3 (DDN) - PromptQL works with both v2 and DDN
+**Current State (from Phase 7):**
+You should have just finished Phase 7 with:
+- ✅ DDN engine running on `localhost:3280`
+- ✅ Cloud console at `https://console.hasura.io/local/graphql`
+- ✅ Console connected to your local DDN instance
+- ✅ Able to run GraphQL queries in the console
+
+**If you closed everything:**
+1. Restart DDN: `cd hasura-ddn && ddn run docker-start`
+2. Reopen console: `https://console.hasura.io/local/graphql`
+3. Reconnect to `http://localhost:3280/graphql`
+
+**Accounts Needed:**
+- OpenAI account (recommended) OR Anthropic account (we'll set this up in Part 1)
 
 ---
 
 ## ⏱️ Time Estimate
 
-**Total: 1-2 hours**
+**Total: 1.5-2 hours**
 
 - Part 1: Get LLM API Key (10 min)
-- Part 2: Configure PromptQL Service (15 min)
-- Part 3: Start PromptQL Server (10 min)
-- Part 4: Test API Endpoints (15 min)
-- Part 5: Launch UI & Query (20 min)
-- Part 6: Deploy to Production (30 min - optional)
+- Part 2: Configure PromptQL (10 min)
+- Part 3: Add Semantic Metadata (30 min)
+- Part 4: Start PromptQL Services (10 min)
+- Part 5: Access Local PromptQL Console (10 min)
+- Part 6: Chat with Your Data (20 min)
+- Part 7: Create Automations (15 min)
+- Part 8 (Optional): Deploy to Cloud (20 min)
 
 ---
 
 ## 🏗️ What You'll Build
 
 ```
-┌──────────────────┐
-│  React Frontend  │
-│  ┌────────────┐  │
-│  │ PromptQL   │  │  Chat-style UI
-│  │    UI      │  │  for natural language queries
-│  └──────┬─────┘  │
-└─────────┼────────┘
-          │ HTTP
-          ▼
-┌──────────────────┐
-│ PromptQL Service │  Node.js/Express
-│  ┌────────────┐  │  Port: 3003
-│  │    LLM     │  │
-│  │ (OpenAI/   │  │  Generates safe SQL
-│  │ Anthropic) │  │
-│  └──────┬─────┘  │
-│         │        │
-│  ┌──────▼─────┐  │
-│  │ Validator  │  │  SQL safety checks
-│  └──────┬─────┘  │
-│         │        │
-│  ┌──────▼─────┐  │
-│  │  Executor  │  │  Runs queries
-│  └──────┬─────┘  │
-└─────────┼────────┘
-          │ GraphQL
-          ▼
-┌──────────────────┐
-│  Hasura Cloud    │  PostgreSQL + GraphQL
-│  (from Phase 1)  │
-└──────────────────┘
+BEFORE (Phase 7):                    AFTER (Phase 8):
+┌────────────────────┐              ┌─────────────────────────────┐
+│  Local GraphQL     │              │  Hasura Cloud Console       │
+│  Console           │              │  https://console.hasura.io/ │
+│  localhost:3280    │              │  local/chat                 │
+│                    │              │  ┌────────────────────────┐ │
+│  (manual queries)  │              │  │   PromptQL Chat UI     │ │
+│                    │              │  │   "Show me denied      │ │
+└─────────┬──────────┘              │  │    claims over $1000"  │ │
+          │                         │  └──────────┬─────────────┘ │
+          │                         └─────────────┼───────────────┘
+          │                                       │ HTTPS
+          │                         ┌─────────────▼───────────────┐
+          ▼                         │  Anthropic API              │
+┌────────────────────┐              │  (Claude for NL→GraphQL)    │
+│  DDN Engine        │              └─────────────┬───────────────┘
+│  localhost:3280    │                            │ GraphQL Query
+│  ┌──────────────┐  │              ┌─────────────▼───────────────┐
+│  │  GraphQL     │◄─┼──────────────┤  DDN Engine (LOCAL)         │
+│  │   Schema     │  │              │  localhost:3280             │
+│  └──────┬───────┘  │              │  ┌──────────────┐           │
+│         │          │              │  │  GraphQL     │           │
+│  ┌──────▼───────┐  │              │  │   Schema     │           │
+│  │  Connector   │  │              │  └──────┬───────┘           │
+│  └──────┬───────┘  │              │         │                   │
+└─────────┼──────────┘              │  ┌──────▼───────┐           │
+          │                         │  │  Connector   │           │
+          ▼                         │  └──────┬───────┘           │
+┌────────────────────┐              └─────────┼───────────────────┘
+│   PostgreSQL       │                        │
+│   (local Docker)   │              ┌─────────▼─────────────────┐
+└────────────────────┘              │   PostgreSQL (LOCAL)      │
+                                    │   claimsight-postgres     │
+                                    └───────────────────────────┘
 ```
+
+**Key Points:**
+- ✅ **PromptQL Console** runs in cloud (console.hasura.io) but connects to YOUR local endpoint
+- ✅ **DDN Engine** stays local on localhost:3280
+- ✅ **Database** stays local - no data leaves your machine
+- ✅ **Anthropic API** only sees the GraphQL queries, not your data
 
 ---
 
 ## 📚 Part 1: Get LLM API Key
 
-### Option A: OpenAI (Recommended for Beginners)
+You can use either **OpenAI** or **Anthropic** for PromptQL. Choose one:
+
+---
+
+### Option A: OpenAI (Recommended)
+
+#### 1A.1 Why OpenAI?
+
+- **Familiar** - GPT-4 is widely known
+- **Generous free tier** - $5 free credits for new accounts
+- **Fast & accurate** - GPT-4 Turbo excels at structured queries
+- **Cost-effective** - ~$0.01-0.03 per query
+
+#### 1A.2 Create OpenAI Account
 
 1. Go to https://platform.openai.com/signup
-2. Create an account (free)
-3. Add $5-10 credit (https://platform.openai.com/account/billing)
-4. Create API key: https://platform.openai.com/api-keys
-5. Copy key (starts with `sk-`)
+2. Click **Sign up**
+3. Verify your email
+4. Add billing (includes $5 free credit for new users)
 
-**Cost:** ~$0.01-0.03 per query with GPT-4
+#### 1A.3 Generate API Key
 
-### Option B: Anthropic Claude (Advanced)
+1. Navigate to **API Keys**: https://platform.openai.com/api-keys
+2. Click **Create new secret key**
+3. Name: "ClaimSight PromptQL Local"
+4. Copy the key (starts with `sk-proj-...` or `sk-...`)
+
+**⚠️ Important:** Save this key - you won't see it again!
+
+#### 1A.4 Verify API Key
+
+Test your key:
+
+```bash
+curl https://api.openai.com/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_KEY_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4-turbo-preview",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 10
+  }'
+```
+
+**Expected:** JSON response with GPT-4's greeting.
+
+**✅ If using OpenAI, skip to Part 2.**
+
+---
+
+### Option B: Anthropic Claude (Alternative)
+
+#### 1B.1 Why Anthropic?
+
+- **Strong reasoning** - Claude 3.5 Sonnet excellent at complex queries
+- **Detailed explanations** - Great query plan generation
+- **Cost** - ~$0.01-0.05 per query
+- **Credits** - $5 free credits available
+
+#### 1B.2 Create Anthropic Account
 
 1. Go to https://console.anthropic.com/
-2. Create account
-3. Add credits ($5 minimum)
-4. Create API key
-5. Copy key (starts with `sk-ant-`)
+2. Click **Sign Up**
+3. Verify email
+4. Add credits (minimum $5, includes free trial credits)
 
-**Cost:** ~$0.01-0.05 per query with Claude 3.5
+#### 1B.3 Generate API Key
+
+1. Navigate to **Settings** → **API Keys**
+2. Click **Create Key**
+3. Name it: "ClaimSight PromptQL Local"
+4. Copy the key (starts with `sk-ant-api...`)
+
+**⚠️ Important:** Save this key securely - it won't be shown again!
+
+#### 1B.4 Verify API Key
+
+Test your key:
+
+```bash
+curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: YOUR_KEY_HERE" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-3-5-sonnet-20241022",
+    "max_tokens": 10,
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'
+```
+
+**Expected:** Response with Claude's greeting.
 
 ---
 
-## 📚 Part 2: Configure PromptQL Service
+## 📚 Part 2: Configure Local PromptQL
 
-### 2.1 Install Dependencies
+### 2.1 Verify Current State
 
-```bash
-cd app/promptql
-npm install
-```
-
-This installs:
-- Express (web server)
-- OpenAI SDK
-- Anthropic SDK
-- GraphQL client (for Hasura)
-- Zod (validation)
-
-### 2.2 Configure Environment
+Make sure your DDN setup from Phase 7 is still running:
 
 ```bash
-# Copy example env file
-cp .env.example .env
+cd hasura-ddn/
 
-# Edit .env
-nano .env  # or your preferred editor
-```
-
-**For OpenAI:**
-```bash
-# LLM Provider
-PROMPTQL_LLM_PROVIDER=openai
-OPENAI_API_KEY=sk-your-key-here
-
-# Hasura (from Phase 1)
-HASURA_GRAPHQL_ENDPOINT=https://your-project.hasura.app
-HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret
-
-# Server
-PROMPTQL_PORT=3003
-```
-
-**For Anthropic:**
-```bash
-# LLM Provider
-PROMPTQL_LLM_PROVIDER=anthropic
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-
-# Hasura (from Phase 1)
-HASURA_GRAPHQL_ENDPOINT=https://your-project.hasura.app
-HASURA_GRAPHQL_ADMIN_SECRET=your-admin-secret
-
-# Server
-PROMPTQL_PORT=3003
-```
-
----
-
-## 📚 Part 3: Start PromptQL Server
-
-### 3.1 Start the Service
-
-```bash
-# From app/promptql/
-npm run dev
-```
-
-Expected output:
-```
-🤖 PromptQL Server
-   LLM Provider: OpenAI (gpt-4-turbo-preview)
-   Hasura: https://your-project.hasura.app
-
-✓ Hasura connection successful
-
-✓ PromptQL server running on port 3003
-  API endpoint: http://localhost:3003/api/query
-  Health check: http://localhost:3003/health
-```
-
-### 3.2 Test Health Endpoint
-
-```bash
-curl http://localhost:3003/health
-```
-
-Should return:
-```json
-{
-  "status": "ok",
-  "service": "promptql",
-  "llmProvider": "OpenAI (gpt-4-turbo-preview)"
-}
-```
-
----
-
-## 📚 Part 4: Test API Endpoints
-
-### 4.1 Test SQL Generation
-
-```bash
-curl -X POST http://localhost:3003/api/generate \
+# Check if engine is running
+curl -s http://localhost:3280/graphql \
   -H "Content-Type: application/json" \
-  -d '{"prompt":"Show me the top 5 members by last name"}'
+  -d '{"query":"{ __typename }"}' | jq '.'
 ```
 
-Response:
-```json
-{
-  "sql": "SELECT * FROM members ORDER BY last_name LIMIT 5",
-  "explanation": "This query retrieves the first 5 members sorted alphabetically by last name.",
-  "confidence": 0.95,
-  "warnings": []
-}
+**Expected:** `{"data":{"__typename":"Query"}}`
+
+**If not running:**
+```bash
+# Restart from Phase 7
+ddn run docker-start
 ```
 
-### 4.2 Test Query Execution
+### 2.2 Update DDN CLI
+
+PromptQL requires DDN CLI v2.28.0+:
 
 ```bash
-curl -X POST http://localhost:3003/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"prompt":"Show me all members with last name Smith"}'
+# Check version
+ddn version
+
+# Update if needed (v3.7.0 recommended)
+ddn update-cli
 ```
 
-Response:
-```json
-{
-  "prompt": "Show me all members with last name Smith",
-  "sql": "SELECT * FROM members WHERE last_name = 'Smith' LIMIT 100",
-  "explanation": "...",
-  "confidence": 0.92,
-  "warnings": [],
-  "data": [
-    {
-      "id": "uuid-here",
-      "first_name": "John",
-      "last_name": "Smith",
-      "dob": "1985-03-15",
-      "plan": "PPO"
-    }
-  ],
-  "rowCount": 1,
-  "executionTime": 45
-}
-```
+### 2.3 Generate PromptQL Secret Key
 
-### 4.3 Test Safety Features
+**Note:** PromptQL is built into modern DDN versions (v2.28.0+) and doesn't require a separate enable command.
 
-Try a dangerous query:
+Create a secret key for local PromptQL authentication:
+
 ```bash
-curl -X POST http://localhost:3003/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"prompt":"Delete all members"}'
+# Generate and save to global config
+ddn auth generate-promptql-secret-key
+
+# This generates a key like: pql_xxxxxxxxxxxxx
 ```
 
-Should return validation error:
-```json
-{
-  "error": "Generated SQL failed validation",
-  "validationErrors": ["Forbidden keyword detected: DELETE"],
-  "sql": "DELETE FROM members"
-}
+**Expected output:**
+```
+✓ PromptQL secret key generated
+✓ Saved to global configuration
+
+Key: pql_abc123...xyz789
 ```
 
-✅ **Security working!** Only SELECT queries are allowed.
+**Copy this key** - you'll need it in the next step!
+
+### 2.4 Update Environment Variables
+
+Edit your `.env` file:
+
+```bash
+cd hasura-ddn/
+nano .env  # or use your preferred editor
+```
+
+Add these variables (choose ONE LLM provider):
+
+**If using OpenAI:**
+```bash
+# OpenAI API Key (from Part 1A.3)
+OPENAI_API_KEY=sk-proj-your-key-here
+
+# PromptQL Secret Key (from Part 2.4)
+PROMPTQL_SECRET_KEY=pql_your-generated-key-here
+
+# Keep existing variables:
+CLAIMSIGHT_POSTGRES_CONNECTION_URI="postgresql://claimsight:claimsight_dev@claimsight-postgres:5432/claimsight"
+# ... etc
+```
+
+**If using Anthropic:**
+```bash
+# Anthropic API Key (from Part 1B.3)
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+
+# PromptQL Secret Key (from Part 2.4)
+PROMPTQL_SECRET_KEY=pql_your-generated-key-here
+
+# Keep existing variables:
+CLAIMSIGHT_POSTGRES_CONNECTION_URI="postgresql://claimsight:claimsight_dev@claimsight-postgres:5432/claimsight"
+# ... etc
+```
+
+**Save the file.**
+
+### 2.5 Verify Configuration
+
+Check that environment variables are set:
+
+**If using OpenAI:**
+```bash
+grep OPENAI_API_KEY .env
+grep PROMPTQL_SECRET_KEY .env
+```
+
+**If using Anthropic:**
+```bash
+grep ANTHROPIC_API_KEY .env
+grep PROMPTQL_SECRET_KEY .env
+```
 
 ---
 
-## 📚 Part 5: Launch UI & Query
+## 📚 Part 3: Add Semantic Metadata
 
-### 5.1 Start the Frontend
+**Why is this critical?**
 
-Open a new terminal:
+PromptQL uses LLMs to understand your questions. The more context you provide through descriptions, the more accurate the AI responses will be.
 
-```bash
-cd app/client
-npm run dev
+**Example:**
+- Without metadata: "Show me claims" → AI doesn't know what fields exist
+- With metadata: "Show me claims" → AI knows about status, amounts, denial reasons, relationships
+
+### 3.1 Understand Semantic Metadata
+
+Semantic metadata provides natural language descriptions that help the AI:
+- Understand what each model represents in business terms
+- Know what fields mean and how they're used
+- Recognize relationships between entities
+- Apply correct filters and aggregations
+
+### 3.2 Add Claims Model Description
+
+Open `claimsight/metadata/Claims.hml` and update the Model description:
+
+```yaml
+kind: Model
+version: v2
+definition:
+  name: Claims
+  objectType: Claims
+  description: |
+    Medical claims submitted for healthcare services. Each claim represents a request
+    for payment from a healthcare provider for services rendered to a member. Claims
+    can be PAID (approved), DENIED (rejected), or PENDING (under review). The charge
+    amount is what the provider billed, while the allowed amount is what the insurance
+    plan approved for payment. Common denial reasons include lack of prior authorization,
+    out-of-network providers, or services not covered by the member's plan.
+  source:
+    dataConnectorName: postgres
+    collection: claims
+  filterExpressionType: ClaimsBoolExp
+  aggregateExpression: ClaimsAggExp
+  orderByExpression: ClaimsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: claims
+      subscription:
+        rootField: claims
+    selectUniques:
+      - queryRootField: claimsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: claimsById
+    filterInputTypeName: ClaimsFilterInput
+    aggregate:
+      queryRootField: claimsAggregate
+      subscription:
+        rootField: claimsAggregate
+  # ... rest of model
 ```
 
-### 5.2 Navigate to PromptQL
+### 3.3 Add Claims Field Descriptions
 
-Open browser: http://localhost:5173/promptql
+Find the `ObjectType` section in `Claims.hml` and add field descriptions:
+
+```yaml
+---
+kind: ObjectType
+version: v1
+definition:
+  name: Claims
+  description: Medical claims submitted for services
+  fields:
+    - name: id
+      type: Uuid!
+      description: Unique claim identifier
+    - name: memberId
+      type: Uuid!
+      description: Reference to the member (patient) who received the service
+    - name: providerId
+      type: Uuid!
+      description: Reference to the healthcare provider who performed the service
+    - name: dos
+      type: Date!
+      description: Date of Service - when the medical service was performed
+    - name: cpt
+      type: String_1!
+      description: |
+        Current Procedural Terminology code - standardized code for medical procedures.
+        Examples: 99213 (office visit), 70450 (CT scan head), 80053 (metabolic panel).
+        Used for billing and determining allowed amounts.
+    - name: status
+      type: String_1!
+      description: |
+        Claim processing status:
+        - PAID: Claim was approved and payment processed
+        - DENIED: Claim was rejected (see denialReason for why)
+        - PENDING: Claim is under review, awaiting decision
+    - name: chargeCents
+      type: Int32!
+      description: |
+        Amount charged by the provider in cents (divide by 100 for dollars).
+        This is what the provider billed, not necessarily what gets paid.
+    - name: allowedCents
+      type: Int32!
+      description: |
+        Amount allowed/approved by the insurance plan in cents (divide by 100 for dollars).
+        This is what the insurance will actually pay. Zero if claim was denied.
+        Always <= chargeCents.
+    - name: denialReason
+      type: String_1
+      description: |
+        Reason the claim was denied (only populated when status is DENIED).
+        Common reasons:
+        - "Prior authorization required"
+        - "Out of network provider"
+        - "Service not covered"
+        - "Medical necessity not established"
+        - "Duplicate claim"
+    - name: createdAt
+      type: Timestamptz!
+      description: Timestamp when the claim was first created in the system
+    - name: updatedAt
+      type: Timestamptz!
+      description: Timestamp when the claim was last updated
+  graphql:
+    typeName: Claims
+    inputTypeName: ClaimsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: claims
+      # ... field mappings
+```
+
+### 3.4 Add Members Model Description
+
+Open `claimsight/metadata/Members.hml`:
+
+```yaml
+---
+kind: ObjectType
+version: v1
+definition:
+  name: Members
+  description: |
+    Insurance plan members (patients) enrolled in healthcare coverage.
+    Members can have multiple claims and eligibility checks.
+  fields:
+    - name: id
+      type: Uuid!
+      description: Unique member identifier
+    - name: firstName
+      type: String_1!
+      description: Member's legal first name
+    - name: lastName
+      type: String_1!
+      description: Member's legal last name
+    - name: dob
+      type: Date!
+      description: |
+        Date of birth - used for eligibility verification and age-based coverage rules.
+        Patients under 26 may be on parent's plan, over 65 qualify for Medicare.
+    - name: memberNumber
+      type: String_1!
+      description: |
+        Unique member ID number used for claims processing.
+        This appears on insurance cards and claim forms.
+    - name: plan
+      type: String_1!
+      description: |
+        Insurance plan type:
+        - HMO (Health Maintenance Organization): Requires in-network providers, PCPselection
+        - PPO (Preferred Provider Organization): Allows out-of-network at higher cost
+        - EPO (Exclusive Provider Organization): In-network only, no referrals needed
+    - name: groupNumber
+      type: String_1!
+      description: Group number for employer-sponsored insurance plans
+    - name: effectiveDate
+      type: Date!
+      description: Date when coverage became active
+    - name: terminationDate
+      type: Date
+      description: Date when coverage ended (null if currently active)
+    - name: createdAt
+      type: Timestamptz!
+      description: Timestamp when member was added to system
+    - name: updatedAt
+      type: Timestamptz!
+      description: Timestamp when member record was last updated
+  # ... rest of object type
+```
+
+### 3.5 Add ProviderRecords Model Description
+
+Open `claimsight/metadata/ProviderRecords.hml`:
+
+```yaml
+---
+kind: ObjectType
+version: v1
+definition:
+  name: ProviderRecords
+  description: |
+    Healthcare providers (doctors, hospitals, clinics) in the network.
+    Providers submit claims for services rendered to members.
+  fields:
+    - name: id
+      type: Uuid!
+      description: Unique provider identifier
+    - name: npi
+      type: String_1!
+      description: |
+        National Provider Identifier - unique 10-digit identifier for US healthcare providers.
+        Required for all HIPAA transactions. Example: 1234567890
+    - name: name
+      type: String_1!
+      description: Provider's full name (for individuals) or facility name (for organizations)
+    - name: specialty
+      type: String_1!
+      description: |
+        Medical specialty:
+        - Cardiology (heart)
+        - Orthopedic Surgery (bones/joints)
+        - Family Medicine (primary care)
+        - Radiology (imaging)
+        - Internal Medicine (adult primary care)
+    - name: networkStatus
+      type: String_1!
+      description: |
+        Network participation status:
+        - IN_NETWORK: Contracted rates, lower member cost
+        - OUT_OF_NETWORK: No contract, higher member cost, claims may be denied
+        - PENDING: Credentialing in progress, not yet accepting claims
+    - name: phone
+      type: String_1
+      description: Primary contact phone number for the provider's office
+    - name: email
+      type: String_1
+      description: Primary contact email address
+    - name: addressLine1
+      type: String_1!
+      description: Street address line 1
+    - name: addressLine2
+      type: String_1
+      description: Street address line 2 (suite, building, etc.)
+    - name: city
+      type: String_1!
+      description: City
+    - name: state
+      type: String_1!
+      description: State (2-letter code, e.g., CA, NY, TX)
+    - name: zipCode
+      type: String_1!
+      description: ZIP code (5 or 9 digit)
+    - name: createdAt
+      type: Timestamptz!
+      description: Timestamp when provider was added to system
+    - name: updatedAt
+      type: Timestamptz!
+      description: Timestamp when provider record was last updated
+  # ... rest of object type
+```
+
+### 3.6 Rebuild with New Metadata
+
+After adding semantic descriptions:
+
+```bash
+# Rebuild the supergraph locally
+ddn supergraph build local
+```
+
+**Expected output:**
+```
+✓ Using Supergraph config file "supergraph.yaml"
+✓ Using localEnvFile ".env"
+✓ Supergraph built for local Engine successfully
+✓ Build artifacts exported to "engine/build"
+```
+
+You may see warnings about boolean expressions - these are safe to ignore.
+
+---
+
+## 📚 Part 4: Start PromptQL Services
+
+### 4.1 Stop Current Services
+
+```bash
+# Stop the engine if it's running
+docker compose down
+
+# Or press Ctrl+C in the terminal where ddn run docker-start is running
+```
+
+### 4.2 Start with PromptQL Enabled
+
+```bash
+# Start all services with new PromptQL configuration
+ddn run docker-start
+```
+
+**Expected output:**
+```
+[+] Running 3/3
+ ✔ Container hasura-ddn-engine-1          Started
+ ✔ Container hasura-ddn-otel-collector-1  Started
+ ✔ Container postgres-claimsight_postgres-1 Running
+
+engine-1 | starting server on [::]:3000
+```
+
+**Note:** You may see:
+- PromptQL secret key message (this is normal)
+- OTEL collector error (safe to ignore for local dev)
+
+### 4.3 Verify Services
+
+```bash
+# Test GraphQL endpoint
+curl -s http://localhost:3280/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ claims(limit: 1) { id status } }"}' | jq '.'
+```
+
+**Expected:** Claims data returned
+
+```bash
+# Test connector is healthy
+cd claimsight/connector/postgres
+docker compose ps
+```
+
+**Expected:** `healthy` status on port 4313
+
+---
+
+## 📚 Part 5: Access Local PromptQL Console
+
+### 5.1 Open Hasura Local Console
+
+Navigate to the **Hasura Cloud Console** that connects to your **local** DDN instance:
+
+```
+https://console.hasura.io/local/chat
+```
+
+**Important:** This is a cloud-hosted UI that connects to `localhost:3280`. Your data stays local!
+
+### 5.2 Configure Local Connection
+
+On first visit, you'll see connection settings:
+
+1. **GraphQL Endpoint:** `http://localhost:3280/graphql`
+2. **Admin Secret:** Leave blank (not required for local)
+3. Click **Connect**
 
 You should see:
-- 🤖 **PromptQL - AI Query Interface** header
-- Natural language input box
-- Example queries
-
-### 5.3 Try Example Queries
-
-**Example 1: Top Denial Reasons**
 ```
-Show me the top 5 denial reasons
+✓ Connected to local DDN instance
+✓ Schema loaded successfully
+✓ PromptQL ready
 ```
 
-**Example 2: High-Value Claims**
+### 5.3 Configure LLM Provider
+
+In the PromptQL console, configure your chosen LLM provider:
+
+**If using OpenAI:**
+
+1. Click the **Settings** icon (gear) in top right
+2. Under **LLM Provider**, select **OpenAI**
+3. Paste your OpenAI API key from Part 1A.3
+4. Click **Save**
+
+You should see:
 ```
-Find all claims over $5000
+✓ OpenAI API key configured
+✓ Model: gpt-4-turbo-preview
 ```
 
-**Example 3: Provider Search**
+**If using Anthropic:**
+
+1. Click the **Settings** icon (gear) in top right
+2. Under **LLM Provider**, select **Anthropic**
+3. Paste your Anthropic API key from Part 1B.3
+4. Click **Save**
+
+You should see:
 ```
-List all providers with specialty Cardiology
+✓ Anthropic API key configured
+✓ Model: claude-3-5-sonnet-20241022
 ```
 
-**Example 4: Member Query**
+### 5.4 Troubleshooting Connection
+
+**Issue: "Cannot connect to localhost"**
+
+This is a browser security issue. Try:
+
+**Option A:** Use Chrome (works best)
+
+**Option B:** Use the local DDN console directly:
+```bash
+ddn console --local
 ```
-Show me members on PPO plans
+
+Then navigate to the **PromptQL** tab.
+
+**Option C:** If you need HTTPS for localhost:
+```bash
+# The DDN CLI can set up a secure tunnel
+ddn run tunnel
 ```
-
-### 5.4 Understand the Results
-
-For each query, you'll see:
-
-1. **Generated SQL** - The actual SQL query
-2. **Explanation** - What the query does
-3. **Confidence** - AI confidence score (0-1)
-4. **Warnings** - Any safety warnings
-5. **Results Table** - Query results
-6. **Execution Time** - How long it took
 
 ---
 
-## 📊 Phase 4 Complete: What You've Learned
+## 📚 Part 6: Chat with Your Data
 
-✅ **Natural Language to SQL** - LLM integration for query generation
-✅ **Query Validation** - SQL injection prevention and safety
-✅ **Schema Context** - Providing database context to LLMs
-✅ **AI Safety** - SELECT-only, LIMIT clauses, validation
-✅ **Cost Management** - Monitoring LLM API usage
-✅ **Chat UI** - User-friendly data exploration
+### 6.1 Interface Overview
+
+You should see:
+- **Chat input** box at the bottom
+- **Conversation** area in the middle
+- **Query Plan** panel (expandable)
+- **Results** section
+- **Artifacts** tab
+
+### 6.2 Try Basic Queries
+
+**Query 1: Explore Claims**
+```
+Show me the 5 most recent claims
+```
+
+**What happens:**
+1. You type the question
+2. Claude (via Anthropic API) reads your schema + metadata
+3. Generates a GraphQL query
+4. Shows you the **query plan** (reasoning)
+5. Executes against `localhost:3280`
+6. Returns results in a table
+
+**Expected result:**
+```
+Query Plan:
+1. Data source: Claims model
+2. Fields: id, dos, status, chargeCents, createdAt
+3. Sort: createdAt descending
+4. Limit: 5
+
+GraphQL Query:
+query {
+  claims(limit: 5, orderBy: {createdAt: Desc}) {
+    id
+    dos
+    status
+    chargeCents
+    createdAt
+  }
+}
+
+Results: [table with 5 claims]
+Confidence: 98%
+```
+
+**Query 2: Analyze Denials**
+```
+What are the top 3 denial reasons and how many claims were denied for each?
+```
+
+**Expected:**
+- Groups by `denialReason`
+- Counts claims per reason
+- Sorts by count descending
+- Returns top 3
+
+**Query 3: Filter by Amount**
+```
+Find all denied claims where the provider charged over $1000
+```
+
+**What the AI understands:**
+- "$1000" → `100000` cents (from your metadata description!)
+- "denied" → `status = "DENIED"`
+- "provider charged" → `chargeCents` field
+
+**Query 4: Cross-Model Analysis**
+```
+Show me all claims from cardiologists that were denied
+```
+
+**What this tests:**
+- Relationship traversal: Claims → ProviderRecords
+- Filter on relationship: `specialty = "Cardiology"`
+- Filter on claim: `status = "DENIED"`
+
+**Query 5: Time-Based**
+```
+How many claims were created each day in the last week?
+```
+
+**What this tests:**
+- Date filtering: `createdAt > (now - 7 days)`
+- Date grouping: Group by date
+- Aggregation: COUNT
+
+**Query 6: Business Logic**
+```
+Which members have the highest total allowed amount for paid claims?
+```
+
+**What this tests:**
+- Filter: `status = "PAID"`
+- Group by: `memberId`
+- Aggregate: SUM of `allowedCents`
+- Sort: descending
+- Relationship: Show member name
+
+### 6.3 Understanding Query Plans
+
+Click **"Show Query Plan"** to see:
+
+**1. Understanding Phase:**
+```
+User wants to find denied claims over $1000.
+
+Key terms:
+- "denied" → status field = "DENIED"
+- "$1000" → chargeCents > 100000 (converted to cents)
+- "claims" → Claims model
+```
+
+**2. Data Selection:**
+```
+Source: Claims
+Fields needed:
+- id (for reference)
+- status (for verification)
+- chargeCents (for display)
+- denialReason (context)
+- dos (when it happened)
+```
+
+**3. Filters Applied:**
+```
+WHERE status = 'DENIED'
+  AND chargeCents > 100000
+```
+
+**4. Presentation:**
+```
+Format: Table
+Sort: chargeCents DESC (highest first)
+Limit: 100 (safety)
+```
+
+### 6.4 Confidence Scores
+
+Each response includes a reliability score:
+
+- **90-100%**: High confidence - AI clearly understood
+- **70-89%**: Medium - likely correct, but verify
+- **Below 70%**: Low - review carefully
+
+**If confidence is low:**
+1. Rephrase with specific field names
+2. Break into simpler questions
+3. Check if metadata descriptions are clear
+
+### 6.5 Complex Healthcare Queries
+
+**Query 7: Risk Analysis**
+```
+Show me members who have had more than 3 denied claims in the last 30 days
+```
+
+**Query 8: Provider Performance**
+```
+For each provider specialty, what is the average denial rate?
+```
+
+**Query 9: Cost Analysis**
+```
+What is the difference between total charged amount and total allowed amount for paid claims, broken down by plan type?
+```
+
+**Query 10: CPT Code Analysis**
+```
+Which CPT codes have the highest denial rate and what are the most common denial reasons for them?
+```
 
 ---
 
-## 🎯 Optional: Part 6 - Deploy to Production
+## 📚 Part 7: Create Automations
 
-### 6.1 Deploy PromptQL Service to Render.com
+Automations convert ad-hoc questions into reusable, parameterized workflows.
+
+### 7.1 What are Automations?
+
+**Before (manual query):**
+```
+Show me denied claims for member ID abc-123 from last 30 days
+```
+
+**After (automation):**
+```yaml
+name: DeniedClaimsForMember
+parameters:
+  - name: member_id
+    type: UUID
+    required: true
+  - name: days_back
+    type: Int
+    default: 30
+```
+
+Now you can run:
+```
+DeniedClaimsForMember(member_id: "abc-123", days_back: 60)
+```
+
+### 7.2 Create Your First Automation
+
+**Step 1:** Have a conversation:
+```
+Show me all denied claims for a specific member in the last 30 days
+```
+
+**Step 2:** PromptQL responds with results
+
+**Step 3:** Click **"Create Automation"** button
+
+**Step 4:** Configure:
+- **Name:** `DeniedClaimsForMember`
+- **Description:** "Returns denied claims for a member in specified timeframe"
+- **Parameters:**
+  - `member_id` (UUID, required)
+  - `days_back` (Int, default: 30)
+
+**Step 5:** Click **"Save Automation"**
+
+### 7.3 Use the Automation
+
+**In PromptQL console:**
+```
+Run DeniedClaimsForMember for member a9235834-0656-41bb-9538-da2b935255a0
+```
+
+**Via DDN CLI:**
+```bash
+# Add automation to your local project
+ddn promptql-program add DeniedClaimsForMember
+
+# This creates: claimsight/metadata/DeniedClaimsForMember.hml
+```
+
+### 7.4 Example Automation Ideas
+
+**Automation 1: High-Risk Members**
+```
+Parameter: risk_threshold (default: 3)
+
+Identify members with:
+- More than {risk_threshold} denied claims in 6 months
+- Total claim amount > $10,000
+- Claims from more than 5 different providers
+
+Return member ID, name, claim count, total amount
+```
+
+**Automation 2: Provider Performance Report**
+```
+Parameter: provider_id
+
+For provider {provider_id}, show:
+- Total claims (last 90 days)
+- Approval rate
+- Average processing time (createdAt → updatedAt)
+- Total allowed amount paid
+- Top denial reasons
+```
+
+**Automation 3: Daily Claims Digest**
+```
+Parameter: date (default: yesterday)
+
+Summary for {date}:
+- Total claims created
+- Total charge amount
+- Total allowed amount
+- Breakdown by status (PAID, DENIED, PENDING)
+- Top 5 CPT codes
+- Top 3 providers by claim volume
+```
+
+### 7.5 Save Automations Locally
+
+Automations are saved as `.hml` files:
 
 ```bash
-# Add to git
-git add app/promptql/
-git commit -m "Add PromptQL service"
-git push
+# List automation programs
+ls claimsight/metadata/*Program*.hml
+
+# View an automation
+cat claimsight/metadata/DeniedClaimsForMember.hml
 ```
 
-On Render.com:
-1. New Web Service
-2. Connect GitHub repo
-3. Settings:
-   - **Root Directory:** `app/promptql`
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-   - **Port:** 3003
-
-4. Environment Variables:
-   - `PROMPTQL_LLM_PROVIDER=openai`
-   - `OPENAI_API_KEY=your-key`
-   - `HASURA_GRAPHQL_ENDPOINT=https://your-project.hasura.app`
-   - `HASURA_GRAPHQL_ADMIN_SECRET=your-secret`
-
-### 6.2 Update Frontend
-
-Edit `app/client/src/components/PromptQL/PromptQLPage.tsx`:
-
-```typescript
-// Change from:
-const response = await fetch('http://localhost:3003/api/query', {
-
-// To:
-const response = await fetch('https://your-promptql.onrender.com/api/query', {
+Example structure:
+```yaml
+kind: PromptQLProgram
+version: v1
+definition:
+  name: DeniedClaimsForMember
+  description: Returns denied claims for a member in specified timeframe
+  parameters:
+    - name: member_id
+      type: UUID!
+    - name: days_back
+      type: Int
+      defaultValue: 30
+  query: |
+    query($member_id: UUID!, $days_back: Int!) {
+      claims(
+        where: {
+          memberId: { _eq: $member_id }
+          status: { _eq: "DENIED" }
+          createdAt: { _gte: now() - interval($days_back days) }
+        }
+      ) {
+        id
+        dos
+        cpt
+        chargeCents
+        denialReason
+      }
+    }
 ```
-
-### 6.3 Cost Monitoring
-
-**Track API usage:**
-- OpenAI: https://platform.openai.com/usage
-- Anthropic: https://console.anthropic.com/account/billing
-
-**Typical costs:**
-- 100 queries/day = ~$1-3/month
-- 1000 queries/day = ~$10-30/month
 
 ---
 
-## 🔒 Security Best Practices
+## 📚 Part 8 (Optional): Deploy to DDN Cloud
 
-### ✅ What We Implemented:
+Want to share your PromptQL-enabled API? Deploy to Hasura DDN Cloud.
 
-1. **SQL Validation** - Only SELECT queries allowed
-2. **Keyword Blocking** - DROP, DELETE, UPDATE blocked
-3. **Injection Prevention** - Pattern detection
-4. **LIMIT Clauses** - Prevent large result sets
-5. **Query Timeout** - 30 second max execution
+### 8.1 Why Deploy to Cloud?
 
-### ⚠️ For Production, Also Add:
+**Local (what you have now):**
+- ✅ Free (except Anthropic API costs)
+- ✅ Data stays on your machine
+- ✅ Fast iteration
+- ❌ Only accessible from your computer
+- ❌ Requires `ddn run docker-start` to be running
 
-1. **Authentication** - Require user login
-2. **Rate Limiting** - 100 queries/hour per user
-3. **Audit Logging** - Log all queries
-4. **Cost Limits** - Set monthly API budget
-5. **Row-Level Security** - Apply Hasura permissions
+**Cloud deployment:**
+- ✅ Accessible from anywhere
+- ✅ Always available (no local services needed)
+- ✅ Shareable with team
+- ✅ Production-ready
+- ⚠️ Data hosted on Hasura Cloud (or your own cloud with BYOC)
+
+### 8.2 Authenticate with Hasura Cloud
+
+```bash
+# Login (opens browser)
+ddn auth login
+
+# Verify
+ddn project list
+```
+
+### 8.3 Create Cloud Build
+
+```bash
+# Create and apply in one command
+ddn supergraph build create --apply
+```
+
+**This uploads:**
+- Your metadata (models, permissions, descriptions)
+- Connector configurations
+- PromptQL automations
+
+**You'll get:**
+- Build version (e.g., v1)
+- Console URL: `https://console.hasura.io/project/your-project-id`
+- PromptQL URL: `https://promptql.console.hasura.io/project/your-project-id`
+- GraphQL endpoint: `https://your-project.ddn.hasura.io/graphql`
+
+### 8.4 Configure Cloud Database
+
+Your cloud deployment needs to connect to a database. Options:
+
+**Option A:** Keep PostgreSQL local (not recommended for production)
+- Use tunneling service (ngrok, cloudflare tunnel)
+- Update `CLAIMSIGHT_POSTGRES_CONNECTION_URI` to public URL
+
+**Option B:** Use Neon (from Phase 1)
+- Update connector to use Neon connection string
+- Migrate data: `pg_dump localhost | psql neon-connection-string`
+
+**Option C:** Use Hasura Cloud Postgres
+- Provision database in Hasura Console
+- Update connector configuration
+
+### 8.5 Test Cloud Deployment
+
+```bash
+# Get GraphQL URL
+ddn project get-graphql-url
+
+# Test it
+curl -X POST https://your-project.ddn.hasura.io/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ claims(limit: 2) { id status } }"}'
+```
+
+### 8.6 Access Cloud PromptQL
+
+Navigate to:
+```
+https://promptql.console.hasura.io/project/your-project-id
+```
+
+All your automations and metadata are now accessible from anywhere!
+
+---
+
+## 📊 Phase 8 Complete: What You've Learned
+
+✅ **Local PromptQL** - AI queries without cloud deployment
+✅ **Anthropic Integration** - Using Claude for natural language understanding
+✅ **Semantic Metadata** - Describing data for AI comprehension
+✅ **Natural Language Queries** - Chat with your local database
+✅ **Query Plans** - Understanding AI decision-making
+✅ **Confidence Scores** - Evaluating AI accuracy
+✅ **Automations** - Reusable parameterized workflows
+✅ **Local-First Development** - Fast iteration, data privacy
+✅ **Optional Cloud Deployment** - Production-ready scaling
+
+---
+
+## 🆚 Comparison
+
+| Feature | Local PromptQL | Cloud PromptQL |
+|---------|---------------|----------------|
+| **Data Location** | Your machine | Hasura Cloud or BYOC |
+| **Accessibility** | Localhost only | Anywhere with internet |
+| **Cost** | Anthropic API only (~$1-5/month) | Anthropic + Hasura Cloud |
+| **Setup Time** | 30 min | 30 min + deployment |
+| **Iteration Speed** | Instant | Need to rebuild/deploy |
+| **Best For** | Development, learning | Production, team collaboration |
+
+---
+
+## 🎯 Next Steps
+
+### Option A: Build Frontend Integration
+Create a chat UI in your ClaimSight app that calls the local PromptQL endpoint
+
+### Option B: Create More Automations
+Build workflow automation library:
+- Daily/weekly reports
+- Risk scoring
+- Fraud detection patterns
+- Provider performance tracking
+
+### Option C: Deploy to Production
+Follow Part 8 to deploy to Hasura DDN Cloud for team access
+
+### Option D: Advanced AI Workflows
+Combine PromptQL primitives:
+- Classify denial reasons into categories
+- Summarize member claims history
+- Extract trends from notes
+- Generate insights and recommendations
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Issue: "LLM API key not found"
-**Solution:** Check `.env` file has correct key format:
-```bash
-# OpenAI keys start with: sk-
-# Anthropic keys start with: sk-ant-
-```
+### Issue: "Cannot connect to console.hasura.io/local/chat"
 
-### Issue: "Hasura connection failed"
-**Solution:** Verify Hasura endpoint and admin secret:
-```bash
-curl -X POST https://your-project.hasura.app/v1/graphql \
-  -H "x-hasura-admin-secret: your-secret" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"{ members { id } }"}'
-```
+**Cause:** Browser security blocking localhost connections from HTTPS site.
 
-### Issue: "Generated SQL is inaccurate"
-**Solution:** Check schema context in `app/promptql/src/schema/context-builder.ts`. Ensure table/column descriptions are accurate.
+**Solutions:**
+1. **Use Chrome** - Best compatibility
+2. **Use local console:** `ddn console --local` then click PromptQL tab
+3. **Use tunnel:** `ddn run tunnel` for HTTPS localhost
 
-### Issue: "High API costs"
+### Issue: "PromptQL queries return errors"
+
+**Cause:** Anthropic API key issue.
+
 **Solution:**
-1. Use caching for repeated queries
-2. Set rate limits per user
-3. Use cheaper models (gpt-3.5 instead of gpt-4)
-4. Add query complexity limits
+```bash
+# Verify key in .env
+grep ANTHROPIC_API_KEY .env
+
+# Test key directly
+curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $(grep ANTHROPIC_API_KEY .env | cut -d= -f2)" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{"model":"claude-3-5-sonnet-20241022","max_tokens":10,"messages":[{"role":"user","content":"test"}]}'
+```
+
+### Issue: "Low confidence scores on all queries"
+
+**Cause:** Insufficient semantic metadata.
+
+**Solution:**
+1. Review Part 3 - add more field descriptions
+2. Include business context and examples in descriptions
+3. Add descriptions to relationships
+4. Rebuild: `ddn supergraph build local`
+5. Restart: `ddn run docker-start`
+
+### Issue: "Query returns wrong results"
+
+**Cause:** AI misunderstood the question.
+
+**Solution:**
+1. Click "Show Query Plan" to see AI's interpretation
+2. Identify where misunderstanding occurred
+3. Rephrase using exact field names from metadata
+4. Add more context: "Show me claims where the status field is DENIED"
+
+### Issue: "Service failed to start after enabling PromptQL"
+
+**Cause:** Missing environment variables or configuration error.
+
+**Solution:**
+```bash
+# Check all required env vars are set
+grep -E "(ANTHROPIC|PROMPTQL)" .env
+
+# Rebuild to catch config errors
+ddn supergraph build local --verbose
+
+# Check Docker logs
+docker logs hasura-ddn-engine-1
+```
+
+### Issue: "Anthropic API rate limit exceeded"
+
+**Cause:** Too many requests.
+
+**Solution:**
+- Wait a few minutes
+- Check your usage: https://console.anthropic.com/settings/usage
+- Add rate limiting to your queries
+- Consider caching common queries
 
 ---
 
 ## 📚 Resources
 
-- [OpenAI API Docs](https://platform.openai.com/docs/)
-- [Anthropic API Docs](https://docs.anthropic.com/)
-- [Hasura run_sql API](https://hasura.io/docs/latest/api-reference/metadata-api/run-sql/)
-- [SQL Injection Prevention](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
+- [PromptQL Documentation](https://promptql.io/docs/)
+- [Anthropic Claude API](https://docs.anthropic.com/)
+- [DDN CLI Reference](https://hasura.io/docs/3.0/reference/cli/)
+- [PromptQL Sample Apps](https://github.com/hasura/promptql-sample-ecommerce-app)
+- [Semantic Metadata Guide](https://promptql.io/docs/reference/metadata-reference/)
 
 ---
 
-## 🎓 What's Next?
+## 💡 Pro Tips
 
-### Option A: Integration Challenge
-Integrate DDN and PromptQL for advanced AI-powered data querying capabilities
+### Tip 1: Start Simple, Add Context Gradually
 
-### Option B: Production Deployment
-Follow [deployment guides](../../deployment/) for Render.com / Vercel
+**Iteration 1:**
+```
+Show me claims
+```
+→ Works, but basic
 
-### Option C: Extend PromptQL
-- Add query history
-- Add favorites
-- Add export to CSV
-- Add chart/visualization generation
+**Iteration 2:**
+```
+Show me denied claims
+```
+→ AI uses status filter
+
+**Iteration 3:**
+```
+Show me denied claims over $1000 from last month
+```
+→ AI applies multiple filters
+
+**Iteration 4:**
+```
+Show me denied claims over $1000 from last month, grouped by denial reason with counts
+```
+→ AI adds grouping and aggregation
+
+### Tip 2: Use Business Language, Not Technical
+
+**❌ Technical:**
+```
+SELECT * FROM claims WHERE charge_cents > 100000 AND status = 'DENIED'
+```
+
+**✅ Business:**
+```
+Show me denied claims where the provider charged over $1000
+```
+
+The semantic metadata bridges the gap!
+
+### Tip 3: Review Query Plans to Improve Metadata
+
+If AI misunderstands:
+1. Check query plan
+2. See what it thought you meant
+3. Add clarifying descriptions to metadata
+4. Rebuild and try again
+
+### Tip 4: Save Useful Questions as Automations
+
+Instead of retyping:
+```
+Show me high-risk members with more than 3 denied claims
+```
+
+Create automation:
+```
+HighRiskMembers(denial_threshold: 3)
+```
+
+Then just:
+```
+Run HighRiskMembers with threshold 5
+```
+
+### Tip 5: Combine PromptQL with Traditional Queries
+
+Use PromptQL for:
+- ✅ Exploration and discovery
+- ✅ Ad-hoc analysis
+- ✅ Business user self-service
+
+Use GraphQL directly for:
+- ✅ Production app queries
+- ✅ Performance-critical operations
+- ✅ Complex custom logic
 
 ---
 
-**🎉 Congratulations!** You've built an AI-powered data query interface!
+## 🔒 Data Privacy
 
-[← Back to Labs Overview](../README.md) | [Phase 3: Hasura DDN ←](../phase-3-hasura-ddn/README.md)
+**What stays local:**
+- ✅ Your PostgreSQL database
+- ✅ All claim, member, provider data
+- ✅ DDN engine and connectors
+- ✅ GraphQL schema
+
+**What goes to Anthropic:**
+- ⚠️ Your natural language question
+- ⚠️ GraphQL schema structure (table/field names)
+- ⚠️ Metadata descriptions
+- ❌ **NOT your actual data**
+
+**How it works:**
+1. You ask: "Show me denied claims over $1000"
+2. Anthropic sees: Schema + question → Generates GraphQL query
+3. Query runs locally against your database
+4. Results stay on your machine
+5. Only the results (not the data) shown in console
+
+---
+
+**🎉 Congratulations!** You've added AI-powered natural language queries to your local ClaimSight platform!
+
+[← Back to Phase 7: Hasura DDN](../phase-7-hasura-ddn/README.md) | [Back to Labs Overview →](../README.md)

@@ -21,13 +21,13 @@ Phase 1 (30 min)          Phase 2 (45 min)          Phase 3 (1 hr)            Ph
 └────────────────┘       └────────────────┘       └────────────────┘       └────────────────┘
       REQUIRED                REQUIRED                 REQUIRED                 REQUIRED
 
-Phase 5 (1 hr)            Phase 6 (45 min)          Phase 7 (2-3 hrs)         Phase 8 (1-2 hrs)
+Phase 5 (1 hr)            Phase 6 (45 min)          Phase 7 (2-3 hrs)         Phase 7.5 (1-1.5 hrs)
 ┌────────────────┐       ┌────────────────┐       ┌────────────────┐       ┌────────────────┐
-│  Spring Boot   │  -->  │ Add Spring Boot│       │  Hasura DDN    │       │   PromptQL +   │
-│    GraphQL     │       │      to        │       │   Migration    │       │   AI Queries   │
+│  Spring Boot   │  -->  │ Add Spring Boot│  -->  │  Hasura DDN    │  -->  │   PromptQL     │
+│    GraphQL     │       │      to        │       │   Migration    │       │   for DDN      │
 │                │       │   Federation   │       │                │       │                │
-│ Manual Schema  │       │  4-Subgraph    │       │  Connectors    │       │   OpenAI/      │
-│     Java       │       │  Polyglot      │       │  Metadata v3   │       │   Anthropic    │
+│ Manual Schema  │       │  4-Subgraph    │       │  Connectors    │       │   OpenAI +     │
+│     Java       │       │  Polyglot      │       │  Metadata v3   │       │   Local DDN    │
 └────────────────┘       └────────────────┘       └────────────────┘       └────────────────┘
       REQUIRED                REQUIRED                 OPTIONAL                 OPTIONAL
 ```
@@ -335,6 +335,48 @@ query PrescriptionsWithMembers {
 
 ---
 
+## 📍 Phase 7.5: Add PromptQL to Local DDN (Advanced)
+
+**🎓 What You'll Learn:**
+- Integrating OpenAI with Hasura DDN for natural language queries
+- Enhancing semantic metadata for AI understanding
+- Using PromptQL console for conversational data access
+- Creating reusable query automations
+- Understanding AI query plans and confidence scores
+
+**🏗️ What You'll Build:**
+- OpenAI integration with local DDN setup
+- Enhanced semantic metadata with business context descriptions
+- PromptQL console connected to local DDN at localhost:3280
+- Natural language query interface for healthcare data
+- Parameterized automation workflows
+
+**⏱️ Time:** 1-1.5 hours
+**💰 Cost:** ~$0.50-2 for API calls (OpenAI)
+**🔧 Difficulty:** 🔴 Advanced
+
+**📖 Lab Guide:** [phase-7.5-promptql/README.md](./phase-7.5-promptql/README.md)
+
+**Prerequisites:** Complete Phase 7 (Part 5.5 - console connected to local DDN)
+
+### Why PromptQL on Local DDN?
+- **Privacy-first:** Data stays local, only queries sent to OpenAI
+- **Rapid prototyping:** Natural language for ad-hoc analysis
+- **Business user friendly:** No GraphQL knowledge required
+- **Enhanced with metadata:** Rich descriptions improve AI accuracy
+
+### Example Queries:
+```
+"Show me the top 5 denial reasons from last month"
+"Find all denied claims where provider charged over $1000"
+"Which members have the highest total allowed amount for paid claims?"
+"Compare denial rate for in-network vs out-of-network providers"
+```
+
+**✅ Checkpoint:** You've added AI-powered natural language queries to your local DDN!
+
+---
+
 ## 📍 Phase 8: PromptQL + AI Integration (Advanced)
 
 **🎓 What You'll Learn:**
@@ -385,14 +427,15 @@ query PrescriptionsWithMembers {
 
 ---
 
-### Path B: DDN Migration Focus
+### Path B: DDN Migration + AI Focus
 1. ✅ Phase 1: Hasura Cloud Basics (30 min)
 2. ✅ Phase 2: Apollo Federation (45 min)
 3. ✅ Phase 3: Apollo Server from Scratch (1 hr)
 4. ✅ Phase 4: Add to Federation (45 min)
 5. ✅ Phase 7: Hasura DDN Migration (2-3 hrs)
+6. ✅ Phase 7.5: Add PromptQL to Local DDN (1-1.5 hrs)
 
-**Best for:** Learning modern GraphQL architecture with Hasura DDN
+**Best for:** Learning modern GraphQL architecture with Hasura DDN + AI-powered queries
 
 ---
 
@@ -413,10 +456,11 @@ query PrescriptionsWithMembers {
 5. ✅ Phase 5: Spring Boot GraphQL (1 hr)
 6. ✅ Phase 6: Add Spring Boot to Federation (45 min)
 7. ✅ Phase 7: Hasura DDN Migration (2-3 hrs)
-8. ✅ Phase 8: PromptQL + AI (1-2 hrs)
-9. 🏆 **Integration Challenge:** Integrate all services (bonus)
+8. ✅ Phase 7.5: Add PromptQL to Local DDN (1-1.5 hrs)
+9. ✅ Phase 8: PromptQL + AI (1-2 hrs)
+10. 🏆 **Integration Challenge:** Integrate all services (bonus)
 
-**Best for:** Building complete production-ready architecture
+**Best for:** Building complete production-ready architecture with AI features
 
 ---
 
