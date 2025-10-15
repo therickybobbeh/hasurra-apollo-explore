@@ -4,6 +4,8 @@
 
 This learning path takes you from GraphQL basics to advanced federation and AI-powered queries in 8 progressive labs. Each lab builds real cloud infrastructure demonstrating polyglot microservices.
 
+📊 **[Database Schema Evolution](../DOCUMENTS/DATABASE_SCHEMA_EVOLUTION.md)** - Visual ER diagram showing how the schema evolves across all 8 phases
+
 ---
 
 ## 🎯 Learning Path Overview

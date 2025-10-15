@@ -306,6 +306,7 @@ This command:
 ✓ Found 12 relationships
 ✓ Configuration updated
 ```
+Or something along those lines of sucess, check to see if the any files generated
 
 ### 4.5 Generate Models from Tables
 
@@ -357,22 +358,55 @@ DDN also generated mutation commands:
 ls claimsight/metadata/ | grep -E "(Insert|Update|Delete)" | head -10
 ```
 
-These provide type-safe mutations for your tables.
+These provide type-safe mutations for your tables. so for instance
+```yaml
+permissions:
+  - role: admin
+    expression: {}
+```
+lets you have role based access control and differnt permissions for differnt operations. can customize the authroization rules per command.
 
 ### 4.8 Check Relationships
 
-Foreign key relationships were automatically detected:
+Foreign key relationships were automatically detected and stored in the DataConnectorLink:
 
 ```bash
-# Check the connector schema for relationship information
-grep -A 5 "foreign_keys" claimsight/connector/postgres/configuration.json | head -30
+# Check for relationship information in the schema
+grep -A 3 "foreign_keys" claimsight/metadata/postgres.hml | head -20
 ```
+
+You'll see relationships like:
+- `claims.member_id` → `members.id`
+- `claims.provider_id` → `provider_records.id`
+- `eligibility_checks.member_id` → `members.id`
+
+These relationships enable powerful federated queries across your data!
 
 ---
 
 ## 📚 Part 5: Build and Test Locally
 
 ### 5.1 Build the Supergraph
+
+**What is "building" in DDN?**
+
+Think of building like **compiling your metadata into an executable GraphQL API**:
+
+```
+Source Code (Metadata)           Compiled Binary (Build Artifacts)
+├── Claims.hml                   ├── open_dd.json (unified schema)
+├── Members.hml          →       ├── metadata.json (introspection)
+├── postgres.hml                 └── auth_config.json (security)
+└── auth_config.hml
+```
+
+**Why build?**
+1. **Validation**: Catches errors before runtime (missing permissions, broken relationships, type mismatches)
+2. **Optimization**: Pre-computes the GraphQL schema for faster startup
+3. **Packaging**: Creates a single deployable artifact from multiple .hml files
+4. **Version Control**: Build output is immutable - same input = same output
+
+**It's like:** TypeScript → JavaScript, or Java → bytecode. You can't run the metadata files directly - they need to be "compiled" first.
 
 ```bash
 # Build the supergraph (validates all metadata)
@@ -381,13 +415,25 @@ ddn supergraph build local
 
 **Expected output:**
 ```
-✓ Building supergraph...
-✓ Validating metadata...
-✓ Generating GraphQL schema...
-Build artifacts exported to "engine/build"
+INF Using Supergraph config file "supergraph.yaml" found in context.
+INF Using localEnvFile ".env" found in context.
+INF Supergraph built for local Engine successfully
+INF Build artifacts exported to "engine/build"
 ```
 
-This creates the build artifacts in `engine/build/` directory.
+You may also see warnings about:
+- **Boolean expression logical operators** - Safe to ignore for now (enables AND/OR in filters)
+- **AuthConfig v2 deprecated** - We're using a simpler auth config for the lab
+
+**What gets created:**
+```
+engine/build/
+├── open_dd.json           # Complete GraphQL schema + metadata
+├── metadata.json          # For GraphQL introspection
+└── auth_config.json       # Authentication rules
+```
+
+The DDN engine (starting in 5.2) will read these files to serve your GraphQL API.
 
 ### 5.2 Start the Local DDN Engine
 
@@ -449,34 +495,158 @@ Your DDN stack is now fully operational locally!
 
 ---
 
-## 📚 Part 6: Integrate with Apollo Federation
+## 📚 Part 6 (Optional): Understanding Federation - DDN vs Apollo
 
-### 6.1 Update Apollo GraphOS with DDN Subgraph
+> **⚠️ Important Decision Point**: This section is **optional** and only needed for specific use cases. Read this first to decide if you need Apollo Federation on top of DDN.
 
-Remember your Apollo setup from Phase 2? Let's replace the Hasura v2 subgraph with DDN.
+### 6.1 Do You Need Apollo Federation?
+
+**TL;DR: If DDN is your only data source, you DON'T need Apollo Federation!**
+
+DDN has its **own built-in federation** called a "supergraph":
+
+```yaml
+# DDN Native Federation (no Apollo needed)
+DDN Supergraph
+├── Subgraph 1: Claims Database (PostgreSQL)
+├── Subgraph 2: Analytics Database (MongoDB)
+└── Subgraph 3: Legacy System (MySQL)
+```
+
+This IS federation - it connects multiple data sources and allows cross-database relationships.
+
+### 6.2 When You DO Need Apollo Federation
+
+**Use Apollo Federation + DDN only if:**
+
+#### **Scenario 1: Incremental Migration from Existing Apollo Setup**
+You already have Apollo Federation with custom GraphQL microservices:
+```
+Apollo Gateway (existing infrastructure)
+├── User Service (Node.js - custom business logic)
+├── Product Service (Python - custom algorithms)
+├── Payment Service (Go - PCI compliance requirements)
+└── Hasura DDN (NEW - replacing your database access layer)
+```
+
+**Why**: You're adding DDN to an existing Apollo ecosystem, not starting fresh.
+
+#### **Scenario 2: Hybrid Architecture - Custom Logic + Database Access**
+You need both custom business logic AND database access:
+```
+Apollo Gateway
+├── Risk Calculation Service (complex algorithms, ML models)
+└── Data Layer (Hasura DDN - CRUD operations, relationships)
+```
+
+**Example Use Case**:
+- **DDN handles**: Basic CRUD for claims, members, providers
+- **Custom service handles**: Fraud detection, risk scoring, premium calculations
+
+**Why**: Business logic that's too complex for database-level computation needs custom code.
+
+#### **Scenario 3: Multi-Team Organization**
+Different teams own different domains:
+```
+Apollo Gateway (Platform Team)
+├── Team A: User Management Service
+├── Team B: Product Catalog Service
+└── Team C: Claims System (DDN)
+```
+
+**Why**: Organizational boundaries require separate services with independent deployment cycles.
+
+### 6.3 Architecture Comparison
+
+#### **DDN Supergraph Only** (Recommended for most projects)
+```
+Client → DDN Engine → Subgraphs
+                      ├── PostgreSQL Connector
+                      ├── MongoDB Connector
+                      └── REST API Connector
+```
+
+**Pros:**
+- ✅ Simpler architecture
+- ✅ Single deployment
+- ✅ Native relationship handling
+- ✅ Better performance (no extra hop)
+
+**Best For:**
+- Greenfield projects
+- Database-driven applications
+- Single team ownership
+
+#### **Apollo Federation + DDN** (Only when needed)
+```
+Client → Apollo Gateway → Subgraphs
+                          ├── Custom Service 1
+                          ├── Custom Service 2
+                          └── DDN (wraps multiple databases)
+```
+
+**Pros:**
+- ✅ Mix custom logic with database access
+- ✅ Independent service deployment
+- ✅ Multi-team ownership
+
+**Cons:**
+- ❌ More complex architecture
+- ❌ Extra network hop (latency)
+- ❌ More moving parts to maintain
+
+**Best For:**
+- Existing Apollo setups
+- Microservices architectures
+- Complex business logic requirements
+
+### 6.4 Decision Matrix
+
+| Your Situation | Use DDN Supergraph Only | Add Apollo Federation |
+|----------------|-------------------------|----------------------|
+| Starting fresh | ✅ Yes | ❌ No |
+| Only database access needed | ✅ Yes | ❌ No |
+| Multiple databases to connect | ✅ Yes | ❌ No |
+| Custom business logic microservices | ❌ No | ✅ Yes |
+| Existing Apollo setup | ❌ No | ✅ Yes |
+| Multi-team with separate services | ❌ No | ✅ Yes |
+
+### 6.5 For This Lab...
+
+**We're using DDN supergraph only** because:
+- We're connecting to a single PostgreSQL database
+- No custom microservices with complex business logic
+- ClaimSight is a database-driven application
+
+**If you completed Phase 2 (Apollo Federation)**, that was to understand the federation concept. But for DDN, you don't need Apollo on top - DDN's supergraph does the job!
+
+---
+
+## 📚 Part 6.6 (Optional): If You Need Apollo Integration
+
+> **Skip this section unless** you have existing Apollo Federation infrastructure or custom microservices.
+
+### Integrating DDN with Apollo GraphOS
+
+If you completed Phase 2 and want to add DDN as a subgraph to your Apollo Gateway:
 
 ```bash
 # Set your Apollo credentials (from Phase 2)
 export APOLLO_KEY="service:claimsight-api:your-key-here"
 export APOLLO_GRAPH_REF="claimsight-api@current"
 
-# Publish DDN as the Hasura subgraph (replaces v2)
-ddn supergraph build publish --graph-ref $APOLLO_GRAPH_REF
-```
-
-Or manually with Rover:
-```bash
+# Publish DDN as a subgraph
 npx @apollo/rover subgraph publish $APOLLO_GRAPH_REF \
-  --name hasura \
-  --routing-url https://your-project.ddn.hasura.app/graphql \
+  --name hasura-ddn \
+  --routing-url http://localhost:3280/graphql \
   --schema <(ddn supergraph build local --output -)
 ```
 
-### 6.2 Verify Federation
+### Verify Federation Composition
 
 ```bash
 npx @apollo/rover subgraph check $APOLLO_GRAPH_REF \
-  --name hasura \
+  --name hasura-ddn \
   --schema <(ddn supergraph build local --output -)
 ```
 
@@ -486,49 +656,35 @@ Should show:
 ✓ No breaking changes detected
 ```
 
----
+### Test Federated Query
 
-## 📚 Part 7: Test Federated Queries
-
-### 7.1 Test DDN + Providers Subgraph
-
-Your Providers subgraph from Phase 2 should still be running. Test the federated query:
+If you have the Providers subgraph from Phase 2 running:
 
 ```graphql
 query FederatedWithDDN {
   provider_records(limit: 5) {
     id
-    name              # From DDN (was Hasura v2)
+    name              # From DDN
     specialty         # From DDN
-    rating            # From Providers subgraph
-    reviewCount       # From Providers subgraph
+    rating            # From Providers custom subgraph
+    reviewCount       # From Providers custom subgraph
   }
 }
 ```
 
-### 7.2 Compare Performance
-
-DDN includes built-in performance monitoring. Check the DDN Console:
-
-```
-https://console.hasura.io/project/claimsight-ddn
-```
-
-Look for:
-- Query latency
-- Cache hit rates
-- Connector performance
+This shows DDN data mixed with custom service data through Apollo Gateway.
 
 ---
 
-## 📊 Phase 3 Complete: What You've Learned
+## 📊 Phase 7 Complete: What You've Learned
 
-✅ **DDN Architecture** - Connector-based data access
-✅ **Metadata-driven** - .hml files instead of JSON
-✅ **CLI Workflow** - Modern CI/CD with `ddn` CLI
-✅ **Migration Path** - v2 → v3 transformation
-✅ **Apollo Federation** - DDN as a federated subgraph
-✅ **Performance** - Global deployment and caching
+✅ **DDN Architecture** - Connector-based data access separates concerns
+✅ **Metadata-driven** - Declarative .hml files instead of JSON
+✅ **CLI Workflow** - Modern CI/CD with `ddn` commands
+✅ **Migration Path** - Clear v2 → v3 transformation process
+✅ **DDN Supergraph** - Native federation for multiple data sources
+✅ **Apollo Federation (Optional)** - When and why to add it on top of DDN
+✅ **Performance** - Built-in observability and optimization
 
 ---
 
@@ -541,9 +697,10 @@ Look for:
 | **Workflow** | Console-first | CLI-first |
 | **Team Collaboration** | Limited | Multi-repo, multi-team |
 | **Global Deployment** | Single region | Multi-region automatic |
-| **Federation** | Supported | Native + enhanced |
+| **Federation** | Apollo required for multi-source | Native supergraph built-in |
 | **Introspection** | Automatic | Connector-based |
 | **Permissions** | JSON config | Declarative .hml |
+| **Custom Logic Integration** | Actions/Remote schemas | Apollo Federation (when needed) |
 
 ---
 
@@ -561,6 +718,66 @@ Look for:
 ---
 
 ## 🐛 Troubleshooting
+
+### Issue: `ddn supergraph build local` fails with "dial tcp: lookup data.pro.hasura.io: no such host"
+
+**Cause:** The `.env` file contains a placeholder `HASURA_DDN_PAT` that the CLI is trying to use for cloud authentication.
+
+**Solution:** For local development, comment out the PAT variable:
+
+```bash
+cd hasura-ddn/
+
+# Edit .env and comment out HASURA_DDN_PAT
+# Change:
+#   HASURA_DDN_PAT="your-personal-access-token-here"
+# To:
+#   # HASURA_DDN_PAT is only needed for cloud deployments
+#   # For local development, leave this unset or run: ddn auth login
+#   # HASURA_DDN_PAT="your-personal-access-token-here"
+
+# Now build will work
+ddn supergraph build local
+```
+
+**Alternative:** If you need cloud access, login first:
+```bash
+ddn auth login
+# This will set your PAT automatically
+```
+
+### Issue: OTEL collector fails with "requires a non-empty endpoint"
+
+**What you see:**
+```
+otel-collector-1  | Error: invalid configuration: exporters::otlp: requires a non-empty "endpoint"
+otel-collector-1 exited with code 1
+```
+
+**Is this a problem?** No! The OpenTelemetry collector is for observability/monitoring, not required for local development.
+
+**Why it happens:** The OTEL collector needs a cloud endpoint configured to send telemetry data.
+
+**Solution:** Safe to ignore for local development. The DDN engine will work perfectly without it. If you see:
+```
+engine-1 | starting server on [::]:3000
+```
+
+Then your engine is running successfully on **http://localhost:3280/graphql** (port 3000 in container → 3280 on host).
+
+### Issue: PromptQL warning on startup
+
+**What you see:**
+```
+Cannot print PromptQL secret key. PromptQL is not enabled for this project.
+```
+
+**Solution:** This is informational only. PromptQL (AI-powered queries) is optional. To enable it:
+```bash
+ddn codemod enable-promptql
+```
+
+Or ignore it if you don't need AI query features for now.
 
 ### Issue: "DDN CLI not found"
 **Solution:** Ensure DDN CLI is in your PATH:

@@ -28,6 +28,8 @@ A comprehensive learning application that teaches modern GraphQL development wit
 | Business Logic | Node.js/Express (Actions & Subgraph) |
 | NL Queries | PromptQL concepts |
 
+📊 **[Database Schema Evolution](DOCUMENTS/DATABASE_SCHEMA_EVOLUTION.md)** - See how the schema grows across all 8 phases
+
 ---
 
 ## 🎓 Learning Labs
@@ -456,6 +458,7 @@ Sign up for free at [studio.apollographql.com](https://studio.apollographql.com/
 
 - 📘 **[Best Practices](DOCUMENTS/BEST_PRACTICES.md)** - Development guidelines
 - 🏗️ **[Architecture Overview](DOCUMENTS/ARCHITECTURE_OVERVIEW.md)** - System design and data flow
+- 📊 **[Database Schema Evolution](DOCUMENTS/DATABASE_SCHEMA_EVOLUTION.md)** - ER diagram across all 8 phases
 - 🔄 **[Role Switcher](DOCUMENTS/ROLE_SWITCHER.md)** - Test different permissions in real-time
 - 🪟 **[Windows Setup Guide](DOCUMENTS/WINDOWS_SETUP.md)** - Docker-free setup with Hasura Cloud
 - 🌐 **[Federation Guide](DOCUMENTS/FEDERATION_GUIDE.md)** - Apollo Federation setup and visualization
