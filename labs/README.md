@@ -337,6 +337,8 @@ query PrescriptionsWithMembers {
 
 ## 📍 Phase 7.5: Add PromptQL to Local DDN (Advanced)
 
+> **⚠️ REQUIRES PRIVATE BETA ACCESS:** PromptQL is currently in private beta. You must request access from Hasura at https://promptql.io before starting this lab. See the lab README for alternatives if you don't have access yet.
+
 **🎓 What You'll Learn:**
 - Integrating OpenAI with Hasura DDN for natural language queries
 - Enhancing semantic metadata for AI understanding

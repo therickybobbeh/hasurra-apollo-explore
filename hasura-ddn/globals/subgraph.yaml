@@ -1,0 +1,11 @@
+kind: Subgraph
+version: v2
+definition:
+  name: globals
+  generator:
+    rootPath: .
+  includePaths:
+    - metadata
+  envMapping:
+    OPENAI_API_KEY:
+      fromEnv: OPENAI_API_KEY

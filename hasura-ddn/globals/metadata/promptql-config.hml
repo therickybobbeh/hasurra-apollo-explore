@@ -1,0 +1,8 @@
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: openai
+    model: gpt-4o
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY

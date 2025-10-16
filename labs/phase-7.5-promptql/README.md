@@ -6,6 +6,31 @@ Learn how to enable Hasura's PromptQL feature to chat with your data using natur
 
 ---
 
+## ⚠️ IMPORTANT: PromptQL Access Required
+
+**PromptQL is currently in private beta and NOT publicly available.**
+
+Before starting this lab, you must:
+
+1. **Request Access:** Visit https://promptql.io and click "Request demo" or "Try playground"
+2. **Contact Hasura:** Fill out the form to request PromptQL access for your account
+3. **Wait for Enablement:** Hasura will enable PromptQL for your DDN project
+
+**Without PromptQL access, you will get this error:**
+```bash
+ddn auth generate-promptql-secret-key
+# ❌ ERR: PromptQL is not enabled for this project
+```
+
+**Alternative Options:**
+- **Option A:** Wait for PromptQL to become publicly available
+- **Option B:** Use the custom PromptQL implementation in [Phase 8](../phase-8-promptql/README.md) (doesn't require Hasura's PromptQL feature)
+- **Option C:** Contact Hasura to request enterprise access
+
+**If you don't have PromptQL access yet, skip this lab for now.**
+
+---
+
 ## 🎯 Learning Objectives
 
 By the end of this lab, you'll understand:

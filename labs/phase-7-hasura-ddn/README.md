@@ -775,7 +775,7 @@ You have a **fully functional local DDN environment**:
 
 ## 🎯 Next Steps
 
-### Recommended: Continue to Phase 7.5
+### Recommended: Continue to Phase 7.5 (Requires PromptQL Access)
 
 **[Phase 7.5: Add PromptQL to Local DDN →](../phase-7.5-promptql/README.md)**
 
@@ -786,6 +786,8 @@ You'll learn to:
 - Enhance semantic metadata for AI understanding
 - Chat with your data using the PromptQL console
 - Create reusable automation workflows
+
+**⚠️ Note:** PromptQL is currently in private beta. You must request access from Hasura at https://promptql.io. If you don't have access yet, skip to the Alternative Options below.
 
 **Keep your DDN services running and proceed to Lab 7.5!**
 
